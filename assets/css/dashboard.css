@@ -1,0 +1,594 @@
+/**
+ * WooCommerce Gravity Forms Integration - Dashboard Styles
+ *
+ * @version 1.1.0
+ * @author Amit Tal
+ */
+
+/* Google Sans Font */
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap');
+
+.woo-gf-dashboard-wrap,
+.wrap.woo-gf-dashboard-wrap {
+    direction: rtl;
+    text-align: right;
+}
+
+.woo-gf-dashboard-wrap,
+.woo-gf-dashboard-wrap .button {
+    font-family: 'Google Sans', 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+.woo-gf-dashboard-wrap {
+    padding-right: 20px;
+}
+
+/* Header */
+.woo-gf-dashboard-wrap {
+    display: flex;
+    flex-direction: column;
+}
+
+.woo-gf-dashboard-header {
+    /* display: flex;
+    justify-content: space-between; */
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #c3c4c7;
+    flex: 0 0 auto;
+}
+
+.woo-gf-dashboard-title {
+    font-size: 23px;
+    font-weight: 500;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.woo-gf-dashboard-title .dashicons {
+    margin-left: 8px;
+    font-size: 28px;
+    height: 28px;
+    width: 28px;
+}
+
+/* Stat Cards */
+.woo-gf-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.woo-gf-stat-card {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    padding: 20px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    --stat-color: #0073aa; /* Default color */
+}
+
+.woo-gf-stat-icon {
+    font-size: 24px;
+    height: 48px;
+    width: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--stat-color);
+    background-color: rgba(var(--stat-color), 0.1);
+    margin-left: 15px;
+}
+
+.woo-gf-stat-content .woo-gf-stat-title {
+    font-size: 14px;
+    font-weight: 500;
+    margin: 0 0 5px 0;
+    color: #50575e;
+}
+
+.woo-gf-stat-content .woo-gf-stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+    color: #1d2327;
+}
+
+.woo-gf-stat-content .woo-gf-stat-subtitle,
+.woo-gf-stat-content .woo-gf-stat-trend {
+    font-size: 12px;
+    color: #50575e;
+}
+
+.woo-gf-stat-trend.woo-gf-trend-up { color: #46b450; }
+.woo-gf-stat-trend.woo-gf-trend-down { color: #dc3232; }
+
+/* Cards */
+.woo-gf-search-card,
+.woo-gf-events-card,
+.woo-gf-registrations-card,
+.woo-gf-tabs-card {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    margin-bottom: 20px;
+}
+
+.woo-gf-card-title {
+    font-size: 16px;
+    padding: 15px 20px;
+    margin: 0;
+    border-bottom: 1px solid #c3c4c7;
+    display: flex;
+    align-items: center;
+}
+
+.woo-gf-card-title .dashicons {
+    margin-left: 8px;
+}
+
+/* Tabs */
+.woo-gf-tabs-header {
+    display: flex;
+    border-bottom: 1px solid #c3c4c7;
+    background: #f6f7f7;
+}
+
+.woo-gf-tab-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 15px 20px;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+    color: #50575e;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.woo-gf-tab-btn:hover {
+    background: #e9eaeb;
+    color: #1d2327;
+}
+
+.woo-gf-tab-btn.active {
+    background: #fff;
+    color: #2271b1;
+    border-bottom-color: #2271b1;
+}
+
+.woo-gf-tab-btn .dashicons {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+.woo-gf-tab-count {
+    background: #f0f0f1;
+    color: #50575e;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    min-width: 24px;
+    text-align: center;
+}
+
+.woo-gf-tab-btn.active .woo-gf-tab-count {
+    background: #e5f0fa;
+    color: #2271b1;
+}
+
+.woo-gf-tabs-content {
+    position: relative;
+}
+
+.woo-gf-tab-panel {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.woo-gf-tab-panel.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Search & Filter */
+.woo-gf-search-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    padding: 20px;
+}
+
+.woo-gf-search-field label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.woo-gf-search-field input,
+.woo-gf-search-field select {
+    width: 100%;
+}
+
+.woo-gf-date-range {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.woo-gf-search-actions {
+    padding: 0 20px 20px;
+}
+
+/* Tables */
+.woo-gf-table-container,
+.woo-gf-events-table {
+    padding: 20px;
+}
+
+.woo-gf-table,
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.woo-gf-table th, .woo-gf-table td,
+table th, table td {
+    padding: 12px 15px;
+    text-align: right;
+    border-bottom: 1px solid #f0f0f1;
+}
+
+.woo-gf-table th,
+table th {
+    background-color: #f6f7f7;
+    font-weight: 500;
+}
+
+.woo-gf-table tbody tr:hover,
+table tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+/* Event & Entry Styles */
+.woo-gf-event-image {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.woo-gf-event-title,
+.woo-gf-form-name,
+.woo-gf-product-name,
+.woo-gf-entry-name {
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.woo-gf-event-meta,
+.woo-gf-event-badge,
+.woo-gf-entry-email,
+.woo-gf-entry-date {
+    font-size: 13px;
+    color: #50575e;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.woo-gf-event-date-time {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.woo-gf-event-date-time .woo-gf-event-meta {
+    flex-direction: column;
+    gap: 0;
+}
+
+.woo-gf-participants-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.woo-gf-participants-summary .woo-gf-event-title {
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.woo-gf-participants-summary .woo-gf-capacity-bar {
+    width: 100%;
+}
+
+.woo-gf-sort-link {
+    color: inherit;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 3px;
+    transition: all 0.2s ease;
+}
+
+.woo-gf-sort-link:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: #0073aa;
+    text-decoration: underline;
+}
+
+.woo-gf-table th a.woo-gf-sort-link {
+    display: inline-flex;
+}
+
+/* Button styles */
+.woo-gf-btn-success {
+    background-color: #46b450;
+    border-color: #46b450;
+    color: white;
+}
+
+.woo-gf-btn-success:hover {
+    background-color: #3a9643;
+    border-color: #3a9643;
+}
+
+.woo-gf-btn-success:disabled {
+    background-color: #bbb;
+    border-color: #bbb;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Loading animation */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.dashicons-update-alt {
+    display: inline-block;
+}
+
+.woo-gf-alert-error {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.woo-gf-event-badge {
+    display: inline-flex;
+    padding: 2px 8px;
+    background: #e5f0fa;
+    color: #2271b1;
+    border-radius: 4px;
+    font-size: 11px;
+    margin-top: 4px;
+}
+
+.woo-gf-entry-id {
+    font-weight: 600;
+    color: #2271b1;
+}
+
+.woo-gf-no-product {
+    color: #999;
+    font-style: italic;
+}
+
+/* Status Badges */
+.woo-gf-status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.woo-gf-status-upcoming { background-color: #e5f5fa; color: #00a0d2; }
+.woo-gf-status-active { background-color: #e7f7e8; color: #46b450; }
+.woo-gf-status-past { background-color: #f3f3f3; color: #787c82; }
+.woo-gf-status-full { background-color: #fef0f1; color: #dc3232; }
+.woo-gf-status-draft { background-color: #f0f0f1; color: #999; }
+
+/* Capacity Bar */
+.woo-gf-capacity-bar {
+    width: 100%;
+    height: 6px;
+    background-color: #f0f0f1;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 4px;
+}
+
+.woo-gf-capacity-fill {
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+.woo-gf-capacity-low { background-color: #46b450; }
+.woo-gf-capacity-medium { background-color: #f39c12; }
+.woo-gf-capacity-high { background-color: #dc3232; }
+
+/* Action Buttons */
+.woo-gf-action-buttons,
+.woo-gf-entry-actions {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.woo-gf-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: 1px solid;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.woo-gf-btn-primary {
+    background: #2271b1;
+    border-color: #2271b1;
+    color: #fff;
+}
+
+.woo-gf-btn-primary:hover {
+    background: #135e96;
+    border-color: #135e96;
+}
+
+.woo-gf-btn-secondary {
+    background: #fff;
+    border-color: #c3c4c7;
+    color: #2c3338;
+}
+
+.woo-gf-btn-secondary:hover {
+    background: #f6f7f7;
+    border-color: #8c8f94;
+}
+
+.woo-gf-btn-sm {
+    padding: 4px 10px;
+    font-size: 12px;
+}
+
+.woo-gf-btn .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+/* Sidepeek */
+.woo-gf-sidepeek {
+    position: fixed;
+    top: 0;
+    right: -600px;
+    width: 600px;
+    max-width: 90%;
+    height: 100%;
+    background: #fff;
+    box-shadow: -2px 0 15px rgba(0,0,0,0.2);
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    transition: right 0.3s ease;
+}
+
+.woo-gf-sidepeek.woo-gf-sidepeek-active {
+    right: 0;
+}
+
+.woo-gf-sidepeek-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0);
+    z-index: 99998;
+    opacity: 0;
+    transition: opacity 0.3s ease, background 0.3s ease;
+    pointer-events: none;
+}
+
+.woo-gf-sidepeek-overlay.active {
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 1;
+    pointer-events: all;
+    cursor: pointer;
+}
+
+.woo-gf-sidepeek-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    background: #f9f9f9;
+    border-bottom: 1px solid #ddd;
+    flex-shrink: 0;
+}
+
+.woo-gf-sidepeek-header h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #1d2327;
+}
+
+.woo-gf-sidepeek-close {
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    color: #666;
+    transition: color 0.2s;
+    line-height: 1;
+}
+
+.woo-gf-sidepeek-close:hover {
+    color: #d63638;
+}
+
+.woo-gf-sidepeek-close .dashicons {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+}
+
+.woo-gf-sidepeek-content {
+    padding: 25px;
+    overflow-y: auto;
+    flex-grow: 1;
+    background: #fff;
+}
+
+/* RTL Adjustments */
+[dir="rtl"] .woo-gf-dashboard-title .dashicons {
+    margin-left: 0;
+    margin-right: 8px;
+}
+
+[dir="rtl"] .woo-gf-stat-icon {
+    margin-left: 0;
+    margin-right: 15px;
+}
+
+[dir="rtl"] .woo-gf-sidepeek-content {
+    left: auto;
+    right: 0;
+} 

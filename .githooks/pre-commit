@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+#
+# Pre-commit hook for at-woo-gf-integration
+# Validates version consistency across files
+#
+
+set -euo pipefail
+
+MAIN="at-woo-gf-integration.php"
+INFO="plugin-info.json"
+CHANGELOG="CHANGELOG.md"
+
+staged() { git diff --cached --name-only; }
+
+# Don't commit .env files
+if staged | grep -qE '^\\.env$'; then
+  echo "❌ .env is staged. Do not commit secrets!"
+  exit 1
+fi
+
+# Extract versions from different locations
+HEADER_VER="$(grep -E '^[[:space:]]*\*[[:space:]]*Version:' "$MAIN" | head -1 | sed -E 's/.*Version:[[:space:]]*([0-9]+\.[0-9]+\.[0-9]+).*/\1/')"
+DOC_VER="$(grep -E '^[[:space:]]*\*[[:space:]]*@version' "$MAIN" | head -1 | sed -E 's/.*@version[[:space:]]*([0-9]+\.[0-9]+\.[0-9]+).*/\1/')"
+CONST_VER="$(grep -E "define.*AT_WOO_GF_INTEGRATION_VERSION" "$MAIN" | head -1 | sed -E "s/.*'([0-9]+\.[0-9]+\.[0-9]+)'.*/\1/")"
+INFO_VER="$(grep -E '"version":' "$INFO" | sed -E 's/.*"version":[[:space:]]*"([^"]+)".*/\1/')"
+
+# Check all versions match
+if [[ "$HEADER_VER" != "$DOC_VER" || "$HEADER_VER" != "$CONST_VER" || "$HEADER_VER" != "$INFO_VER" ]]; then
+  echo "❌ Version mismatch detected:"
+  echo "   Header Version: $HEADER_VER"
+  echo "   @version:       $DOC_VER"
+  echo "   Constant:       $CONST_VER"
+  echo "   plugin-info:    $INFO_VER"
+  echo ""
+  echo "💡 Use scripts/bump-version.sh X.Y.Z to update all versions consistently"
+  exit 1
+fi
+
+# Check CHANGELOG has entry for current version
+if ! grep -q "## \[${HEADER_VER}\]" "$CHANGELOG"; then
+  echo "❌ CHANGELOG.md missing entry for version $HEADER_VER"
+  echo ""
+  echo "💡 Add a changelog entry or use scripts/bump-version.sh"
+  exit 1
+fi
+
+# Check for large files
+while read -r f; do
+  if [[ -f "$f" ]]; then
+    size=$(wc -c < "$f")
+    if (( size > 5242880 )); then  # 5MB
+      echo "❌ Large file staged: $f ($size bytes)"
+      echo "   Files over 5MB should not be committed"
+      exit 1
+    fi
+  fi
+done < <(staged)
+
+echo "✅ Pre-commit validation passed"
+exit 0

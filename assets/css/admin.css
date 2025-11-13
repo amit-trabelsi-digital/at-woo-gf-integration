@@ -1,0 +1,140 @@
+/* Admin Styles */
+
+/* Entries Container */
+#woo_gf_entries_container {
+    margin-top: 20px;
+    padding: 20px;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+#woo_gf_entries_container table {
+    margin-top: 15px;
+}
+
+/* Modal Styles */
+.woo-gf-modal {
+    display: block;
+    position: fixed;
+    z-index: 99999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.woo-gf-modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 0;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 800px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-radius: 4px;
+}
+
+.woo-gf-modal-close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.woo-gf-modal-close:hover,
+.woo-gf-modal-close:focus {
+    color: #000;
+    text-decoration: none;
+}
+
+.woo-gf-modal-body {
+    padding: 20px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.woo-gf-entry-details h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #23282d;
+    font-size: 1.3em;
+}
+
+.woo-gf-entry-details table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.woo-gf-entry-details table th,
+.woo-gf-entry-details table td {
+    padding: 10px;
+    text-align: right;
+    border-bottom: 1px solid #eee;
+}
+
+.woo-gf-entry-details table th {
+    background-color: #f5f5f5;
+    font-weight: 600;
+    width: 30%;
+}
+
+/* Pagination */
+.tablenav-pages {
+    margin-top: 15px;
+    text-align: left;
+}
+
+.tablenav-pages .pagination-links {
+    margin-right: 10px;
+}
+
+.tablenav-pages .button {
+    margin: 0 2px;
+}
+
+/* Product Data Tab */
+#gravity_forms_product_data .form-field {
+    margin-top: 15px;
+}
+
+#woo_gf_view_entries,
+#woo_gf_create_form {
+    margin-top: 10px;
+    margin-right: 5px;
+}
+
+#woo_gf_create_form {
+    background: #0073aa;
+    border-color: #0073aa;
+    color: #fff;
+}
+
+#woo_gf_create_form:hover {
+    background: #005a87;
+    border-color: #005a87;
+}
+
+#woo_gf_create_form:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* RTL Support */
+body.rtl #woo_gf_entries_container table,
+body.rtl .woo-gf-entry-details table th,
+body.rtl .woo-gf-entry-details table td {
+    text-align: left;
+}
+
+body.rtl .tablenav-pages {
+    text-align: right;
+}
+
+body.rtl .woo-gf-modal-close {
+    float: left;
+} 

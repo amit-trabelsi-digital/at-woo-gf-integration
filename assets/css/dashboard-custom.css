@@ -1,0 +1,14 @@
+/* Custom Admin Menu Styling */
+
+/* Separators styling */
+#adminmenu li.wp-menu-separator {
+    height: 4px;
+    margin: 0;
+    padding: 0;
+}
+
+/* Hide extra separators */
+#adminmenu .wp-menu-separator:not([id*="separator1"]):not([id*="separator2"]) {
+    display: none !important;
+}
+
