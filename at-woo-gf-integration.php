@@ -3,7 +3,7 @@
  * Plugin Name: AT - WooCommerce Gravity Forms Integration
  * Plugin URI: https://amit-trabelsi.co.il/
  * Description: תוסף מתקדם שמחבר בין WooCommerce ל-Gravity Forms עם ניהול אירועים, הרשאות משתמשים ודשבורד הרשמות מלא
- * Version: 2.6.0
+ * Version: 2.6.2
  * Author: Amit Trabelsi
  * Author URI: https://amit-trabelsi.co.il/
  * Text Domain: at-woo-gf-integration
@@ -18,7 +18,7 @@
  * Requires PHP: 7.4
  * 
  * @package ATWooGFIntegration
- * @version 2.6.0
+ * @version 2.6.2
  * @author Amit Trabelsi
  * @since 1.0.0
  */
@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define plugin constants
-define( 'AT_WOO_GF_INTEGRATION_VERSION', '2.6.0' );
+define( 'AT_WOO_GF_INTEGRATION_VERSION', '2.6.2' );
 define( 'AT_WOO_GF_INTEGRATION_FILE', __FILE__ );
 define( 'AT_WOO_GF_INTEGRATION_PATH', plugin_dir_path( __FILE__ ) );
 define( 'AT_WOO_GF_INTEGRATION_URL', plugin_dir_url( __FILE__ ) );
@@ -181,7 +181,7 @@ class AT_Woo_GF_Integration {
         error_log( 'AT WooGF Debug - Hook: ' . $hook . ', Plugin URL: ' . AT_WOO_GF_INTEGRATION_URL );
 
         // Enqueue on product edit page
-        if ( 'post.php' === $hook && isset( $post ) && 'product' === $post->post_type ) {
+        if ( in_array( $hook, array( 'post.php', 'post-new.php' ) ) && isset( $post ) && 'product' === $post->post_type ) {
             wp_enqueue_style( 
                 'at-woo-gf-integration-admin', 
                 AT_WOO_GF_INTEGRATION_URL . 'assets/css/admin.css', 
