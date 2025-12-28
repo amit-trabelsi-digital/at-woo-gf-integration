@@ -5,6 +5,11 @@
 הפורמט מבוסס על [Keep a Changelog](https://keepachangelog.com/he/1.0.0/),
 והפרויקט משתמש ב-[Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.6.3] - 2025-12-28
+
+### שונה
+- עדכון גרסה כללי וסנכרון תצורה.
+
 ## [2.6.2] - 2025-12-22
 
 ### שונה

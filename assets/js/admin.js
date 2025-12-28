@@ -234,4 +234,64 @@ jQuery(document).ready(function($) {
             }
         });
     });
+
+    // --- Dashboard Improvements ---
+
+    // 1. Default to "Event" product type on new product creation
+    if ($('body').hasClass('post-new-php') && $('body').hasClass('post-type-product')) {
+        var productTypeSelect = $('#product-type');
+        // Check if "event" exists in the options
+        if (productTypeSelect.find('option[value="event"]').length > 0) {
+            // Only set if not already set
+            if (productTypeSelect.val() !== 'event') {
+                productTypeSelect.val('event').trigger('change');
+            }
+        }
+    }
+
+    // 2. Add "Quick Save" button to sticky Admin Bar
+    if ($('body').hasClass('post-type-product') && ($('body').hasClass('post-php') || $('body').hasClass('post-new-php'))) {
+        var adminBar = $('#wp-admin-bar-root-default');
+        
+        if (adminBar.length > 0) {
+            // Create list item for admin bar
+            var li = $('<li id="wp-admin-bar-quick-save-product"></li>');
+            var div = $('<div class="ab-item ab-empty-item" style="padding: 0 10px; display: flex; align-items: center; height: 32px;"></div>');
+            var saveBtn = $('<button type="button" class="button button-primary">שמור שינויים</button>');
+            
+            // Logic for click
+            saveBtn.on('click', function(e) {
+                e.preventDefault();
+                
+                var saveDraftBtn = $('#save-post');
+                var publishBtn = $('#publish');
+                
+                // Visual feedback
+                var originalText = $(this).text();
+                $(this).text('שומר...').prop('disabled', true);
+                var self = $(this);
+                
+                // Logic:
+                // - If #save-post is visible (Draft/Pending/New), click it.
+                // - If #save-post is hidden, use #publish (Update for published posts).
+                
+                if (saveDraftBtn.is(':visible')) {
+                    saveDraftBtn.trigger('click');
+                } else {
+                    publishBtn.trigger('click');
+                }
+                
+                // Reset button after delay (if page doesn't reload)
+                setTimeout(function() {
+                    self.text(originalText).prop('disabled', false);
+                }, 3000);
+            });
+            
+            div.append(saveBtn);
+            li.append(div);
+            
+            // Add to admin bar (append adds it to the end of the group)
+            adminBar.append(li);
+        }
+    }
 }); 
