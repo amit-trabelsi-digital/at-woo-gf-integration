@@ -815,6 +815,7 @@ class Woo_GF_Registration_Dashboard {
             return $count;
         }
         
+        // Count only event products
         $args = array(
             'post_type' => 'product',
             'posts_per_page' => -1,
@@ -823,6 +824,13 @@ class Woo_GF_Registration_Dashboard {
                 array(
                     'key' => '_woo_gf_form_id',
                     'compare' => 'EXISTS',
+                ),
+            ),
+            'tax_query' => array(
+                array(
+                    'taxonomy' => 'product_type',
+                    'field' => 'slug',
+                    'terms' => 'event',
                 ),
             ),
         );
@@ -846,6 +854,7 @@ class Woo_GF_Registration_Dashboard {
             return $count;
         }
         
+        // Count only event products
         $args = array(
             'post_type' => 'product',
             'posts_per_page' => 100, // Limit to prevent memory issues
@@ -858,6 +867,13 @@ class Woo_GF_Registration_Dashboard {
                 array(
                     'key' => '_event_date',
                     'compare' => 'EXISTS',
+                ),
+            ),
+            'tax_query' => array(
+                array(
+                    'taxonomy' => 'product_type',
+                    'field' => 'slug',
+                    'terms' => 'event',
                 ),
             ),
         );
@@ -1118,6 +1134,7 @@ class Woo_GF_Registration_Dashboard {
      * Render products dropdown
      */
     private function render_products_dropdown() {
+        // Show only event products in the filter dropdown
         $args = array(
             'post_type' => 'product',
             'posts_per_page' => -1,
@@ -1127,13 +1144,20 @@ class Woo_GF_Registration_Dashboard {
                     'compare' => 'EXISTS',
                 ),
             ),
+            'tax_query' => array(
+                array(
+                    'taxonomy' => 'product_type',
+                    'field' => 'slug',
+                    'terms' => 'event',
+                ),
+            ),
         );
         
         $products = get_posts( $args );
         $selected_product = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : 0;
         ?>
         <select name="product_id" id="woo-gf-product-filter">
-            <option value=""><?php esc_html_e( 'כל המוצרים', 'at-woo-gf-integration' ); ?></option>
+            <option value=""><?php esc_html_e( 'כל האירועים', 'at-woo-gf-integration' ); ?></option>
             <?php foreach ( $products as $product ) : ?>
                 <option value="<?php echo esc_attr( $product->ID ); ?>" 
                         <?php selected( $selected_product, $product->ID ); ?>>
@@ -1457,9 +1481,10 @@ class Woo_GF_Registration_Dashboard {
     }
 
     /**
-     * Get count of products with forms
+     * Get count of products with forms (only event products)
      */
     private function get_products_with_forms_count() {
+        // Count only event products with forms
         $args = array(
             'post_type' => 'product',
             'posts_per_page' => -1,
@@ -1467,6 +1492,13 @@ class Woo_GF_Registration_Dashboard {
                 array(
                     'key' => '_woo_gf_form_id',
                     'compare' => 'EXISTS',
+                ),
+            ),
+            'tax_query' => array(
+                array(
+                    'taxonomy' => 'product_type',
+                    'field' => 'slug',
+                    'terms' => 'event',
                 ),
             ),
         );
@@ -1564,6 +1596,7 @@ class Woo_GF_Registration_Dashboard {
         }
         
         // Get all products that have forms linked to them - optimized query
+        // Filter by product type 'event' to show only event products
         $args = array(
             'post_type' => 'product',
             'post_status' => 'publish',
@@ -1573,6 +1606,13 @@ class Woo_GF_Registration_Dashboard {
                 array(
                     'key' => '_woo_gf_form_id',
                     'compare' => 'EXISTS',
+                ),
+            ),
+            'tax_query' => array(
+                array(
+                    'taxonomy' => 'product_type',
+                    'field' => 'slug',
+                    'terms' => 'event',
                 ),
             ),
         );
