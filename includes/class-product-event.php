@@ -243,20 +243,15 @@ class WC_Product_Event extends WC_Product {
 		$id = parent::save();
 		
 		if ( $id && ! is_wp_error( $id ) ) {
-			// Use data store to handle meta data
-			$data_store = WC_Data_Store::load( 'product' );
-			
-			// Save event-specific meta using WooCommerce methods
-			$this->update_meta_data( '_event_date', $this->get_event_date( 'edit' ) );
-			$this->update_meta_data( '_event_end_date', $this->get_event_end_date( 'edit' ) );
-			$this->update_meta_data( '_event_location', $this->get_event_location( 'edit' ) );
-			$this->update_meta_data( '_max_attendees', $this->get_max_attendees( 'edit' ) );
-			$this->update_meta_data( '_event_type', $this->get_event_type( 'edit' ) );
-			$this->update_meta_data( '_event_duration', $this->get_event_duration( 'edit' ) );
-			$this->update_meta_data( '_inquiries_email', $this->get_inquiries_email( 'edit' ) );
-			
-			// Save all meta data
-			$this->save_meta_data();
+			// Save event-specific meta using standard WordPress functions to avoid "internal meta key" notices
+			// These are already in $this->extra_data but WooCommerce CPT data store doesn't save them automatically
+			update_post_meta( $id, '_event_date', $this->get_event_date( 'edit' ) );
+			update_post_meta( $id, '_event_end_date', $this->get_event_end_date( 'edit' ) );
+			update_post_meta( $id, '_event_location', $this->get_event_location( 'edit' ) );
+			update_post_meta( $id, '_max_attendees', $this->get_max_attendees( 'edit' ) );
+			update_post_meta( $id, '_event_type', $this->get_event_type( 'edit' ) );
+			update_post_meta( $id, '_event_duration', $this->get_event_duration( 'edit' ) );
+			update_post_meta( $id, '_event_inquiries_email', $this->get_inquiries_email( 'edit' ) );
 		}
 		
 		return $id;
@@ -270,15 +265,16 @@ class WC_Product_Event extends WC_Product {
 	protected function read_product_data() {
 		parent::read_product_data();
 		
-		// Read event-specific data
+		// Read event-specific data using get_post_meta to avoid internal meta key notices
+		$id = $this->get_id();
 		$this->set_props( array(
-			'event_date'     => $this->get_meta( '_event_date', true ),
-			'event_end_date' => $this->get_meta( '_event_end_date', true ),
-			'event_location' => $this->get_meta( '_event_location', true ),
-			'max_attendees'  => (int) $this->get_meta( '_max_attendees', true ),
-			'event_type'     => $this->get_meta( '_event_type', true ) ?: 'physical',
-			'event_duration' => $this->get_meta( '_event_duration', true ),
-			'inquiries_email' => $this->get_meta( '_inquiries_email', true ),
+			'event_date'     => get_post_meta( $id, '_event_date', true ),
+			'event_end_date' => get_post_meta( $id, '_event_end_date', true ),
+			'event_location' => get_post_meta( $id, '_event_location', true ),
+			'max_attendees'  => (int) get_post_meta( $id, '_max_attendees', true ),
+			'event_type'     => get_post_meta( $id, '_event_type', true ) ?: 'physical',
+			'event_duration' => get_post_meta( $id, '_event_duration', true ),
+			'inquiries_email' => get_post_meta( $id, '_event_inquiries_email', true ) ?: get_post_meta( $id, '_inquiries_email', true ), // Fallback to old key
 		) );
 	}
 } 

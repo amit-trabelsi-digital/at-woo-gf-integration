@@ -39,7 +39,7 @@ class WooGF_Event_Attendees_Limit {
 			return $is_in_stock;
 		}
 
-		$max_attendees = $product->get_meta( '_max_attendees', true );
+		$max_attendees = $product->get_max_attendees();
 		if ( empty( $max_attendees ) || $max_attendees <= 0 ) {
 			return true; // No limit
 		}
@@ -56,7 +56,7 @@ class WooGF_Event_Attendees_Limit {
 			return $stock_quantity;
 		}
 
-		$max_attendees = $product->get_meta( '_max_attendees', true );
+		$max_attendees = $product->get_max_attendees();
 		if ( empty( $max_attendees ) || $max_attendees <= 0 ) {
 			return null; // No limit
 		}
@@ -75,7 +75,7 @@ class WooGF_Event_Attendees_Limit {
 			return $manage_stock;
 		}
 
-		$max_attendees = $product->get_meta( '_max_attendees', true );
+		$max_attendees = $product->get_max_attendees();
 		return ! empty( $max_attendees ) && $max_attendees > 0;
 	}
 
@@ -87,7 +87,7 @@ class WooGF_Event_Attendees_Limit {
 			return $availability;
 		}
 
-		$max_attendees = $product->get_meta( '_max_attendees', true );
+		$max_attendees = $product->get_max_attendees();
 		if ( empty( $max_attendees ) || $max_attendees <= 0 ) {
 			return __( 'מקומות פנויים', 'woo-gf-integration' );
 		}
@@ -114,7 +114,7 @@ class WooGF_Event_Attendees_Limit {
 			return $class;
 		}
 
-		$max_attendees = $product->get_meta( '_max_attendees', true );
+		$max_attendees = $product->get_max_attendees();
 		if ( empty( $max_attendees ) || $max_attendees <= 0 ) {
 			return 'in-stock';
 		}
@@ -141,7 +141,7 @@ class WooGF_Event_Attendees_Limit {
 			return $passed;
 		}
 
-		$max_attendees = $product->get_meta( '_max_attendees', true );
+		$max_attendees = $product->get_max_attendees();
 		if ( empty( $max_attendees ) || $max_attendees <= 0 ) {
 			return $passed; // No limit
 		}
@@ -189,7 +189,7 @@ class WooGF_Event_Attendees_Limit {
 		}
 
 		$product_id = $product->get_id();
-		$max_attendees = $product->get_meta( '_max_attendees', true );
+		$max_attendees = $product->get_max_attendees();
 		
 		if ( empty( $max_attendees ) || $max_attendees <= 0 ) {
 			return $passed; // No limit
@@ -222,7 +222,7 @@ class WooGF_Event_Attendees_Limit {
 	 */
 	private function get_current_attendees_count( $product_id ) {
 		$product = wc_get_product( $product_id );
-		$form_id = $product ? $product->get_meta( '_gravity_form_id', true ) : '';
+		$form_id = $product ? get_post_meta( $product_id, '_woo_gf_form_id', true ) : '';
 		
 		if ( ! $form_id || ! class_exists( 'GFAPI' ) ) {
 			return 0;

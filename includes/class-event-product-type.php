@@ -268,33 +268,30 @@ class WooGF_Event_Product_Type {
 
 		$product = wc_get_product( $post_id );
 
-		if ( ! $product ) {
+		if ( ! $product || ! $product->is_type( 'event' ) ) {
 			return;
 		}
-
-		// Initialize max_attendees variable
-		$max_attendees = 0;
 
 		// Save event date
 		if ( isset( $_POST['_event_date'] ) ) {
 			$event_date = ! empty( $_POST['_event_date'] ) ? str_replace( 'T', ' ', wc_clean( wp_unslash( $_POST['_event_date'] ) ) ) : '';
-			$product->update_meta_data( '_event_date', $event_date );
+			$product->set_event_date( $event_date );
 		} else {
-			$product->update_meta_data( '_event_date', '' );
+			$product->set_event_date( '' );
 		}
 
 		// Save event end date
 		if ( isset( $_POST['_event_end_date'] ) ) {
 			$event_end_date = ! empty( $_POST['_event_end_date'] ) ? str_replace( 'T', ' ', wc_clean( wp_unslash( $_POST['_event_end_date'] ) ) ) : '';
-			$product->update_meta_data( '_event_end_date', $event_end_date );
+			$product->set_event_end_date( $event_end_date );
 		} else {
-			$product->update_meta_data( '_event_end_date', '' );
+			$product->set_event_end_date( '' );
 		}
 
 		// Save event location
 		if ( isset( $_POST['_event_location'] ) ) {
 			$location = ! empty( $_POST['_event_location'] ) ? sanitize_textarea_field( wp_unslash( $_POST['_event_location'] ) ) : '';
-			$product->update_meta_data( '_event_location', $location );
+			$product->set_event_location( $location );
 		}
 
 		// Save max attendees - allow empty/0 for unlimited
@@ -302,40 +299,40 @@ class WooGF_Event_Product_Type {
 		if ( isset( $_POST['_max_attendees'] ) && ! empty( $_POST['_max_attendees'] ) ) {
 			$max_attendees = intval( $_POST['_max_attendees'] );
 		}
-		$product->update_meta_data( '_max_attendees', $max_attendees );
+		$product->set_max_attendees( $max_attendees );
 
 		// Save event type
 		if ( isset( $_POST['_event_type'] ) ) {
-			$product->update_meta_data( '_event_type', sanitize_text_field( wp_unslash( $_POST['_event_type'] ) ) );
+			$product->set_event_type( sanitize_text_field( wp_unslash( $_POST['_event_type'] ) ) );
 		}
 
 		// Save event duration
 		if ( isset( $_POST['_event_duration'] ) ) {
 			$duration = ! empty( $_POST['_event_duration'] ) ? wc_clean( wp_unslash( $_POST['_event_duration'] ) ) : '';
-			$product->update_meta_data( '_event_duration', $duration );
+			$product->set_event_duration( $duration );
 		} else {
-			$product->update_meta_data( '_event_duration', '' );
+			$product->set_event_duration( '' );
 		}
 
 		// Save inquiries email
 		if ( isset( $_POST['_event_inquiries_email'] ) ) {
 			$email = ! empty( $_POST['_event_inquiries_email'] ) ? sanitize_email( wp_unslash( $_POST['_event_inquiries_email'] ) ) : '';
-			$product->update_meta_data( '_event_inquiries_email', $email );
+			$product->set_inquiries_email( $email );
 		} else {
-			$product->update_meta_data( '_event_inquiries_email', '' );
+			$product->set_inquiries_email( '' );
 		}
 
-		// Save event manager
+		// Save event manager - this is not in extra_data, so we use update_post_meta to avoid internal notice
 		if ( isset( $_POST['_event_manager'] ) ) {
 			$manager = ! empty( $_POST['_event_manager'] ) ? sanitize_text_field( wp_unslash( $_POST['_event_manager'] ) ) : '';
-			$product->update_meta_data( '_event_manager', $manager );
+			update_post_meta( $post_id, '_event_manager', $manager );
 		} else {
-			$product->update_meta_data( '_event_manager', '' );
+			update_post_meta( $post_id, '_event_manager', '' );
 		}
 
 		// Events are always virtual
-		$product->update_meta_data( '_virtual', 'yes' );
-		$product->update_meta_data( '_downloadable', 'no' );
+		$product->set_virtual( true );
+		$product->set_downloadable( false );
 		
 		// Enable stock management for events
 		$product->set_manage_stock( true );
