@@ -403,6 +403,12 @@ table tbody tr:hover {
 }
 
 /* Status Badges */
+.woo-gf-status-container {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
 .woo-gf-status-badge {
     display: inline-block;
     padding: 4px 10px;
@@ -410,13 +416,25 @@ table tbody tr:hover {
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
+    white-space: nowrap;
 }
 
+.woo-gf-status-reason {
+    font-size: 11px;
+    color: #666;
+    line-height: 1.4;
+    margin-top: 4px;
+}
+
+/* Status badge colors */
 .woo-gf-status-upcoming { background-color: #e5f5fa; color: #00a0d2; }
 .woo-gf-status-active { background-color: #e7f7e8; color: #46b450; }
 .woo-gf-status-past { background-color: #f3f3f3; color: #787c82; }
 .woo-gf-status-full { background-color: #fef0f1; color: #dc3232; }
 .woo-gf-status-draft { background-color: #f0f0f1; color: #999; }
+.woo-gf-status-closed { background-color: #fef0f1; color: #dc3232; }
+.woo-gf-status-scheduled { background-color: #fff8e5; color: #f39c12; }
+.woo-gf-status-expired { background-color: #f3f3f3; color: #787c82; }
 
 /* Capacity Bar */
 .woo-gf-capacity-bar {
@@ -510,6 +528,57 @@ table tbody tr:hover {
 
 .woo-gf-sidepeek.woo-gf-sidepeek-active {
     right: 0;
+}
+
+/* Pagination */
+.woo-gf-pagination {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    padding: 10px;
+}
+
+.woo-gf-pagination .page-numbers {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    padding: 0 8px;
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    color: #2271b1;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.woo-gf-pagination .page-numbers:hover {
+    background: #f0f0f1;
+    border-color: #2271b1;
+}
+
+.woo-gf-pagination .page-numbers.current {
+    background: #2271b1;
+    border-color: #2271b1;
+    color: #fff;
+    cursor: default;
+}
+
+.woo-gf-pagination .page-numbers.dots {
+    border: none;
+    background: transparent;
+    color: #646970;
+    cursor: default;
+}
+
+.woo-gf-pagination .page-numbers .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
 }
 
 .woo-gf-sidepeek-overlay {

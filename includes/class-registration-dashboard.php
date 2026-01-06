@@ -373,8 +373,13 @@ class Woo_GF_Registration_Dashboard {
         // Set PHP timeout to prevent hangs
         @set_time_limit( 60 );
         
+        $per_page = 20;
+        $current_page = isset($_GET['paged_events']) ? max(1, intval($_GET['paged_events'])) : 1;
+        $total_events = $this->get_events_count();
+        $total_pages = ceil($total_events / $per_page);
+
         try {
-            $events = $this->get_events_data();
+            $events = $this->get_events_data($current_page, $per_page);
         } catch ( Exception $e ) {
             error_log( 'WooGF Events Table Error: ' . $e->getMessage() );
             echo '<div class="notice notice-error">';
@@ -388,34 +393,16 @@ class Woo_GF_Registration_Dashboard {
         $sort_by = isset($_GET['sort_by']) ? sanitize_text_field($_GET['sort_by']) : 'date';
         $sort_order = isset($_GET['sort_order']) ? sanitize_text_field($_GET['sort_order']) : 'asc';
         
-        // Sort events
-        usort($events, function($a, $b) use ($sort_by, $sort_order) {
-            $comparison = 0;
-            
-            switch($sort_by) {
-                case 'price':
-                    $price_a = isset($a['price']) ? floatval($a['price']) : 0;
-                    $price_b = isset($b['price']) ? floatval($b['price']) : 0;
-                    $comparison = $price_a <=> $price_b;
-                    break;
-                    
-                case 'status':
-                    // Get form status
-                    $status_a = (isset($a['form']) && $a['form'] && (!isset($a['form']['is_active']) || $a['form']['is_active'] !== false)) ? 1 : 0;
-                    $status_b = (isset($b['form']) && $b['form'] && (!isset($b['form']['is_active']) || $b['form']['is_active'] !== false)) ? 1 : 0;
-                    $comparison = $status_a <=> $status_b;
-                    break;
-                    
-                case 'date':
-                default:
-                    $date_a = isset($a['event_date']) && $a['event_date'] ? strtotime($a['event_date']) : 0;
-                    $date_b = isset($b['event_date']) && $b['event_date'] ? strtotime($b['event_date']) : 0;
-                    $comparison = $date_a <=> $date_b;
-                    break;
-            }
-            
-            return $sort_order === 'desc' ? -$comparison : $comparison;
-        });
+        // No need to sort in PHP if we sorted in WP_Query, 
+        // except for 'status' which is not handled by WP_Query yet.
+        if ($sort_by === 'status') {
+            usort($events, function($a, $b) use ($sort_order) {
+                $status_a = (isset($a['form']) && $a['form'] && (!isset($a['form']['is_active']) || $a['form']['is_active'] !== false)) ? 1 : 0;
+                $status_b = (isset($b['form']) && $b['form'] && (!isset($b['form']['is_active']) || $b['form']['is_active'] !== false)) ? 1 : 0;
+                $comparison = $status_a <=> $status_b;
+                return $sort_order === 'desc' ? -$comparison : $comparison;
+            });
+        }
         
         if (empty($events)) {
             echo '<div class="woo-gf-empty-state">';
@@ -498,11 +485,58 @@ class Woo_GF_Registration_Dashboard {
                 $capacity = $event['capacity'];
                 $available_spots = max(0, $capacity - $registration_count);
                 
-                // Determine form status (open/closed)
-                $form = isset($event['form_id']) ? GFAPI::get_form($event['form_id']) : null;
-                $is_form_active = $form && !isset($form['is_active']) || $form['is_active'] !== false;
-                $form_status_class = $is_form_active ? 'woo-gf-status-active' : 'woo-gf-status-past';
-                $form_status_text = $is_form_active ? '✅ פתוח' : '❌ סגור';
+                // Determine form status (open/closed) with detailed reason
+                // Use cached form from event data instead of fetching again
+                $form = isset($event['form']) ? $event['form'] : null;
+                
+                // Default status
+                $form_status_class = 'woo-gf-status-active';
+                $form_status_text = '✅ פתוח';
+                $form_status_reason = '';
+                
+                if ($form) {
+                    // Check if form is manually set to inactive
+                    $is_form_manually_active = !isset($form['is_active']) || $form['is_active'] !== false;
+                    
+                    if (!$is_form_manually_active) {
+                        $form_status_class = 'woo-gf-status-closed';
+                        $form_status_text = '❌ סגור';
+                        $form_status_reason = 'הטופס הושבת ידנית';
+                    } else {
+                        // Check schedule dates
+                        $now = time();
+                        $is_scheduled = isset($form['scheduleForm']) && $form['scheduleForm'];
+                        
+                        if ($is_scheduled) {
+                            // Check start date
+                            if (isset($form['scheduleStart'])) {
+                                $start_timestamp = strtotime($form['scheduleStart']);
+                                if ($start_timestamp && $now < $start_timestamp) {
+                                    $form_status_class = 'woo-gf-status-scheduled';
+                                    $form_status_text = '⏰ מתוזמן';
+                                    $form_status_reason = 'טרם נפתח - נפתח ב-' . date_i18n('j.m.Y H:i', $start_timestamp);
+                                }
+                            }
+                            
+                            // Check end date
+                            if (isset($form['scheduleEnd'])) {
+                                $end_timestamp = strtotime($form['scheduleEnd']);
+                                if ($end_timestamp && $now > $end_timestamp) {
+                                    $form_status_class = 'woo-gf-status-expired';
+                                    $form_status_text = '🕒 ההרשמה נסגרה אוטומטית';
+                                    $form_status_reason = 'הטופס נסגר ב-' . date_i18n('j.m.Y H:i', $end_timestamp) . $form['scheduleEnd'];
+                                }
+                            }
+                        }
+                        
+                        // Check capacity (only if still open)
+                        if ($form_status_class === 'woo-gf-status-active' && $capacity > 0 && $registration_count >= $capacity) {
+                            $form_status_class = 'woo-gf-status-full';
+                            $form_status_text = '🎫 מלא';
+                            $form_status_reason = 'הושלמה המכסה (' . number_format_i18n($capacity) . ' מקומות)';
+                        }
+                    }
+                }
                 
                 echo '<tr class="woo-gf-event-row" data-event-id="' . esc_attr($event_id) . '">';
                 
@@ -521,14 +555,33 @@ class Woo_GF_Registration_Dashboard {
                 }
                 echo '</div>';
                 
-                // Form close date if set
+                // Form schedule dates if set
                 if (isset($event['form']) && $event['form']) {
                     $form = $event['form'];
+                    
+                    // Show start date if schedule is enabled
+                    if (isset($form['scheduleForm']) && $form['scheduleForm'] && isset($form['scheduleStart'])) {
+                        // Gravity Forms stores dates in format: Y-m-d H:i:s
+                        $start_date_str = $form['scheduleStart'];
+                        // Remove time if it's midnight (00:00:00) for cleaner display
+                        $start_timestamp = strtotime($start_date_str);
+                        if ($start_timestamp && $start_timestamp > time()) {
+                            echo '<div class="woo-gf-event-meta" style="color: #46b450; font-size: 12px;">';
+                            echo '🔓 פתיחה: ' . date_i18n('j בF Y, H:i', $start_timestamp);
+                            echo '</div>';
+                        }
+                    }
+                    
+                    // Show end date if schedule is enabled
                     if (isset($form['scheduleForm']) && $form['scheduleForm'] && isset($form['scheduleEnd'])) {
-                        $close_date = strtotime($form['scheduleEnd']);
-                        if ($close_date) {
-                            echo '<div class="woo-gf-event-meta" style="color: #dc3232; font-size: 12px;">';
-                            echo '⏱️ סגירה: ' . date_i18n('j בF H:i', $close_date);
+                        // Gravity Forms stores dates in format: Y-m-d H:i:s
+                        $end_date_str = $form['scheduleEnd'];
+                        $end_timestamp = strtotime($end_date_str);
+                        if ($end_timestamp) {
+                            $is_past = $end_timestamp < time();
+                            $color = $is_past ? '#dc3232' : '#f39c12';
+                            echo '<div class="woo-gf-event-meta" style="color: ' . $color . '; font-size: 12px;">';
+                            echo ($is_past ? '🔒' : '⏱️') . ' סגירה: ' . date_i18n('j בF Y, H:i', $end_timestamp);
                             echo '</div>';
                         }
                     }
@@ -603,7 +656,12 @@ class Woo_GF_Registration_Dashboard {
                 
                 // Form Status
                 echo '<td>';
+                echo '<div class="woo-gf-status-container">';
                 echo '<span class="woo-gf-status-badge ' . $form_status_class . '">' . $form_status_text . '</span>';
+                if (!empty($form_status_reason)) {
+                    echo '<div class="woo-gf-status-reason" style="font-size: 11px; color: #666; margin-top: 4px;">' . esc_html($form_status_reason) . '</div>';
+                }
+                echo '</div>';
                 echo '</td>';
                 
                 // Actions
@@ -641,6 +699,21 @@ class Woo_GF_Registration_Dashboard {
             
             echo '</tbody>';
             echo '</table>';
+
+            if ( $total_pages > 1 ) {
+                echo '<div class="woo-gf-pagination">';
+                echo paginate_links( array(
+                    'base' => add_query_arg( 'paged_events', '%#%' ),
+                    'format' => '',
+                    'prev_text' => '<span class="dashicons dashicons-arrow-right-alt2"></span>',
+                    'next_text' => '<span class="dashicons dashicons-arrow-left-alt2"></span>',
+                    'total' => $total_pages,
+                    'current' => $current_page,
+                    'type' => 'plain',
+                ) );
+                echo '</div>';
+            }
+
             echo '</div>'; // Close woo-gf-table-container
         }
     }
@@ -1352,6 +1425,7 @@ class Woo_GF_Registration_Dashboard {
      */
     private function build_search_criteria() {
         $search_criteria = array();
+        $search_criteria['field_filters'] = array();
         
         // Search text
         if ( ! empty( $_GET['search'] ) ) {
@@ -1362,13 +1436,60 @@ class Woo_GF_Registration_Dashboard {
             );
         }
         
-        // Date range
-        if ( ! empty( $_GET['date_from'] ) ) {
-            $search_criteria['start_date'] = sanitize_text_field( $_GET['date_from'] );
+        // Date range - Based on _event_date of the product instead of entry creation date
+        $date_from = ! empty( $_GET['date_from'] ) ? sanitize_text_field( $_GET['date_from'] ) : '';
+        $date_to = ! empty( $_GET['date_to'] ) ? sanitize_text_field( $_GET['date_to'] ) : '';
+        
+        if ( $date_from || $date_to ) {
+            $meta_query = array( 'relation' => 'AND' );
+            
+            if ( $date_from ) {
+                $meta_query[] = array(
+                    'key'     => '_event_date',
+                    'value'   => $date_from,
+                    'compare' => '>=',
+                    'type'    => 'DATETIME'
+                );
+            }
+            
+            if ( $date_to ) {
+                $meta_query[] = array(
+                    'key'     => '_event_date',
+                    'value'   => $date_to . ' 23:59:59',
+                    'compare' => '<=',
+                    'type'    => 'DATETIME'
+                );
+            }
+            
+            $product_ids = get_posts( array(
+                'post_type'      => 'product',
+                'posts_per_page' => -1,
+                'fields'         => 'ids',
+                'meta_query'     => $meta_query,
+                'no_found_rows'  => true,
+            ) );
+            
+            if ( ! empty( $product_ids ) ) {
+                $search_criteria['field_filters'][] = array(
+                    'key'      => 'woo_gf_product_id',
+                    'value'    => $product_ids,
+                    'operator' => 'in'
+                );
+            } else {
+                // No products match the date range, force no results
+                $search_criteria['field_filters'][] = array(
+                    'key'   => 'woo_gf_product_id',
+                    'value' => 0,
+                );
+            }
         }
         
-        if ( ! empty( $_GET['date_to'] ) ) {
-            $search_criteria['end_date'] = sanitize_text_field( $_GET['date_to'] );
+        // Product ID filter (if selected in dropdown)
+        if ( ! empty( $_GET['product_id'] ) ) {
+            $search_criteria['field_filters'][] = array(
+                'key'   => 'woo_gf_product_id',
+                'value' => intval( $_GET['product_id'] ),
+            );
         }
         
         // Status
@@ -1382,43 +1503,61 @@ class Woo_GF_Registration_Dashboard {
      */
     private function get_all_entries( $search_criteria, $sorting, $paging, &$total_count ) {
         $entries = array();
+        $form_ids = array();
         
         // Check if specific form is selected
         if ( ! empty( $_GET['form_id'] ) ) {
-            $form_id = intval( $_GET['form_id'] );
-            
-            try {
-                $entries = GFAPI::get_entries( $form_id, $search_criteria, $sorting, $paging, $total_count );
-            } catch ( Exception $e ) {
-                error_log( 'WooGF Error getting entries for form ' . $form_id . ': ' . $e->getMessage() );
-                return array();
+            $form_ids = array( intval( $_GET['form_id'] ) );
+        } elseif ( ! empty( $_GET['product_id'] ) ) {
+            $product_id = intval( $_GET['product_id'] );
+            $form_id = get_post_meta( $product_id, '_woo_gf_form_id', true );
+            if ( $form_id ) {
+                $form_ids = array( $form_id );
             }
         } else {
-            // Get entries from all forms
-            $forms = $this->get_cached_forms();
-            
-            // Limit number of forms to prevent memory issues
-            if ( count( $forms ) > 20 ) {
-                $forms = array_slice( $forms, 0, 20 );
-            }
-            
-            $form_ids = wp_list_pluck( $forms, 'id' );
-            
-            // If product filter is set, get only forms associated with that product
-            if ( ! empty( $_GET['product_id'] ) ) {
-                $product_id = intval( $_GET['product_id'] );
-                $form_id = get_post_meta( $product_id, '_woo_gf_form_id', true );
-                if ( $form_id ) {
-                    $form_ids = array( $form_id );
+            // Check if we have product IDs from date filter in search criteria
+            $filtered_product_ids = array();
+            if ( ! empty( $search_criteria['field_filters'] ) ) {
+                foreach ( $search_criteria['field_filters'] as $filter ) {
+                    if ( 'woo_gf_product_id' === $filter['key'] && 'in' === $filter['operator'] ) {
+                        $filtered_product_ids = (array) $filter['value'];
+                        break;
+                    }
                 }
             }
-            
-            try {
-                $entries = GFAPI::get_entries( $form_ids, $search_criteria, $sorting, $paging, $total_count );
-            } catch ( Exception $e ) {
-                error_log( 'WooGF Error getting entries for all forms: ' . $e->getMessage() );
-                return array();
+
+            if ( ! empty( $filtered_product_ids ) ) {
+                // Collect form IDs associated with these products
+                foreach ( $filtered_product_ids as $pid ) {
+                    $fid = get_post_meta( $pid, '_woo_gf_form_id', true );
+                    if ( $fid ) {
+                        $form_ids[] = (int) $fid;
+                    }
+                }
+                $form_ids = array_unique( $form_ids );
             }
+
+            if ( empty( $form_ids ) ) {
+                // Get entries from all forms
+                $forms = $this->get_cached_forms();
+                $form_ids = wp_list_pluck( $forms, 'id' );
+                
+                // Increase limit of forms - 50 is too low for some sites
+                if ( count( $form_ids ) > 500 ) {
+                    $form_ids = array_slice( $form_ids, 0, 500 );
+                }
+            }
+        }
+
+        if ( empty( $form_ids ) ) {
+            return array();
+        }
+
+        try {
+            $entries = GFAPI::get_entries( $form_ids, $search_criteria, $sorting, $paging, $total_count );
+        } catch ( Exception $e ) {
+            error_log( 'WooGF Error getting entries: ' . $e->getMessage() );
+            return array();
         }
         
         return $entries;
@@ -1434,11 +1573,14 @@ class Woo_GF_Registration_Dashboard {
         
         if ( false === $count ) {
             $count = 0;
-                $forms = $this->get_cached_forms();
+            $forms = $this->get_cached_forms();
             
-            if ( ! empty( $forms ) && count( $forms ) < 50 ) {
-                // Only count if reasonable number of forms
-                foreach ( $forms as $form ) {
+            if ( ! empty( $forms ) ) {
+                // Limit to 500 forms to prevent timeout, but 50 was too low
+                $form_limit = 500;
+                $forms_to_count = count( $forms ) > $form_limit ? array_slice( $forms, 0, $form_limit ) : $forms;
+                
+                foreach ( $forms_to_count as $form ) {
                     $count += GFAPI::count_entries( $form['id'], array( 'status' => 'active' ) );
                 }
             }
@@ -1459,17 +1601,19 @@ class Woo_GF_Registration_Dashboard {
         
         if ( false === $count ) {
             $count = 0;
-                $forms = $this->get_cached_forms();
+            $forms = $this->get_cached_forms();
             
-            if ( ! empty( $forms ) && count( $forms ) < 50 ) {
-                // Only count if reasonable number of forms
+            if ( ! empty( $forms ) ) {
+                $form_limit = 500;
+                $forms_to_count = count( $forms ) > $form_limit ? array_slice( $forms, 0, $form_limit ) : $forms;
+                
                 $search_criteria = array(
                     'status' => 'active',
                     'start_date' => date( 'Y-m-d 00:00:00' ),
                     'end_date' => date( 'Y-m-d 23:59:59' ),
                 );
                 
-                foreach ( $forms as $form ) {
+                foreach ( $forms_to_count as $form ) {
                     $count += GFAPI::count_entries( $form['id'], $search_criteria );
                 }
             }
@@ -1575,33 +1719,33 @@ class Woo_GF_Registration_Dashboard {
     /**
      * Get events data with registration information (optimized with caching)
      */
-    private function get_events_data() {
+    private function get_events_data($page = 1, $per_page = 20) {
         $events = array();
         
         // Check if Gravity Forms is active
         if ( ! class_exists( 'GFAPI' ) ) {
-            echo '<div class="notice notice-error">';
-            echo '<h3>Gravity Forms לא פעיל</h3>';
-            echo '<p>הדשבורד דורש Gravity Forms להיות מותקן ופעיל.</p>';
-            echo '</div>';
             return $events;
         }
         
-        // Use transient cache for events data (2 minutes)
-        $cache_key = 'woo_gf_events_data_v2';
-        $events = get_transient( $cache_key );
+        // Get sort parameters
+        $sort_by = isset($_GET['sort_by']) ? sanitize_text_field($_GET['sort_by']) : 'date';
+        $sort_order = isset($_GET['sort_order']) ? sanitize_text_field($_GET['sort_order']) : 'asc';
+
+        // Use transient cache for events data - include paging and sorting in key
+        $cache_key = 'woo_gf_events_data_p' . $page . '_s' . $per_page . '_' . $sort_by . '_' . $sort_order;
+        $cached_data = get_transient( $cache_key );
         
-        if ( false !== $events ) {
-            return $events;
+        if ( false !== $cached_data ) {
+            return $cached_data;
         }
         
-        // Get all products that have forms linked to them - optimized query
-        // Filter by product type 'event' to show only event products
+        // Prepare WP_Query args
         $args = array(
             'post_type' => 'product',
             'post_status' => 'publish',
-            'posts_per_page' => 100, // Limit to prevent memory issues
-            'fields' => 'ids', // Get IDs only first for speed
+            'posts_per_page' => $per_page,
+            'paged' => $page,
+            'fields' => 'ids',
             'meta_query' => array(
                 array(
                     'key' => '_woo_gf_form_id',
@@ -1616,17 +1760,33 @@ class Woo_GF_Registration_Dashboard {
                 ),
             ),
         );
+
+        // Add sorting to query
+        switch ($sort_by) {
+            case 'price':
+                $args['meta_key'] = '_price';
+                $args['orderby'] = 'meta_value_num';
+                break;
+            case 'date':
+                $args['meta_key'] = '_event_date';
+                $args['orderby'] = 'meta_value';
+                break;
+            default:
+                $args['orderby'] = 'title';
+                break;
+        }
+        $args['order'] = strtoupper($sort_order);
         
-        $product_ids = get_posts( $args );
+        $query = new WP_Query( $args );
+        $product_ids = $query->posts;
         
         if ( empty( $product_ids ) ) {
-            // Cache empty result for 30 seconds to prevent repeated queries
             set_transient( $cache_key, array(), 30 );
             return array();
         }
         
         $events = array();
-        $batch_forms = array(); // Cache forms to avoid repeated GFAPI calls
+        $batch_forms = array();
         
         foreach ( $product_ids as $product_id ) {
             $product = get_post( $product_id );
@@ -1703,6 +1863,7 @@ class Woo_GF_Registration_Dashboard {
     public function register_ajax_handlers() {
         add_action( 'wp_ajax_woo_gf_get_event_details', array( $this, 'ajax_get_event_details' ) );
         add_action( 'wp_ajax_woo_gf_get_registrations', array( $this, 'ajax_get_registrations' ) );
+        add_action( 'wp_ajax_woo_gf_get_event_registrations', array( $this, 'ajax_get_registrations' ) ); // Alias to match JS
         add_action( 'wp_ajax_woo_gf_export_registrations', array( $this, 'ajax_export_registrations' ) );
         add_action( 'wp_ajax_woo_gf_clear_dashboard_cache', array( $this, 'ajax_clear_dashboard_cache' ) );
     }
@@ -1876,7 +2037,9 @@ class Woo_GF_Registration_Dashboard {
             $search_criteria = array(); // Empty criteria = all entries
         }
         
-        $entries = GFAPI::get_entries( $form_id, $search_criteria );
+        // Return up to 500 entries for the sidepeek to ensure "all" results are shown
+        $paging = array( 'offset' => 0, 'page_size' => 500 );
+        $entries = GFAPI::get_entries( $form_id, $search_criteria, array( 'key' => 'date_created', 'direction' => 'DESC' ), $paging );
         $total_entries = count( $entries );
         
         // Get event details
