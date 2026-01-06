@@ -217,6 +217,114 @@ class Woo_GF_Product_Form_Metabox {
                 </p>
             </div>
 
+            <!-- תזמון וסטטוס טופס -->
+            <div class="options_group" id="woo_gf_form_schedule_settings">
+                <h4 style="margin: 15px 12px 10px; font-size: 13px; color: #23282d;">
+                    <span class="dashicons dashicons-clock" style="vertical-align: text-bottom;"></span>
+                    <?php esc_html_e( 'תזמון וסטטוס טופס', 'woo-gf-integration' ); ?>
+                </h4>
+                
+                <?php
+                // Get form scheduling data
+                $form = $selected_form ? GFAPI::get_form( $selected_form ) : null;
+                $is_form_active = true;
+                $schedule_enabled = false;
+                $schedule_start = '';
+                $schedule_end = '';
+                
+                if ( $form ) {
+                    $is_form_active = !isset( $form['is_active'] ) || $form['is_active'] !== false;
+                    $schedule_enabled = isset( $form['scheduleForm'] ) && $form['scheduleForm'];
+                    $schedule_start = isset( $form['scheduleStart'] ) ? $form['scheduleStart'] : '';
+                    $schedule_end = isset( $form['scheduleEnd'] ) ? $form['scheduleEnd'] : '';
+                }
+                
+                woocommerce_wp_checkbox( array(
+                    'id'          => '_woo_gf_form_is_active',
+                    'label'       => __( 'הטופס פעיל', 'woo-gf-integration' ),
+                    'description' => __( 'סמן כדי שהטופס יהיה זמין להרשמות. בטל סימון כדי לסגור את הטופס ידנית', 'woo-gf-integration' ),
+                    'desc_tip'    => true,
+                    'value'       => $is_form_active ? 'yes' : 'no',
+                    'cbvalue'     => 'yes',
+                ) );
+                
+                woocommerce_wp_checkbox( array(
+                    'id'          => '_woo_gf_enable_form_schedule',
+                    'label'       => __( 'הפעל תזמון אוטומטי', 'woo-gf-integration' ),
+                    'description' => __( 'הגדר תאריכי פתיחה וסגירה אוטומטית של הטופס', 'woo-gf-integration' ),
+                    'desc_tip'    => true,
+                    'value'       => $schedule_enabled ? 'yes' : 'no',
+                    'cbvalue'     => 'yes',
+                ) );
+                
+                woocommerce_wp_text_input( array(
+                    'id'          => '_woo_gf_schedule_start',
+                    'label'       => '<span class="dashicons dashicons-unlock"></span> ' . __( 'תאריך פתיחה', 'woo-gf-integration' ),
+                    'description' => __( 'הטופס ייפתח אוטומטית בתאריך ושעה זו', 'woo-gf-integration' ),
+                    'desc_tip'    => true,
+                    'type'        => 'datetime-local',
+                    'value'       => $schedule_start ? str_replace( ' ', 'T', $schedule_start ) : '',
+                    'wrapper_class' => 'show_if_schedule_enabled',
+                ) );
+                
+                woocommerce_wp_text_input( array(
+                    'id'          => '_woo_gf_schedule_end',
+                    'label'       => '<span class="dashicons dashicons-lock"></span> ' . __( 'תאריך סגירה', 'woo-gf-integration' ),
+                    'description' => __( 'הטופס ייסגר אוטומטית בתאריך ושעה זו', 'woo-gf-integration' ),
+                    'desc_tip'    => true,
+                    'type'        => 'datetime-local',
+                    'value'       => $schedule_end ? str_replace( ' ', 'T', $schedule_end ) : '',
+                    'wrapper_class' => 'show_if_schedule_enabled',
+                ) );
+                ?>
+                
+                <p class="form-field" style="margin: 10px 12px; padding: 10px; background: #f0f6fc; border-right: 4px solid #0073aa;">
+                    <strong><span class="dashicons dashicons-info" style="color: #0073aa;"></span> <?php esc_html_e( 'חשוב לדעת:', 'woo-gf-integration' ); ?></strong><br>
+                    <small><?php esc_html_e( 'השינויים האלה ישפיעו ישירות על הטופס ב-Gravity Forms. לאחר שמירה, הטופס יתעדכן אוטומטית עם ההגדרות החדשות.', 'woo-gf-integration' ); ?></small>
+                </p>
+                
+                <style>
+                    .show_if_schedule_enabled { display: none; }
+                    #woo_gf_form_schedule_settings .dashicons {
+                        font-size: 16px;
+                        width: 16px;
+                        height: 16px;
+                        vertical-align: text-bottom;
+                        margin-left: 4px;
+                    }
+                </style>
+                <script>
+                    jQuery(document).ready(function($) {
+                        function toggleScheduleFields() {
+                            if ($('#_woo_gf_enable_form_schedule').is(':checked')) {
+                                $('.show_if_schedule_enabled').show();
+                            } else {
+                                $('.show_if_schedule_enabled').hide();
+                            }
+                        }
+                        
+                        // Show/hide on page load
+                        toggleScheduleFields();
+                        
+                        // Toggle on checkbox change
+                        $('#_woo_gf_enable_form_schedule').on('change', toggleScheduleFields);
+                        
+                        // Show/hide entire schedule section if no form is selected
+                        function toggleScheduleSection() {
+                            var selectedForm = $('#_woo_gf_form_id').val();
+                            if (selectedForm && selectedForm !== '') {
+                                $('#woo_gf_form_schedule_settings').show();
+                            } else {
+                                $('#woo_gf_form_schedule_settings').hide();
+                            }
+                        }
+                        
+                        toggleScheduleSection();
+                        $('#_woo_gf_form_id').on('change', toggleScheduleSection);
+                    });
+                </script>
+            </div>
+
             <div class="options_group">
                 <h4 style="margin-bottom: 10px;"><?php esc_html_e( 'מעקב הרשמות', 'woo-gf-integration' ); ?></h4>
                 <?php
