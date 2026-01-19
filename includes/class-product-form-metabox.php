@@ -520,34 +520,33 @@ class Woo_GF_Product_Form_Metabox {
 
         // Save form ID
         if ( isset( $_POST['_woo_gf_form_id'] ) ) {
-            $product = wc_get_product( $post_id );
-            if ( $product ) {
-                $old_form_id = $product->get_meta( '_woo_gf_form_id', true );
-                $new_form_id = sanitize_text_field( $_POST['_woo_gf_form_id'] );
+            $old_form_id = get_post_meta( $post_id, '_woo_gf_form_id', true );
+            $new_form_id = sanitize_text_field( $_POST['_woo_gf_form_id'] );
 
-                // Update product meta
-                $product->update_meta_data( '_woo_gf_form_id', $new_form_id );
+            // Update product meta
+            update_post_meta( $post_id, '_woo_gf_form_id', $new_form_id );
 
-                // Update form meta
-                if ( class_exists( 'GFAPI' ) ) {
-                    // If there was an old form, remove the link from it
-                    if ( ! empty( $old_form_id ) && $old_form_id !== $new_form_id ) {
-                        $old_form = GFAPI::get_form( $old_form_id );
-                        if ( $old_form ) {
-                            $old_form['woo_gf_linked_product_id'] = '';
-                            GFAPI::update_form( $old_form );
-                        }
+            // Update form meta
+            if ( class_exists( 'GFAPI' ) ) {
+                // If there was an old form, remove the link from it
+                if ( ! empty( $old_form_id ) && $old_form_id !== $new_form_id ) {
+                    $old_form = GFAPI::get_form( $old_form_id );
+                    if ( $old_form ) {
+                        $old_form['woo_gf_linked_product_id'] = '';
+                        GFAPI::update_form( $old_form );
                     }
-                    // If a new form is selected, add the link to it
-                    if ( ! empty( $new_form_id ) ) {
-                        $new_form = GFAPI::get_form( $new_form_id );
-                        if ( $new_form ) {
-                            $new_form['woo_gf_linked_product_id'] = $post_id;
-                            GFAPI::update_form( $new_form );
-                        }
+                }
+                // If a new form is selected, add the link to it
+                if ( ! empty( $new_form_id ) ) {
+                    $new_form = GFAPI::get_form( $new_form_id );
+                    if ( $new_form ) {
+                        $new_form['woo_gf_linked_product_id'] = $post_id;
+                        GFAPI::update_form( $new_form );
                     }
+                }
 
-                    // Save form schedule settings
+                // Save form schedule settings
+                if ( ! empty( $new_form_id ) ) {
                     $form = GFAPI::get_form( $new_form_id );
                     if ( $form ) {
                         // Form status (active/inactive)
@@ -573,21 +572,21 @@ class Woo_GF_Product_Form_Metabox {
                         GFAPI::update_form( $form );
                     }
                 }
-                
-                // Save registration tracking settings
-                $enable_email = isset( $_POST['_woo_gf_enable_registration_email'] ) ? 'yes' : 'no';
-                $product->update_meta_data( '_woo_gf_enable_registration_email', $enable_email );
+            }
+        }
+        
+        // Save registration tracking settings
+        if ( isset( $_POST['_woo_gf_enable_registration_email'] ) || isset( $_POST['_woo_gf_form_id'] ) ) {
+            $enable_email = isset( $_POST['_woo_gf_enable_registration_email'] ) ? 'yes' : 'no';
+            update_post_meta( $post_id, '_woo_gf_enable_registration_email', $enable_email );
 
-                if ( 'yes' === $enable_email ) {
-                    if ( isset( $_POST['_woo_gf_email_frequency'] ) ) {
-                        $product->update_meta_data( '_woo_gf_email_frequency', sanitize_text_field( $_POST['_woo_gf_email_frequency'] ) );
-                    }
-                    if ( isset( $_POST['_woo_gf_notification_email'] ) ) {
-                        $product->update_meta_data( '_woo_gf_notification_email', sanitize_email( $_POST['_woo_gf_notification_email'] ) );
-                    }
+            if ( 'yes' === $enable_email ) {
+                if ( isset( $_POST['_woo_gf_email_frequency'] ) ) {
+                    update_post_meta( $post_id, '_woo_gf_email_frequency', sanitize_text_field( $_POST['_woo_gf_email_frequency'] ) );
                 }
-                
-                $product->save();
+                if ( isset( $_POST['_woo_gf_notification_email'] ) ) {
+                    update_post_meta( $post_id, '_woo_gf_notification_email', sanitize_email( $_POST['_woo_gf_notification_email'] ) );
+                }
             }
         }
     }
