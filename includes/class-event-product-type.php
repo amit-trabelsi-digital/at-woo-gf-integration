@@ -266,32 +266,36 @@ class WooGF_Event_Product_Type {
 			}
 		}
 
-		$product = wc_get_product( $post_id );
-
-		if ( ! $product || ! $product->is_type( 'event' ) ) {
-			return;
+		// Check if this is an event product being saved
+		if ( ! isset( $_POST['product-type'] ) || 'event' !== $_POST['product-type'] ) {
+			// Also check existing product type if type is not in POST (e.g. quick edit)
+			$terms = wp_get_object_terms( $post_id, 'product_type', array( 'fields' => 'names' ) );
+			if ( is_wp_error( $terms ) || empty( $terms ) || ! in_array( 'event', $terms ) ) {
+				return;
+			}
 		}
+
+		// IMPORTANT: We use update_post_meta directly instead of $product->save() 
+		// to avoid conflicts with WooCommerce's own save process which handles 
+		// core fields like featured images. Calling $product->save() during 
+		// the standard save process can cause metadata (like thumbnails) to be lost.
 
 		// Save event date
 		if ( isset( $_POST['_event_date'] ) ) {
 			$event_date = ! empty( $_POST['_event_date'] ) ? str_replace( 'T', ' ', wc_clean( wp_unslash( $_POST['_event_date'] ) ) ) : '';
-			$product->set_event_date( $event_date );
-		} else {
-			$product->set_event_date( '' );
+			update_post_meta( $post_id, '_event_date', $event_date );
 		}
 
 		// Save event end date
 		if ( isset( $_POST['_event_end_date'] ) ) {
 			$event_end_date = ! empty( $_POST['_event_end_date'] ) ? str_replace( 'T', ' ', wc_clean( wp_unslash( $_POST['_event_end_date'] ) ) ) : '';
-			$product->set_event_end_date( $event_end_date );
-		} else {
-			$product->set_event_end_date( '' );
+			update_post_meta( $post_id, '_event_end_date', $event_end_date );
 		}
 
 		// Save event location
 		if ( isset( $_POST['_event_location'] ) ) {
 			$location = ! empty( $_POST['_event_location'] ) ? sanitize_textarea_field( wp_unslash( $_POST['_event_location'] ) ) : '';
-			$product->set_event_location( $location );
+			update_post_meta( $post_id, '_event_location', $location );
 		}
 
 		// Save max attendees - allow empty/0 for unlimited
@@ -299,50 +303,41 @@ class WooGF_Event_Product_Type {
 		if ( isset( $_POST['_max_attendees'] ) && ! empty( $_POST['_max_attendees'] ) ) {
 			$max_attendees = intval( $_POST['_max_attendees'] );
 		}
-		$product->set_max_attendees( $max_attendees );
+		update_post_meta( $post_id, '_max_attendees', $max_attendees );
 
 		// Save event type
 		if ( isset( $_POST['_event_type'] ) ) {
-			$product->set_event_type( sanitize_text_field( wp_unslash( $_POST['_event_type'] ) ) );
+			update_post_meta( $post_id, '_event_type', sanitize_text_field( wp_unslash( $_POST['_event_type'] ) ) );
 		}
 
 		// Save event duration
 		if ( isset( $_POST['_event_duration'] ) ) {
 			$duration = ! empty( $_POST['_event_duration'] ) ? wc_clean( wp_unslash( $_POST['_event_duration'] ) ) : '';
-			$product->set_event_duration( $duration );
-		} else {
-			$product->set_event_duration( '' );
+			update_post_meta( $post_id, '_event_duration', $duration );
 		}
 
 		// Save inquiries email
 		if ( isset( $_POST['_event_inquiries_email'] ) ) {
 			$email = ! empty( $_POST['_event_inquiries_email'] ) ? sanitize_email( wp_unslash( $_POST['_event_inquiries_email'] ) ) : '';
-			$product->set_inquiries_email( $email );
-		} else {
-			$product->set_inquiries_email( '' );
+			update_post_meta( $post_id, '_event_inquiries_email', $email );
 		}
 
-		// Save event manager - this is not in extra_data, so we use update_post_meta to avoid internal notice
+		// Save event manager
 		if ( isset( $_POST['_event_manager'] ) ) {
 			$manager = ! empty( $_POST['_event_manager'] ) ? sanitize_text_field( wp_unslash( $_POST['_event_manager'] ) ) : '';
 			update_post_meta( $post_id, '_event_manager', $manager );
-		} else {
-			update_post_meta( $post_id, '_event_manager', '' );
 		}
 
-		// Events are always virtual
-		$product->set_virtual( true );
-		$product->set_downloadable( false );
+		// Events are always virtual and manage stock based on max attendees
+		update_post_meta( $post_id, '_virtual', 'yes' );
+		update_post_meta( $post_id, '_manage_stock', 'yes' );
+		update_post_meta( $post_id, '_stock', $max_attendees );
 		
-		// Enable stock management for events
-		$product->set_manage_stock( true );
-		$product->set_stock_quantity( $max_attendees );
-		
-		// Save the product
-		$product->save();
+		// Clear WooCommerce product cache
+		wc_delete_product_transients( $post_id );
 
 		// Sync with Gravity Forms form limit if connected
-		$form_id = $product->get_meta( '_woo_gf_form_id', true );
+		$form_id = get_post_meta( $post_id, '_woo_gf_form_id', true );
 		if ( $form_id && class_exists( 'GFAPI' ) && $max_attendees > 0 ) {
 			$this->sync_with_gravity_forms( $form_id, $max_attendees );
 		}
