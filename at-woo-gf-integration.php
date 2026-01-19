@@ -3,9 +3,9 @@
  * Plugin Name: AT - WooCommerce Gravity Forms Integration
  * Plugin URI: https://amit-trabelsi.co.il/
  * Description: תוסף מתקדם שמחבר בין WooCommerce ל-Gravity Forms עם ניהול אירועים, הרשאות משתמשים ודשבורד הרשמות מלא
- * Version: 2.7.2
+ * Version: 2.8.0
  * Author: Amit Trabelsi
- * Author URI: https://amit-trabelsi.co.il/
+ * Author URI: https://amit-trabelsi-digital.com/
  * Text Domain: at-woo-gf-integration
  * Domain Path: /languages
  * License: GPL v2 or later
@@ -18,7 +18,7 @@
  * Requires PHP: 7.4
  * 
  * @package ATWooGFIntegration
- * @version 2.7.2
+ * @version 2.8.0
  * @author Amit Trabelsi
  * @since 1.0.0
  */
@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define plugin constants
-define( 'AT_WOO_GF_INTEGRATION_VERSION', '2.7.2' );
+define( 'AT_WOO_GF_INTEGRATION_VERSION', '2.8.0' );
 define( 'AT_WOO_GF_INTEGRATION_FILE', __FILE__ );
 define( 'AT_WOO_GF_INTEGRATION_PATH', plugin_dir_path( __FILE__ ) );
 define( 'AT_WOO_GF_INTEGRATION_URL', plugin_dir_url( __FILE__ ) );

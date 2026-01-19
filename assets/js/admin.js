@@ -269,28 +269,37 @@ jQuery(document).ready(function($) {
                 var self = $(this);
                 
                 // 1. Classic Editor / WooCommerce Products
-                var saveDraftBtn = $('#save-post');
                 var publishBtn = $('#publish');
+                var saveDraftBtn = $('#save-post');
+                var buttonClicked = false;
                 
                 // Logic:
-                // - If #save-post is visible (Draft/Pending/New), click it.
-                // - If #save-post is hidden, use #publish (Update for published posts).
+                // We prefer clicking the actual buttons as they trigger all validation and WordPress hooks.
+                // In WordPress, both "Publish" and "Update" buttons have id="publish".
                 
-                if (saveDraftBtn.length && saveDraftBtn.is(':visible')) {
-                    saveDraftBtn[0].click();
-                } else if (publishBtn.length && publishBtn.is(':visible')) {
+                if (publishBtn.length) {
+                    // Force click the button, even if not visible (might be in a collapsed sidebar)
                     publishBtn[0].click();
-                } else {
+                    buttonClicked = true;
+                } else if (saveDraftBtn.length) {
+                    saveDraftBtn[0].click();
+                    buttonClicked = true;
+                }
+                
+                if (!buttonClicked) {
                     // 2. Gutenberg / Block Editor fallback
                     var gutenbergSave = $('.editor-post-publish-button, .editor-post-publish-panel__toggle');
                     if (gutenbergSave.length) {
                         gutenbergSave[0].click();
-                    } else {
-                        // 3. Last resort - submit the form
-                        var postForm = $('form#post');
-                        if (postForm.length) {
-                            postForm.submit();
-                        }
+                        buttonClicked = true;
+                    }
+                }
+
+                if (!buttonClicked) {
+                    // 3. Last resort - submit the form directly
+                    var postForm = $('form#post');
+                    if (postForm.length) {
+                        postForm.submit();
                     }
                 }
                 
