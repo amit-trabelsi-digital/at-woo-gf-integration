@@ -234,9 +234,20 @@ class Woo_GF_Product_Form_Metabox {
                 
                 if ( $form ) {
                     $is_form_active = !isset( $form['is_active'] ) || $form['is_active'] !== false;
-                    $schedule_enabled = isset( $form['scheduleForm'] ) && $form['scheduleForm'];
-                    $schedule_start = isset( $form['scheduleStart'] ) ? $form['scheduleStart'] : '';
-                    $schedule_end = isset( $form['scheduleEnd'] ) ? $form['scheduleEnd'] : '';
+                    
+                    // Priority to post meta for the admin interface persistence
+                    $meta_schedule_enabled = get_post_meta( $post->ID, '_woo_gf_enable_form_schedule', true );
+                    if ( '' !== $meta_schedule_enabled ) {
+                        $schedule_enabled = 'yes' === $meta_schedule_enabled;
+                    } else {
+                        $schedule_enabled = isset( $form['scheduleForm'] ) && $form['scheduleForm'];
+                    }
+
+                    $meta_start = get_post_meta( $post->ID, '_woo_gf_schedule_start', true );
+                    $schedule_start = ! empty( $meta_start ) ? $meta_start : ( isset( $form['scheduleStart'] ) ? $form['scheduleStart'] : '' );
+
+                    $meta_end = get_post_meta( $post->ID, '_woo_gf_schedule_end', true );
+                    $schedule_end = ! empty( $meta_end ) ? $meta_end : ( isset( $form['scheduleEnd'] ) ? $form['scheduleEnd'] : '' );
                 }
                 
                 woocommerce_wp_checkbox( array(
@@ -263,7 +274,7 @@ class Woo_GF_Product_Form_Metabox {
                     'description' => __( 'הטופס ייפתח אוטומטית בתאריך ושעה זו', 'woo-gf-integration' ),
                     'desc_tip'    => true,
                     'type'        => 'datetime-local',
-                    'value'       => $schedule_start ? substr( str_replace( ' ', 'T', $schedule_start ), 0, 16 ) : '',
+                    'value'       => $schedule_start ? date('Y-m-d\TH:i', strtotime($schedule_start)) : '',
                     'wrapper_class' => 'show_if_schedule_enabled',
                 ) );
                 
@@ -273,7 +284,7 @@ class Woo_GF_Product_Form_Metabox {
                     'description' => __( 'הטופס ייסגר אוטומטית בתאריך ושעה זו', 'woo-gf-integration' ),
                     'desc_tip'    => true,
                     'type'        => 'datetime-local',
-                    'value'       => $schedule_end ? substr( str_replace( ' ', 'T', $schedule_end ), 0, 16 ) : '',
+                    'value'       => $schedule_end ? date('Y-m-d\TH:i', strtotime($schedule_end)) : '',
                     'wrapper_class' => 'show_if_schedule_enabled',
                 ) );
                 ?>
@@ -550,18 +561,25 @@ class Woo_GF_Product_Form_Metabox {
                     $form = GFAPI::get_form( $new_form_id );
                     if ( $form ) {
                         // Form status (active/inactive)
-                        $form['is_active'] = isset( $_POST['_woo_gf_form_is_active'] ) ? true : false;
+                        $is_active = isset( $_POST['_woo_gf_form_is_active'] ) ? true : false;
+                        $form['is_active'] = $is_active;
+                        update_post_meta( $post_id, '_woo_gf_form_is_active', $is_active ? 'yes' : 'no' );
                         
                         // Schedule settings
                         $schedule_enabled = isset( $_POST['_woo_gf_enable_form_schedule'] );
                         $form['scheduleForm'] = $schedule_enabled;
+                        update_post_meta( $post_id, '_woo_gf_enable_form_schedule', $schedule_enabled ? 'yes' : 'no' );
                         
                         if ( $schedule_enabled ) {
                             if ( isset( $_POST['_woo_gf_schedule_start'] ) ) {
-                                $form['scheduleStart'] = str_replace( 'T', ' ', $_POST['_woo_gf_schedule_start'] );
+                                $start_val = str_replace( 'T', ' ', $_POST['_woo_gf_schedule_start'] );
+                                $form['scheduleStart'] = $start_val;
+                                update_post_meta( $post_id, '_woo_gf_schedule_start', $start_val );
                             }
                             if ( isset( $_POST['_woo_gf_schedule_end'] ) ) {
-                                $form['scheduleEnd'] = str_replace( 'T', ' ', $_POST['_woo_gf_schedule_end'] );
+                                $end_val = str_replace( 'T', ' ', $_POST['_woo_gf_schedule_end'] );
+                                $form['scheduleEnd'] = $end_val;
+                                update_post_meta( $post_id, '_woo_gf_schedule_end', $end_val );
                             }
                             // Default message if not set
                             if ( empty( $form['scheduleMessage'] ) ) {
