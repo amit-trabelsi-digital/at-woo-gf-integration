@@ -1,17 +1,17 @@
 {
   "name": "AT - WooCommerce Gravity Forms Integration",
   "slug": "at-woo-gf-integration",
-  "version": "2.7.0",
+  "version": "2.7.1",
   "author": "Amit Trabelsi",
-  "author_profile": "https://amit-trabelsi.co.il/",
+  "author_profile": "https://amit-trabelsi-digital.com/",
   "requires": "6.0",
   "tested": "6.7",
   "requires_php": "7.4",
-  "download_url": "https://github.com/amit-trabelsi-digital/at-woo-gf-integration/releases/download/v2.7.0/at-woo-gf-integration-2.7.0.zip",
-  "last_updated": "2026-01-19 10:00:00",
+  "download_url": "https://github.com/amit-trabelsi-digital/at-woo-gf-integration/releases/download/v2.7.1/at-woo-gf-integration-2.7.1.zip",
+  "last_updated": "2026-01-19 11:00:00",
   "sections": {
     "description": "תוסף מתקדם שמחבר בין WooCommerce ל-Gravity Forms עם ניהול אירועים, הרשאות משתמשים ודשבורד הרשמות מלא",
-    "changelog": "<h4>2.7.0</h4><ul><li>Fix: Quick save button in Admin Bar now works correctly for existing products</li><li>Improvement: Better support for classic and block editors</li></ul><h4>2.6.4</h4><ul><li>Fix: standardization of event metadata handling</li></ul><h4>2.6.3</h4><ul><li>Version bump and maintenance</li></ul>"
+    "changelog": "<h4>2.7.1</h4><ul><li>Fix: Event form scheduling dates now load and save correctly</li><li>Fix: Added persistence for form active status and scheduling in product metabox</li></ul><h4>2.7.0</h4><ul><li>Fix: Quick save button in Admin Bar now works correctly for existing products</li><li>Improvement: Better support for classic and block editors</li></ul>"
   },
   "banners": {
     "low": "",

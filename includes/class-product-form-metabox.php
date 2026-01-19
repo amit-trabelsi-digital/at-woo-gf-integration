@@ -263,7 +263,7 @@ class Woo_GF_Product_Form_Metabox {
                     'description' => __( 'הטופס ייפתח אוטומטית בתאריך ושעה זו', 'woo-gf-integration' ),
                     'desc_tip'    => true,
                     'type'        => 'datetime-local',
-                    'value'       => $schedule_start ? str_replace( ' ', 'T', $schedule_start ) : '',
+                    'value'       => $schedule_start ? substr( str_replace( ' ', 'T', $schedule_start ), 0, 16 ) : '',
                     'wrapper_class' => 'show_if_schedule_enabled',
                 ) );
                 
@@ -273,7 +273,7 @@ class Woo_GF_Product_Form_Metabox {
                     'description' => __( 'הטופס ייסגר אוטומטית בתאריך ושעה זו', 'woo-gf-integration' ),
                     'desc_tip'    => true,
                     'type'        => 'datetime-local',
-                    'value'       => $schedule_end ? str_replace( ' ', 'T', $schedule_end ) : '',
+                    'value'       => $schedule_end ? substr( str_replace( ' ', 'T', $schedule_end ), 0, 16 ) : '',
                     'wrapper_class' => 'show_if_schedule_enabled',
                 ) );
                 ?>
@@ -545,6 +545,32 @@ class Woo_GF_Product_Form_Metabox {
                             $new_form['woo_gf_linked_product_id'] = $post_id;
                             GFAPI::update_form( $new_form );
                         }
+                    }
+
+                    // Save form schedule settings
+                    $form = GFAPI::get_form( $new_form_id );
+                    if ( $form ) {
+                        // Form status (active/inactive)
+                        $form['is_active'] = isset( $_POST['_woo_gf_form_is_active'] ) ? true : false;
+                        
+                        // Schedule settings
+                        $schedule_enabled = isset( $_POST['_woo_gf_enable_form_schedule'] );
+                        $form['scheduleForm'] = $schedule_enabled;
+                        
+                        if ( $schedule_enabled ) {
+                            if ( isset( $_POST['_woo_gf_schedule_start'] ) ) {
+                                $form['scheduleStart'] = str_replace( 'T', ' ', $_POST['_woo_gf_schedule_start'] );
+                            }
+                            if ( isset( $_POST['_woo_gf_schedule_end'] ) ) {
+                                $form['scheduleEnd'] = str_replace( 'T', ' ', $_POST['_woo_gf_schedule_end'] );
+                            }
+                            // Default message if not set
+                            if ( empty( $form['scheduleMessage'] ) ) {
+                                $form['scheduleMessage'] = __( 'מצטערים, ההרשמה לאירוע זה נסגרה.', 'woo-gf-integration' );
+                            }
+                        }
+                        
+                        GFAPI::update_form( $form );
                     }
                 }
                 
