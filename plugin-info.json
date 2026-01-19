@@ -1,17 +1,17 @@
 {
   "name": "AT - WooCommerce Gravity Forms Integration",
   "slug": "at-woo-gf-integration",
-  "version": "2.6.4",
+  "version": "2.7.0",
   "author": "Amit Trabelsi",
   "author_profile": "https://amit-trabelsi.co.il/",
   "requires": "6.0",
   "tested": "6.7",
   "requires_php": "7.4",
-  "download_url": "https://github.com/amit-trabelsi-digital/at-woo-gf-integration/releases/download/v2.6.4/at-woo-gf-integration-2.6.4.zip",
-  "last_updated": "2025-12-28 10:00:00",
+  "download_url": "https://github.com/amit-trabelsi-digital/at-woo-gf-integration/releases/download/v2.7.0/at-woo-gf-integration-2.7.0.zip",
+  "last_updated": "2026-01-19 10:00:00",
   "sections": {
     "description": "תוסף מתקדם שמחבר בין WooCommerce ל-Gravity Forms עם ניהול אירועים, הרשאות משתמשים ודשבורד הרשמות מלא",
-    "changelog": "<h4>2.6.3</h4><ul><li>Version bump and maintenance</li></ul><h4>2.6.2</h4><ul><li>Stability improvements</li><li>Documentation updates</li></ul><h4>2.6.1</h4><ul><li>Periodic version update</li><li>Stability improvements</li></ul><h4>2.6.0</h4><ul><li>Initial Git repository setup with automated tooling</li><li>Remote update mechanism</li><li>Version validation hooks</li></ul>"
+    "changelog": "<h4>2.7.0</h4><ul><li>Fix: Quick save button in Admin Bar now works correctly for existing products</li><li>Improvement: Better support for classic and block editors</li></ul><h4>2.6.4</h4><ul><li>Fix: standardization of event metadata handling</li></ul><h4>2.6.3</h4><ul><li>Version bump and maintenance</li></ul>"
   },
   "banners": {
     "low": "",

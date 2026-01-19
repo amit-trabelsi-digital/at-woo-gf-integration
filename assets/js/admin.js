@@ -263,28 +263,41 @@ jQuery(document).ready(function($) {
             saveBtn.on('click', function(e) {
                 e.preventDefault();
                 
-                var saveDraftBtn = $('#save-post');
-                var publishBtn = $('#publish');
-                
                 // Visual feedback
                 var originalText = $(this).text();
                 $(this).text('שומר...').prop('disabled', true);
                 var self = $(this);
                 
+                // 1. Classic Editor / WooCommerce Products
+                var saveDraftBtn = $('#save-post');
+                var publishBtn = $('#publish');
+                
                 // Logic:
                 // - If #save-post is visible (Draft/Pending/New), click it.
                 // - If #save-post is hidden, use #publish (Update for published posts).
                 
-                if (saveDraftBtn.is(':visible')) {
-                    saveDraftBtn.trigger('click');
+                if (saveDraftBtn.length && saveDraftBtn.is(':visible')) {
+                    saveDraftBtn[0].click();
+                } else if (publishBtn.length && publishBtn.is(':visible')) {
+                    publishBtn[0].click();
                 } else {
-                    publishBtn.trigger('click');
+                    // 2. Gutenberg / Block Editor fallback
+                    var gutenbergSave = $('.editor-post-publish-button, .editor-post-publish-panel__toggle');
+                    if (gutenbergSave.length) {
+                        gutenbergSave[0].click();
+                    } else {
+                        // 3. Last resort - submit the form
+                        var postForm = $('form#post');
+                        if (postForm.length) {
+                            postForm.submit();
+                        }
+                    }
                 }
                 
                 // Reset button after delay (if page doesn't reload)
                 setTimeout(function() {
                     self.text(originalText).prop('disabled', false);
-                }, 3000);
+                }, 5000);
             });
             
             div.append(saveBtn);
