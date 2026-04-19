@@ -233,5 +233,30 @@ GPL v2 or later
 
 ---
 
+## 🧑‍💻 Standalone development
+
+עבודה על ריפו התוסף בלבד (ללא ה-monorepo של Haruv):
+
+```bash
+git clone git@github.com:amit-trabelsi-digital/at-woo-gf-integration.git
+cd at-woo-gf-integration
+# ראה DEVELOPER.md להגדרת סביבת פיתוח
+```
+
+- ריפו זה עצמאי — יש לו גרסאות, CHANGELOG, ומנגנון עדכונים משלו.
+- ברירת מחדל לעבודה: ענף `dev`.
+
+## 🌐 Full-site context (Haruv)
+
+במונו-ריפו של Haruv, התוסף יושב תחת `haruv-new-wp/wp-content/plugins/at-woo-gf-integration/`.
+
+- **Monorepo wrapper:** {{MONOREPO_URL}}
+- **Theme used:** [`amit-trabelsi-digital/haruv-2025-theme`](https://github.com/amit-trabelsi-digital/haruv-2025-theme) (ל-render של חלק מהטפסים)
+- **Product/tech context:** [`../../../../docs/base/`](../../../../docs/base/)
+- **Root guidance (Docker, FTP deploy):** [`../../../../CLAUDE.md`](../../../../CLAUDE.md)
+- **Deploy mechanism:** GitHub Actions → Railway CDN → `https://updates.amiteam.io/at-woo-gf-integration/plugin-info.json` (ראה ה-CHANGELOG של התוסף, וסקיל `at-wp-plugins` לתהליך release).
+
+---
+
 **© 2025 Amit Trabelsi. All rights reserved.**  
 **פותח עם ❤️ עבור מכון חרוב** 
