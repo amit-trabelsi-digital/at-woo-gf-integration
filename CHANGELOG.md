@@ -5,6 +5,14 @@
 הפורמט מבוסס על [Keep a Changelog](https://keepachangelog.com/he/1.0.0/),
 והפרויקט משתמש ב-[Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.0] - 2026-06-24
+
+### נוסף
+- **רשימת המתנה לאירועים** - מנגנון מלא לרשימת המתנה כאשר אירוע מלא.
+  - מחלקה `class-event-waitlist.php` המנהלת אחסון (`_event_waitlist_entries`) ופונקציות API ציבוריות: `woo_gf_is_waitlist_enabled`, `woo_gf_get_waitlist_entries`, `woo_gf_get_waitlist_count`, `woo_gf_add_waitlist_entry`.
+  - התוסף הוא המקור היחיד לאחסון רשימת ההמתנה; התמה מאצילה אליו את כל הקריאות.
+  - תצוגת רשומות רשימת ההמתנה בדשבורד ההרשמות (טעינה דרך AJAX).
+
 ## [2.10.0] - 2026-01-19
 
 ### תוקן

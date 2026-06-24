@@ -484,6 +484,8 @@ class Woo_GF_Registration_Dashboard {
                 $registration_count = $event['registration_count'];
                 $capacity = $event['capacity'];
                 $available_spots = max(0, $capacity - $registration_count);
+                $waitlist_count = isset( $event['waitlist_count'] ) ? (int) $event['waitlist_count'] : 0;
+                $waitlist_enabled = ! empty( $event['waitlist_enabled'] );
                 
                 // Determine form status (open/closed) with detailed reason
                 // Use cached form from event data instead of fetching again
@@ -651,6 +653,13 @@ class Woo_GF_Registration_Dashboard {
                 } else {
                     echo '<div class="woo-gf-event-meta" style="color: #999;">ללא הגבלה</div>';
                 }
+
+                if ( $waitlist_enabled ) {
+                    echo '<div class="woo-gf-event-meta" style="margin-top: 6px;">';
+                    echo '⏳ ' . esc_html( number_format_i18n( $waitlist_count ) ) . ' ' . esc_html__( 'ברשימת המתנה', 'at-woo-gf-integration' );
+                    echo '</div>';
+                }
+
                 echo '</div>';
                 echo '</td>';
                 
@@ -690,6 +699,24 @@ class Woo_GF_Registration_Dashboard {
                 echo 'title="' . ($has_registrations ? 'ייצוא לאקסל' : 'אין הרשמות לייצוא') . '">';
                 echo '<span class="dashicons dashicons-download"></span>';
                 echo '</button>';
+
+                if ( $waitlist_enabled ) {
+                    $has_waitlist = $waitlist_count > 0;
+                    echo '<button type="button" class="woo-gf-btn woo-gf-btn-secondary woo-gf-btn-sm view-waitlist" ';
+                    echo 'data-event-id="' . esc_attr( $event_id ) . '" ';
+                    echo 'data-event-title="' . esc_attr( $event['title'] ) . '" ';
+                    echo 'title="' . esc_attr( $has_waitlist ? 'צפה ברשימת המתנה' : 'אין נרשמים לרשימת המתנה' ) . '">';
+                    echo '<span class="dashicons dashicons-clock"></span>';
+                    echo '</button>';
+
+                    echo '<button type="button" class="woo-gf-btn woo-gf-btn-success woo-gf-btn-sm export-waitlist" ';
+                    echo 'data-event-id="' . esc_attr( $event_id ) . '" ';
+                    echo 'data-event-title="' . esc_attr( $event['title'] ) . '" ';
+                    echo ( $has_waitlist ? '' : 'disabled="disabled" ' );
+                    echo 'title="' . esc_attr( $has_waitlist ? 'ייצוא רשימת המתנה' : 'אין רשימת המתנה לייצוא' ) . '">';
+                    echo '<span class="dashicons dashicons-media-spreadsheet"></span>';
+                    echo '</button>';
+                }
                 
                 echo '</div>';
                 echo '</td>';
@@ -1808,6 +1835,8 @@ class Woo_GF_Registration_Dashboard {
             
             // Get registration count (uses its own caching)
             $registration_count = $this->get_registration_count( $form_id, $product_id );
+            $waitlist_count     = function_exists( 'woo_gf_get_waitlist_count' ) ? woo_gf_get_waitlist_count( $product_id ) : 0;
+            $waitlist_enabled   = function_exists( 'woo_gf_is_waitlist_enabled' ) ? woo_gf_is_waitlist_enabled( $product_id ) : false;
             
             // Get event date - check multiple possible meta fields
             $event_date = get_post_meta( $product_id, '_event_date', true );
@@ -1832,6 +1861,8 @@ class Woo_GF_Registration_Dashboard {
                 'form' => $form,
                 'form_title' => $form_title,
                 'registration_count' => $registration_count,
+                'waitlist_count'     => $waitlist_count,
+                'waitlist_enabled'   => $waitlist_enabled,
                 'capacity' => $capacity,
                 'event_date' => $event_date,
                 'image_url' => '', // Skip image for performance

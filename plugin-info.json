@@ -1,17 +1,17 @@
 {
   "name": "AT - WooCommerce Gravity Forms Integration",
   "slug": "at-woo-gf-integration",
-  "version": "2.10.0",
+  "version": "2.11.0",
   "author": "Amit Trabelsi",
   "author_profile": "https://amit-trabelsi-digital.com/",
   "requires": "6.0",
   "tested": "6.7",
   "requires_php": "7.4",
-  "download_url": "https://github.com/amit-trabelsi-digital/at-woo-gf-integration/releases/download/v2.10.0/at-woo-gf-integration-2.10.0.zip",
-  "last_updated": "2026-01-19 15:00:00",
+  "download_url": "https://github.com/amit-trabelsi-digital/at-woo-gf-integration/releases/download/v2.11.0/at-woo-gf-integration-2.11.0.zip",
+  "last_updated": "2026-06-24 12:00:00",
   "sections": {
     "description": "תוסף מתקדם שמחבר בין WooCommerce ל-Gravity Forms עם ניהול אירועים, הרשאות משתמשים ודשבורד הרשמות מלא",
-    "changelog": "<h4>2.10.0</h4><ul><li>Fix: Resolved issue where product featured image would fail to save by refactoring event product save logic to use update_post_meta directly and avoiding redundant $product->save() calls during the save process</li></ul><h4>2.9.0</h4><ul><li>Fix: Event form scheduling dates now load correctly in the product edit interface by prioritizing post meta and ensuring proper datetime-local formatting</li></ul>"
+    "changelog": "<h4>2.11.0</h4><ul><li>Feature: Event waitlist — when an event is full, users can join a waitlist. Plugin owns canonical storage (_event_waitlist_entries) and exposes woo_gf_* API functions the theme delegates to; entries are viewable in the registrations dashboard via AJAX</li></ul><h4>2.10.0</h4><ul><li>Fix: Resolved issue where product featured image would fail to save by refactoring event product save logic to use update_post_meta directly and avoiding redundant $product->save() calls during the save process</li></ul><h4>2.9.0</h4><ul><li>Fix: Event form scheduling dates now load correctly in the product edit interface by prioritizing post meta and ensuring proper datetime-local formatting</li></ul>"
   },
   "banners": {
     "low": "",

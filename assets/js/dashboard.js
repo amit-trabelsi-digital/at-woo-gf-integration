@@ -83,6 +83,36 @@ jQuery(document).ready(function($) {
             
             exportRegistrationsToCSV(eventId, formId, eventTitle, $btn);
         });
+
+        $(document).on('click', '.view-waitlist', function(e) {
+            e.preventDefault();
+            const eventId = $(this).data('event-id');
+            const eventTitle = $(this).data('event-title');
+
+            if (isLoading) return;
+
+            showWaitlistSidepeek(eventId, eventTitle);
+        });
+
+        $(document).on('click', '.export-waitlist', function(e) {
+            e.preventDefault();
+
+            if ($(this).prop('disabled')) {
+                alert('❌ אין רשימת המתנה לייצוא');
+                return;
+            }
+
+            const eventId = $(this).data('event-id');
+            const eventTitle = $(this).data('event-title');
+            const url = wooGfDashboard.ajaxUrl + '?' + $.param({
+                action: 'woo_gf_export_waitlist',
+                nonce: wooGfDashboard.nonce,
+                product_id: eventId,
+                event_title: eventTitle,
+            });
+
+            window.location.href = url;
+        });
     }
 
     // Setup refresh button
@@ -164,6 +194,66 @@ jQuery(document).ready(function($) {
 
         // Load registrations data - pass the correct parameters
         loadRegistrationsData(eventId, formId);
+    }
+
+    function showWaitlistSidepeek(eventId, eventTitle) {
+        if (isLoading) return;
+
+        isLoading = true;
+
+        const sidepeekHtml = `
+            <div class="woo-gf-sidepeek-overlay"></div>
+            <div class="woo-gf-sidepeek" id="waitlist-sidepeek">
+                <div class="woo-gf-sidepeek-header">
+                    <h3>${eventTitle}</h3>
+                    <button type="button" class="woo-gf-sidepeek-close" aria-label="סגור">
+                        <span class="dashicons dashicons-no-alt"></span>
+                    </button>
+                </div>
+                <div class="woo-gf-sidepeek-content">
+                    <div class="woo-gf-loading">
+                        <div class="woo-gf-spinner"></div>
+                        <p>${wooGfDashboard.strings.loading}</p>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        $('body').append(sidepeekHtml);
+        $('.woo-gf-sidepeek-overlay').addClass('active');
+
+        currentSidepeek = $('#waitlist-sidepeek');
+        setTimeout(function() {
+            currentSidepeek.addClass('woo-gf-sidepeek-active');
+        }, 10);
+
+        loadWaitlistData(eventId, eventTitle);
+    }
+
+    function loadWaitlistData(eventId, eventTitle) {
+        $.ajax({
+            url: wooGfDashboard.ajaxUrl,
+            type: 'POST',
+            data: {
+                action: 'woo_gf_get_event_waitlist',
+                nonce: wooGfDashboard.nonce,
+                product_id: eventId,
+                event_title: eventTitle,
+            },
+            success: function(response) {
+                if (response.success && response.data && response.data.html) {
+                    displayRegistrations(response.data.html);
+                } else {
+                    displayError('שגיאה בטעינת רשימת ההמתנה');
+                }
+            },
+            error: function() {
+                displayError('שגיאה בטעינת רשימת ההמתנה');
+            },
+            complete: function() {
+                isLoading = false;
+            }
+        });
     }
 
     // Load registrations data via AJAX
