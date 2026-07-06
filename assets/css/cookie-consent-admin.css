@@ -1,0 +1,33 @@
+/**
+ * AT Cookie Consent — admin settings styling (RTL).
+ */
+.at-cc-admin__detected-list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.375rem;
+}
+.at-cc-admin__cats input[type="text"],
+.at-cc-admin__cats textarea,
+.at-cc-admin__cookies input[type="text"],
+.at-cc-admin__cookies select {
+	width: 100%;
+}
+.at-cc-admin__cookies td {
+	vertical-align: middle;
+}
+.at-cc-admin__cats td,
+.at-cc-admin__cookies th {
+	vertical-align: top;
+}
+.at-cc-admin .button-link-delete {
+	color: #b32d2e;
+	cursor: pointer;
+	background: none;
+	border: 0;
+	padding: 0;
+	text-decoration: underline;
+}
+.at-cc-admin__row input[type="text"],
+.at-cc-admin__row select {
+	min-width: 6rem;
+}

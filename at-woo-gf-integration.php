@@ -3,7 +3,7 @@
  * Plugin Name: AT - WooCommerce Gravity Forms Integration
  * Plugin URI: https://amit-trabelsi.co.il/
  * Description: תוסף מתקדם שמחבר בין WooCommerce ל-Gravity Forms עם ניהול אירועים, הרשאות משתמשים ודשבורד הרשמות מלא
- * Version: 2.11.0
+ * Version: 2.12.0
  * Author: Amit Trabelsi
  * Author URI: https://amit-trabelsi-digital.com/
  * Text Domain: at-woo-gf-integration
@@ -18,7 +18,7 @@
  * Requires PHP: 7.4
  * 
  * @package ATWooGFIntegration
- * @version 2.11.0
+ * @version 2.12.0
  * @author Amit Trabelsi
  * @since 1.0.0
  */
@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define plugin constants
-define( 'AT_WOO_GF_INTEGRATION_VERSION', '2.11.0' );
+define( 'AT_WOO_GF_INTEGRATION_VERSION', '2.12.0' );
 define( 'AT_WOO_GF_INTEGRATION_FILE', __FILE__ );
 define( 'AT_WOO_GF_INTEGRATION_PATH', plugin_dir_path( __FILE__ ) );
 define( 'AT_WOO_GF_INTEGRATION_URL', plugin_dir_url( __FILE__ ) );
@@ -65,9 +65,13 @@ class AT_Woo_GF_Integration {
     private function __construct() {
         // Declare HPOS compatibility
         add_action( 'before_woocommerce_init', array( $this, 'declare_hpos_compatibility' ) );
-        
+
         // Check if required plugins are active
         add_action( 'plugins_loaded', array( $this, 'check_requirements' ) );
+
+        // GDPR cookie consent — site-wide, must load even without WooCommerce/GF.
+        require_once AT_WOO_GF_INTEGRATION_PATH . 'includes/class-cookie-consent.php';
+        AT_Woo_GF_Cookie_Consent::get_instance();
     }
     
     /**
