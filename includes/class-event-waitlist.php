@@ -87,6 +87,64 @@ function woo_gf_get_registration_count( $product_id ) {
 }
 
 /**
+ * Invalidate the cached registration count for a product.
+ *
+ * The count is cached in a transient for 2 minutes. Without this, a new
+ * registration does not immediately flip an event to "full" / show the waitlist
+ * button until the transient expires. Call this whenever a registration is
+ * created or removed for the event's form.
+ *
+ * @param int $product_id Product ID.
+ * @return void
+ */
+function woo_gf_flush_registration_count( $product_id ) {
+	$product_id = absint( $product_id );
+	if ( ! $product_id ) {
+		return;
+	}
+	$form_id = get_post_meta( $product_id, '_woo_gf_form_id', true );
+	if ( $form_id ) {
+		delete_transient( 'woo_gf_reg_count_' . $product_id . '_' . $form_id );
+		// Dashboard writes the key with the arguments reversed; clear that too.
+		delete_transient( 'woo_gf_reg_count_' . $form_id . '_' . $product_id );
+	}
+}
+
+/**
+ * Flush the registration-count cache when a Gravity Forms entry is submitted.
+ *
+ * Fires late (priority 20) so the entry's woo_gf_product_id meta (set at
+ * priority 10 by the product-form metabox) is already stored.
+ *
+ * @param array $entry Gravity Forms entry.
+ * @param array $form  Gravity Forms form.
+ * @return void
+ */
+function woo_gf_flush_registration_count_on_submission( $entry, $form ) {
+	$product_id = 0;
+
+	// Product ID may be posted directly (AJAX add-to-cart popup) …
+	if ( isset( $_POST['woo_gf_product_id'] ) ) {
+		$product_id = absint( $_POST['woo_gf_product_id'] );
+	}
+
+	// … or resolved from the current product page.
+	if ( ! $product_id && function_exists( 'is_product' ) && is_product() ) {
+		$product_id = get_queried_object_id();
+	}
+
+	// … or read back from the entry meta the metabox just saved.
+	if ( ! $product_id && function_exists( 'gform_get_meta' ) && isset( $entry['id'] ) ) {
+		$product_id = absint( gform_get_meta( $entry['id'], 'woo_gf_product_id' ) );
+	}
+
+	if ( $product_id ) {
+		woo_gf_flush_registration_count( $product_id );
+	}
+}
+add_action( 'gform_after_submission', 'woo_gf_flush_registration_count_on_submission', 20, 2 );
+
+/**
  * Add waitlist entry.
  *
  * @param int   $product_id Product ID.

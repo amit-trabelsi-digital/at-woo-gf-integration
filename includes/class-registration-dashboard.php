@@ -234,6 +234,11 @@ class Woo_GF_Registration_Dashboard {
                             <span class="woo-gf-tab-label"><?php esc_html_e( 'הרשמות', 'at-woo-gf-integration' ); ?></span>
                             <span class="woo-gf-tab-count"><?php echo $this->get_total_entries_count(); ?></span>
                         </button>
+                        <button class="woo-gf-tab-btn" data-tab="waitlist">
+                            <span class="dashicons dashicons-clock"></span>
+                            <span class="woo-gf-tab-label"><?php esc_html_e( 'רשימות המתנה', 'at-woo-gf-integration' ); ?></span>
+                            <span class="woo-gf-tab-count"><?php echo (int) $this->get_waitlist_events_count(); ?></span>
+                        </button>
                     </div>
 
                     <!-- Tabs Content -->
@@ -249,11 +254,16 @@ class Woo_GF_Registration_Dashboard {
 
                         <!-- טאב הרשמות -->
                         <div id="woo-gf-tab-registrations" class="woo-gf-tab-panel">
-                            <?php 
+                            <?php
                             error_log( 'WooGF: Before render_entries_table()' );
-                            $this->render_entries_table(); 
+                            $this->render_entries_table();
                             error_log( 'WooGF: After render_entries_table()' );
                             ?>
+                        </div>
+
+                        <!-- טאב רשימות המתנה -->
+                        <div id="woo-gf-tab-waitlist" class="woo-gf-tab-panel">
+                            <?php $this->render_waitlist_table(); ?>
                         </div>
                     </div>
                 </div>
@@ -2489,5 +2499,126 @@ class Woo_GF_Registration_Dashboard {
             'csv_data' => $csv_string,
             'filename' => $filename,
         ) );
+    }
+
+    /**
+     * Get all event products that currently have waitlist entries.
+     *
+     * @return array<int,WP_Post>
+     */
+    private function get_waitlist_events() {
+        $query = new WP_Query( array(
+            'post_type'      => 'product',
+            'posts_per_page' => -1,
+            'post_status'    => 'publish',
+            'orderby'        => 'title',
+            'order'          => 'ASC',
+            'no_found_rows'  => true,
+            'meta_query'     => array(
+                array(
+                    'key'     => '_event_waitlist_entries',
+                    'compare' => 'EXISTS',
+                ),
+            ),
+        ) );
+
+        // Filter out products whose entries array is empty (meta exists but []).
+        $events = array();
+        foreach ( $query->posts as $post ) {
+            $count = function_exists( 'woo_gf_get_waitlist_count' )
+                ? woo_gf_get_waitlist_count( $post->ID )
+                : 0;
+            if ( $count > 0 ) {
+                $events[] = $post;
+            }
+        }
+        wp_reset_postdata();
+
+        return $events;
+    }
+
+    /**
+     * Count events that have at least one waitlist entry (for the tab badge).
+     *
+     * @return int
+     */
+    private function get_waitlist_events_count() {
+        return count( $this->get_waitlist_events() );
+    }
+
+    /**
+     * Render the "רשימות המתנה" tab: one row per event that has people waiting,
+     * with view / export actions wired to the existing waitlist AJAX handlers.
+     *
+     * @return void
+     */
+    private function render_waitlist_table() {
+        $events = $this->get_waitlist_events();
+
+        if ( empty( $events ) ) {
+            echo '<div class="woo-gf-empty-state" style="padding: 40px; text-align: center; color: #777;">';
+            echo '<span class="dashicons dashicons-clock" style="font-size: 40px; width: 40px; height: 40px;"></span>';
+            echo '<p>' . esc_html__( 'אין כרגע נרשמים לרשימות המתנה.', 'at-woo-gf-integration' ) . '</p>';
+            echo '</div>';
+            return;
+        }
+        ?>
+        <div class="woo-gf-table-container">
+            <table class="woo-gf-table">
+                <thead>
+                    <tr>
+                        <th><?php esc_html_e( 'אירוע', 'at-woo-gf-integration' ); ?></th>
+                        <th><?php esc_html_e( 'תאריך האירוע', 'at-woo-gf-integration' ); ?></th>
+                        <th><?php esc_html_e( 'נרשמים לרשימת המתנה', 'at-woo-gf-integration' ); ?></th>
+                        <th><?php esc_html_e( 'פעולות', 'at-woo-gf-integration' ); ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    foreach ( $events as $event_post ) :
+                        $event_id       = $event_post->ID;
+                        $event_title    = $event_post->post_title;
+                        $waitlist_count = woo_gf_get_waitlist_count( $event_id );
+                        $event_date_raw = get_post_meta( $event_id, '_event_date', true );
+                        $event_date     = $event_date_raw
+                            ? date_i18n( 'd/m/Y', strtotime( $event_date_raw ) )
+                            : __( 'ללא תאריך', 'at-woo-gf-integration' );
+                        ?>
+                        <tr>
+                            <td>
+                                <div class="woo-gf-event-title">
+                                    <a href="<?php echo esc_url( get_edit_post_link( $event_id ) ); ?>">
+                                        <?php echo esc_html( $event_title ); ?>
+                                    </a>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="woo-gf-event-meta"><?php echo esc_html( $event_date ); ?></div>
+                            </td>
+                            <td>
+                                <div class="woo-gf-event-title">
+                                    ⏳ <?php echo esc_html( number_format_i18n( $waitlist_count ) ); ?>
+                                </div>
+                            </td>
+                            <td class="woo-gf-entry-actions">
+                                <button type="button" class="woo-gf-btn woo-gf-btn-secondary woo-gf-btn-sm view-waitlist"
+                                    data-event-id="<?php echo esc_attr( $event_id ); ?>"
+                                    data-event-title="<?php echo esc_attr( $event_title ); ?>"
+                                    title="<?php esc_attr_e( 'צפה ברשימת המתנה', 'at-woo-gf-integration' ); ?>">
+                                    <span class="dashicons dashicons-visibility"></span>
+                                </button>
+                                <button type="button" class="woo-gf-btn woo-gf-btn-success woo-gf-btn-sm export-waitlist"
+                                    data-event-id="<?php echo esc_attr( $event_id ); ?>"
+                                    data-event-title="<?php echo esc_attr( $event_title ); ?>"
+                                    title="<?php esc_attr_e( 'ייצוא רשימת המתנה', 'at-woo-gf-integration' ); ?>">
+                                    <span class="dashicons dashicons-download"></span>
+                                </button>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <?php
     }
 } 
