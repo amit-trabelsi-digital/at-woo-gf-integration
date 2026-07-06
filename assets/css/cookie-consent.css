@@ -12,6 +12,12 @@
 	font-family: inherit;
 }
 
+/* The `hidden` attribute must win over the display rules below, otherwise the
+   modal's full-screen overlay stays rendered and swallows all clicks. */
+.at-cc [hidden] {
+	display: none !important;
+}
+
 /* ── Banner ──────────────────────────────────────────────────────────── */
 .at-cc__banner {
 	position: fixed;

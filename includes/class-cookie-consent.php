@@ -75,8 +75,88 @@ class AT_Woo_GF_Cookie_Consent {
 		}
 		$settings               = array_merge( $defaults, $saved );
 		$settings['categories'] = ( isset( $saved['categories'] ) && is_array( $saved['categories'] ) ) ? $saved['categories'] : $defaults['categories'];
-		$settings['cookies']    = ( isset( $saved['cookies'] ) && is_array( $saved['cookies'] ) ) ? $saved['cookies'] : array();
+		// Seed a sensible default registry until the admin saves their own, so
+		// the preferences modal always lists real cookies with details.
+		if ( isset( $saved['cookies'] ) && is_array( $saved['cookies'] ) && ! empty( $saved['cookies'] ) ) {
+			$settings['cookies'] = $saved['cookies'];
+		} else {
+			$settings['cookies'] = $this->default_cookies();
+		}
 		return $settings;
+	}
+
+	/**
+	 * A starter cookie registry covering the cookies this WordPress/WooCommerce
+	 * site commonly sets. Used until the admin defines their own list.
+	 *
+	 * @return array
+	 */
+	public function default_cookies() {
+		return array(
+			array(
+				'name'     => 'at_cookie_consent',
+				'category' => 'necessary',
+				'provider' => __( 'אתר זה', 'at-woo-gf-integration' ),
+				'purpose'  => __( 'שומרת את בחירת הסכמת העוגיות שלך.', 'at-woo-gf-integration' ),
+				'expiry'   => __( '6 חודשים', 'at-woo-gf-integration' ),
+			),
+			array(
+				'name'     => 'PHPSESSID',
+				'category' => 'necessary',
+				'provider' => __( 'אתר זה', 'at-woo-gf-integration' ),
+				'purpose'  => __( 'מזהה הפעלה (session) לשמירת מצב בזמן הגלישה.', 'at-woo-gf-integration' ),
+				'expiry'   => __( 'עד סגירת הדפדפן', 'at-woo-gf-integration' ),
+			),
+			array(
+				'name'     => 'woocommerce_cart_hash',
+				'category' => 'necessary',
+				'provider' => 'WooCommerce',
+				'purpose'  => __( 'שומרת את תוכן עגלת הקניות בין עמודים.', 'at-woo-gf-integration' ),
+				'expiry'   => __( 'סשן', 'at-woo-gf-integration' ),
+			),
+			array(
+				'name'     => 'woocommerce_items_in_cart',
+				'category' => 'necessary',
+				'provider' => 'WooCommerce',
+				'purpose'  => __( 'מציינת אם יש פריטים בעגלה.', 'at-woo-gf-integration' ),
+				'expiry'   => __( 'סשן', 'at-woo-gf-integration' ),
+			),
+			array(
+				'name'     => 'wp_woocommerce_session_',
+				'category' => 'necessary',
+				'purpose'  => __( 'מקשרת בין המבקר לנתוני העגלה/ההזמנה שלו.', 'at-woo-gf-integration' ),
+				'provider' => 'WooCommerce',
+				'expiry'   => __( 'יומיים', 'at-woo-gf-integration' ),
+			),
+			array(
+				'name'     => 'pll_language',
+				'category' => 'functional',
+				'provider' => 'Polylang',
+				'purpose'  => __( 'זוכרת את שפת האתר שבחרת.', 'at-woo-gf-integration' ),
+				'expiry'   => __( 'שנה', 'at-woo-gf-integration' ),
+			),
+			array(
+				'name'     => '_ga',
+				'category' => 'analytics',
+				'provider' => 'Google Analytics',
+				'purpose'  => __( 'מבחינה בין משתמשים לצורך מדידת שימוש באתר.', 'at-woo-gf-integration' ),
+				'expiry'   => __( 'שנתיים', 'at-woo-gf-integration' ),
+			),
+			array(
+				'name'     => '_gid',
+				'category' => 'analytics',
+				'provider' => 'Google Analytics',
+				'purpose'  => __( 'מבחינה בין משתמשים לצורך מדידת שימוש באתר.', 'at-woo-gf-integration' ),
+				'expiry'   => __( '24 שעות', 'at-woo-gf-integration' ),
+			),
+			array(
+				'name'     => 'sbjs_current',
+				'category' => 'marketing',
+				'provider' => 'Sourcebuster',
+				'purpose'  => __( 'עוקבת אחר מקור ההגעה לאתר (שיוך שיווקי).', 'at-woo-gf-integration' ),
+				'expiry'   => __( '6 חודשים', 'at-woo-gf-integration' ),
+			),
+		);
 	}
 
 	/**
