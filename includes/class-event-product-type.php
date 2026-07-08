@@ -417,12 +417,16 @@ class WooGF_Event_Product_Type {
 				unset( $tabs['inventory']['class'][ $key ] );
 			}
 		}
-		
-		// Make sure general tab is always visible for events
-		if ( isset( $tabs['general']['class'] ) ) {
-			$tabs['general']['class'][] = 'show_if_event';
-		}
-		
+
+		// NOTE: We intentionally do NOT add 'show_if_event' to the general tab.
+		// The 'event' product type inherits from the simple product type, so the
+		// general tab (and its pricing panel) is already displayed for events by
+		// WooCommerce core. Previously this method appended 'show_if_event' to the
+		// general tab for EVERY product; combined with the `.show_if_event { display:none }`
+		// rule in event_admin_scripts(), that hid the general tab (and the price field)
+		// for regular/simple products — it only reappeared after switching the product
+		// to the event type. Leaving the general tab untouched fixes that.
+
 		return $tabs;
 	}
 
