@@ -5,6 +5,15 @@
 הפורמט מבוסס על [Keep a Changelog](https://keepachangelog.com/he/1.0.0/),
 והפרויקט משתמש ב-[Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.13.3] - 2026-07-08
+
+### שונה
+- **`uninstall.php` מנקה יותר** - נוספה מחיקת אופציות מודול הסכמת העוגיות (`at_woo_gf_cookie_settings`, `at_woo_gf_cookie_detected`), מטא רשימות ההמתנה (`_event_waitlist_entries`, `enable_waitlist`) וכל ה-transients של `woo_gf_`. השאילתה `SHOW TABLES` עברה ל-`$wpdb->prepare`.
+- **i18n**: נוצר `languages/at-woo-gf-integration.pot` (222 מחרוזות) — התוסף מוכן לתרגום.
+
+### תיעוד
+- README: עדכון גרסה 2.6.0→2.13.3. DEVELOPER.md: החלפת דומייני העדכונים הישנים (alltech.co.il) במנגנון ה-GitHub raw בפועל + כתובת תמיכה מעודכנת. CHANGELOG: ניקוי סעיף Unreleased מפריטים ששוחררו (CSV, waitlist, עוגיות).
+
 ## [2.13.2] - 2026-07-08
 
 ### אבטחה
@@ -389,6 +398,7 @@
 ## [Unreleased]
 ### תכנון עתידי
 - אינטגרציה עם LearnDash
-- ייצוא נתונים ל-CSV
 - שליחת אימיילים אוטומטיים למשתתפים
-- ניהול רשימות המתנה לאירועים 
+- מודול התראות back-office (טפסים ללא נרשמים מעל 5 ימים)
+
+_בוצע: ייצוא CSV (2.13.0), ניהול רשימות המתנה (2.11), מודול הסכמת עוגיות (2.12)._

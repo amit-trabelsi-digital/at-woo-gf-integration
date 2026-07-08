@@ -1,13 +1,13 @@
 {
   "name": "AT - WooCommerce Gravity Forms Integration",
   "slug": "at-woo-gf-integration",
-  "version": "2.13.2",
+  "version": "2.13.3",
   "author": "Amit Trabelsi",
   "author_profile": "https://amit-trabelsi-digital.com/",
   "requires": "6.0",
   "tested": "6.7",
   "requires_php": "7.4",
-  "download_url": "https://github.com/amit-trabelsi-digital/at-woo-gf-integration/releases/download/v2.13.2/at-woo-gf-integration-2.13.2.zip",
+  "download_url": "https://github.com/amit-trabelsi-digital/at-woo-gf-integration/releases/download/v2.13.3/at-woo-gf-integration-2.13.3.zip",
   "last_updated": "2026-07-06 16:38:42",
   "sections": {
     "description": "תוסף מתקדם שמחבר בין WooCommerce ל-Gravity Forms עם ניהול אירועים, הרשאות משתמשים ודשבורד הרשמות מלא",

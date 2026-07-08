@@ -1,0 +1,960 @@
+# Copyright (C) 2026 Amit Trabelsi
+# This file is distributed under the GPL v2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: AT - WooCommerce Gravity Forms Integration 2.13.2\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/at-woo-gf-integration\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-07-08T08:31:31+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: at-woo-gf-integration\n"
+
+#. Plugin Name of the plugin
+#: at-woo-gf-integration.php
+msgid "AT - WooCommerce Gravity Forms Integration"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: at-woo-gf-integration.php
+msgid "https://amit-trabelsi.co.il/"
+msgstr ""
+
+#. Description of the plugin
+#: at-woo-gf-integration.php
+msgid "תוסף מתקדם שמחבר בין WooCommerce ל-Gravity Forms עם ניהול אירועים, הרשאות משתמשים ודשבורד הרשמות מלא"
+msgstr ""
+
+#. Author of the plugin
+#: at-woo-gf-integration.php
+msgid "Amit Trabelsi"
+msgstr ""
+
+#. Author URI of the plugin
+#: at-woo-gf-integration.php
+msgid "https://amit-trabelsi-digital.com/"
+msgstr ""
+
+#: at-woo-gf-integration.php:209
+#: includes/class-registration-dashboard.php:114
+msgid "טוען..."
+msgstr ""
+
+#: at-woo-gf-integration.php:210
+msgid "אירעה שגיאה. אנא נסה שוב."
+msgstr ""
+
+#: at-woo-gf-integration.php:211
+msgid "צור טופס חדש"
+msgstr ""
+
+#: at-woo-gf-integration.php:212
+msgid "האם ברצונך לערוך את הטופס כעת?"
+msgstr ""
+
+#: at-woo-gf-integration.php:213
+msgid "הרשמה ל-"
+msgstr ""
+
+#: at-woo-gf-integration.php:214
+msgid "כבר קיים טופס משויך למוצר זה. האם ברצונך ליצור טופס חדש ולהחליף את הקיים?"
+msgstr ""
+
+#: at-woo-gf-integration.php:250
+msgid "תוסף AT - WooCommerce Gravity Forms Integration דורש שתוסף WooCommerce יהיה מותקן ופעיל."
+msgstr ""
+
+#: at-woo-gf-integration.php:261
+msgid "תוסף AT - WooCommerce Gravity Forms Integration דורש שתוסף Gravity Forms יהיה מותקן ופעיל."
+msgstr ""
+
+#: at-woo-gf-integration.php:280
+#: at-woo-gf-integration.php:302
+msgid "כל המאמרים"
+msgstr ""
+
+#: at-woo-gf-integration.php:283
+#: at-woo-gf-integration.php:294
+#: at-woo-gf-integration.php:297
+msgid "מאמר חדש"
+msgstr ""
+
+#: at-woo-gf-integration.php:292
+msgid "מאמרים"
+msgstr ""
+
+#: at-woo-gf-integration.php:293
+#: at-woo-gf-integration.php:303
+msgid "מאמר"
+msgstr ""
+
+#: at-woo-gf-integration.php:295
+msgid "הוסף מאמר חדש"
+msgstr ""
+
+#: at-woo-gf-integration.php:296
+msgid "ערוך מאמר"
+msgstr ""
+
+#: at-woo-gf-integration.php:298
+msgid "צפה במאמר"
+msgstr ""
+
+#: at-woo-gf-integration.php:299
+msgid "חפש מאמרים"
+msgstr ""
+
+#: at-woo-gf-integration.php:300
+msgid "לא נמצאו מאמרים"
+msgstr ""
+
+#: at-woo-gf-integration.php:301
+msgid "לא נמצאו מאמרים באשפה"
+msgstr ""
+
+#: at-woo-gf-integration.php:332
+msgid "ניהול אתר"
+msgstr ""
+
+#: at-woo-gf-integration.php:344
+msgid "ניהול אתר מלא"
+msgstr ""
+
+#: at-woo-gf-integration.php:354
+msgid "ניהול חנות"
+msgstr ""
+
+#: at-woo-gf-integration.php:365
+msgid "ניהול תוכן"
+msgstr ""
+
+#: at-woo-gf-integration.php:376
+msgid "ניהול עריכה"
+msgstr ""
+
+#: at-woo-gf-integration.php:387
+msgid "ניהול שיווק"
+msgstr ""
+
+#: at-woo-gf-integration.php:398
+msgid "תמיכה טכנית"
+msgstr ""
+
+#: at-woo-gf-integration.php:407
+msgid "גישה מוגבלת"
+msgstr ""
+
+#: at-woo-gf-integration.php:418
+msgid "ניהול מותאם אישית"
+msgstr ""
+
+#: at-woo-gf-integration.php:424
+msgid "גישה חלקית"
+msgstr ""
+
+#: at-woo-gf-integration.php:493
+#: at-woo-gf-integration.php:494
+#: menu-customization-examples.php:221
+msgid "קופונים"
+msgstr ""
+
+#: at-woo-gf-integration.php:516
+#: at-woo-gf-integration.php:517
+msgid "הזמנות"
+msgstr ""
+
+#: at-woo-gf-integration.php:548
+msgid "פיתוח ידע ומחקר"
+msgstr ""
+
+#: at-woo-gf-integration.php:655
+msgctxt "post status"
+msgid "מפורסם אך נגיש בלינק ישיר בלבד"
+msgstr ""
+
+#: at-woo-gf-integration.php:660
+#, php-format
+msgid "מפורסם אך נגיש בלינק ישיר בלבד <span class=\"count\">(%s)</span>"
+msgid_plural "מפורסם אך נגיש בלינק ישיר בלבד <span class=\"count\">(%s)</span>"
+msgstr[0] ""
+msgstr[1] ""
+
+#: at-woo-gf-integration.php:715
+msgid "מפורסם אך נגיש בלינק ישיר בלבד"
+msgstr ""
+
+#: includes/class-ajax-handler.php:53
+#: includes/class-ajax-handler.php:241
+msgid "Security check failed"
+msgstr ""
+
+#: includes/class-cookie-consent.php:66
+msgid "אנחנו משתמשים בעוגיות כדי לשפר את חוויית הגלישה שלך. חלקן חיוניות לתפקוד האתר, ואחרות עוזרות לנו להבין כיצד משתמשים באתר. באפשרותך לבחור אילו עוגיות לאשר."
+msgstr ""
+
+#: includes/class-cookie-consent.php:99
+#: includes/class-cookie-consent.php:106
+msgid "אתר זה"
+msgstr ""
+
+#: includes/class-cookie-consent.php:100
+msgid "שומרת את בחירת הסכמת העוגיות שלך."
+msgstr ""
+
+#: includes/class-cookie-consent.php:101
+#: includes/class-cookie-consent.php:157
+msgid "6 חודשים"
+msgstr ""
+
+#: includes/class-cookie-consent.php:107
+msgid "מזהה הפעלה (session) לשמירת מצב בזמן הגלישה."
+msgstr ""
+
+#: includes/class-cookie-consent.php:108
+msgid "עד סגירת הדפדפן"
+msgstr ""
+
+#: includes/class-cookie-consent.php:114
+msgid "שומרת את תוכן עגלת הקניות בין עמודים."
+msgstr ""
+
+#: includes/class-cookie-consent.php:115
+#: includes/class-cookie-consent.php:122
+msgid "סשן"
+msgstr ""
+
+#: includes/class-cookie-consent.php:121
+msgid "מציינת אם יש פריטים בעגלה."
+msgstr ""
+
+#: includes/class-cookie-consent.php:127
+msgid "מקשרת בין המבקר לנתוני העגלה/ההזמנה שלו."
+msgstr ""
+
+#: includes/class-cookie-consent.php:129
+msgid "יומיים"
+msgstr ""
+
+#: includes/class-cookie-consent.php:135
+msgid "זוכרת את שפת האתר שבחרת."
+msgstr ""
+
+#: includes/class-cookie-consent.php:136
+msgid "שנה"
+msgstr ""
+
+#: includes/class-cookie-consent.php:142
+#: includes/class-cookie-consent.php:149
+msgid "מבחינה בין משתמשים לצורך מדידת שימוש באתר."
+msgstr ""
+
+#: includes/class-cookie-consent.php:143
+msgid "שנתיים"
+msgstr ""
+
+#: includes/class-cookie-consent.php:150
+msgid "24 שעות"
+msgstr ""
+
+#: includes/class-cookie-consent.php:156
+msgid "עוקבת אחר מקור ההגעה לאתר (שיוך שיווקי)."
+msgstr ""
+
+#: includes/class-cookie-consent.php:170
+msgid "הכרחיות"
+msgstr ""
+
+#: includes/class-cookie-consent.php:171
+msgid "עוגיות חיוניות לתפקוד האתר. תמיד פעילות."
+msgstr ""
+
+#: includes/class-cookie-consent.php:175
+msgid "תפקודיות"
+msgstr ""
+
+#: includes/class-cookie-consent.php:176
+msgid "מאפשרות פונקציונליות מתקדמת והעדפות אישיות."
+msgstr ""
+
+#: includes/class-cookie-consent.php:180
+msgid "אנליטיקה"
+msgstr ""
+
+#: includes/class-cookie-consent.php:181
+msgid "עוזרות לנו להבין כיצד המבקרים משתמשים באתר."
+msgstr ""
+
+#: includes/class-cookie-consent.php:185
+#: menu-customization-examples.php:83
+msgid "שיווק"
+msgstr ""
+
+#: includes/class-cookie-consent.php:186
+msgid "משמשות להצגת פרסום מותאם אישית."
+msgstr ""
+
+#: includes/class-cookie-consent.php:257
+#: includes/class-cookie-consent.php:258
+msgid "הסכמת עוגיות"
+msgstr ""
+
+#: includes/class-cookie-consent.php:290
+msgid "להסיר עוגייה זו?"
+msgstr ""
+
+#: includes/class-event-product-type.php:149
+msgid "משך זמן (בשעות)"
+msgstr ""
+
+#: includes/class-event-product-type.php:151
+msgid "הזן את משך האירוע בשעות. לדוגמה: 2.5"
+msgstr ""
+
+#: includes/class-event-product-type.php:164
+msgid "מייל לבירורים"
+msgstr ""
+
+#: includes/class-event-product-type.php:165
+msgid "לדוגמה: info@example.com"
+msgstr ""
+
+#: includes/class-event-product-type.php:167
+msgid "כתובת המייל אליה יגיעו פניות בנוגע לאירוע"
+msgstr ""
+
+#: includes/class-event-product-type.php:176
+msgid "פרוייקטור אחראי"
+msgstr ""
+
+#: includes/class-event-product-type.php:177
+msgid "לדוגמה: אמיר כהן"
+msgstr ""
+
+#: includes/class-event-product-type.php:179
+msgid "שם האדם האחראי על האירוע"
+msgstr ""
+
+#: includes/class-event-waitlist.php:161
+msgid "נא למלא שם וכתובת דוא\"ל תקינה."
+msgstr ""
+
+#: includes/class-event-waitlist.php:165
+msgid "רשימת המתנה אינה פעילה לאירוע זה."
+msgstr ""
+
+#: includes/class-event-waitlist.php:170
+msgid "האירוע עדיין פתוח להרשמה."
+msgstr ""
+
+#: includes/class-event-waitlist.php:175
+msgid "כתובת הדוא\"ל כבר רשומה לרשימת ההמתנה."
+msgstr ""
+
+#: includes/class-event-waitlist.php:213
+#: includes/class-event-waitlist.php:276
+msgid "Insufficient permissions"
+msgstr ""
+
+#: includes/class-event-waitlist.php:225
+msgid "רשימת המתנה"
+msgstr ""
+
+#: includes/class-event-waitlist.php:230
+msgid "אין נרשמים לרשימת ההמתנה"
+msgstr ""
+
+#: includes/class-event-waitlist.php:237
+#: includes/class-registration-dashboard.php:183
+#: includes/class-registration-dashboard.php:1297
+msgid "תאריך"
+msgstr ""
+
+#: includes/class-event-waitlist.php:238
+#: includes/class-registration-dashboard.php:1166
+#: includes/class-registration-dashboard.php:1295
+#: includes/class-registration-dashboard.php:2156
+#: includes/views/cookie-consent-admin.php:96
+#: includes/views/cookie-consent-banner.php:80
+msgid "שם"
+msgstr ""
+
+#: includes/class-event-waitlist.php:239
+msgid "דוא\"ל"
+msgstr ""
+
+#: includes/class-event-waitlist.php:240
+#: includes/class-registration-dashboard.php:1168
+#: includes/class-registration-dashboard.php:2158
+msgid "טלפון"
+msgstr ""
+
+#: includes/class-gf-product-link-setting.php:52
+msgid "ללא מוצר מקושר"
+msgstr ""
+
+#: includes/class-gf-product-link-setting.php:74
+msgid "קישור למוצר WooCommerce"
+msgstr ""
+
+#: includes/class-gf-product-link-setting.php:77
+#: includes/class-gf-product-link-setting.php:80
+msgid "מוצר מקושר"
+msgstr ""
+
+#: includes/class-gf-product-link-setting.php:80
+msgid "בחר את המוצר שאליו טופס זה מקושר. הקישור יתעדכן אוטומטית בעת שמירת מוצר ב-WooCommerce ובחירת טופס זה."
+msgstr ""
+
+#: includes/class-registration-dashboard.php:68
+#: includes/class-registration-dashboard.php:69
+#: includes/class-registration-dashboard.php:136
+msgid "דשבורד הרשמות"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:115
+msgid "שגיאה בטעינת הנתונים"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:116
+msgid "אין נרשמים לאירוע זה"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:142
+msgid "רענן"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:159
+msgid "חיפוש וסינון"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:166
+msgid "חיפוש חופשי"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:169
+msgid "חפש לפי שם, אימייל, טלפון..."
+msgstr ""
+
+#: includes/class-registration-dashboard.php:173
+#: includes/class-registration-dashboard.php:1293
+msgid "טופס"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:178
+#: includes/class-registration-dashboard.php:1294
+msgid "מוצר"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:187
+msgid "מתאריך"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:191
+msgid "עד תאריך"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:199
+msgid "חפש"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:204
+msgid "נקה חיפוש"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:218
+msgid "אירועים"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:223
+msgid "הרשמות"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:228
+msgid "רשימות המתנה"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:302
+msgid "סך הרשמות"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:309
+msgid "אירועים פעילים"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:313
+#, php-format
+msgid "מתוך %d אירועים"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:316
+msgid "הרשמות היום"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:323
+msgid "טפסים פעילים"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:327
+#, php-format
+msgid "עם %d מוצרים"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:647
+msgid "ברשימת המתנה"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:818
+msgid "📍 פיזי"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:819
+msgid "💻 מקוון"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:820
+msgid "🔄 משולב"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:855
+msgid "קרוב"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:860
+msgid "מתקיים"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:865
+msgid "הסתיים"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:870
+msgid "מלא"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:875
+msgid "טיוטה"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:1002
+msgid "חדש"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:1013
+#, php-format
+msgid "+%d%%"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:1019
+#, php-format
+msgid "%d%%"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:1025
+#: includes/class-registration-dashboard.php:1053
+msgid "יציב"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:1041
+msgid "עלייה"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:1047
+msgid "ירידה"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:1098
+msgid "אין לך הרשאה לבצע פעולה זו."
+msgstr ""
+
+#: includes/class-registration-dashboard.php:1106
+msgid "אירוע לא נמצא."
+msgstr ""
+
+#: includes/class-registration-dashboard.php:1111
+msgid "לא נמצא טופס הרשמה לאירוע זה."
+msgstr ""
+
+#: includes/class-registration-dashboard.php:1140
+msgid "לא נמצאו הרשמות לאירוע זה."
+msgstr ""
+
+#: includes/class-registration-dashboard.php:1159
+#, php-format
+msgid "%d הרשמות"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:1167
+#: includes/class-registration-dashboard.php:1296
+#: includes/class-registration-dashboard.php:2157
+msgid "אימייל"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:1169
+#: includes/class-registration-dashboard.php:2155
+msgid "תאריך הרשמה"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:1210
+msgid "כל הטפסים"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:1248
+msgid "כל האירועים"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:1279
+msgid "לא נמצאו הרשמות."
+msgstr ""
+
+#: includes/class-registration-dashboard.php:1292
+msgid "מזהה"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:1298
+#: includes/class-registration-dashboard.php:2594
+msgid "פעולות"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:1359
+msgid "לא צוין"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:1387
+msgid "צפה בפרטי הרשמה"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:1392
+msgid "ערוך הרשמה"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:1899
+#: includes/class-registration-dashboard.php:1938
+#: includes/class-registration-dashboard.php:2041
+msgid "אין הרשאה"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:1903
+msgid "המטמון נוקה בהצלחה"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:1983
+msgid "טופס הרשמה"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:1989
+#: includes/class-registration-dashboard.php:2592
+msgid "תאריך האירוע"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:1995
+#: includes/class-registration-dashboard.php:2109
+msgid "נרשמים"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:2001
+msgid "קיבולת"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:2006
+#: includes/class-registration-dashboard.php:2114
+msgid "מקומות פנויים"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:2011
+#: includes/class-registration-dashboard.php:2118
+msgid "אחוז מילוי"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:2019
+msgid "ערוך אירוע"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:2024
+msgid "צפה בנרשמים"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:2138
+msgid "מקומות"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:2147
+msgid "אין נרשמים"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:2148
+msgid "עדיין לא נרשמו אנשים לאירוע זה."
+msgstr ""
+
+#: includes/class-registration-dashboard.php:2159
+msgid "סטטוס"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:2186
+msgid "נרשם"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:2428
+msgid "אין לך הרשאה לביצוע פעולה זו"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:2435
+msgid "פרמטרים לא תקינים"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:2440
+msgid "המוצר לא נמצא"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:2445
+msgid "הטופס לא נמצא"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:2470
+msgid "אין נרשמים לייצוא"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:2582
+msgid "אין כרגע נרשמים לרשימות המתנה."
+msgstr ""
+
+#: includes/class-registration-dashboard.php:2591
+msgid "אירוע"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:2593
+msgid "נרשמים לרשימת המתנה"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:2606
+msgid "ללא תאריך"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:2628
+msgid "צפה ברשימת המתנה"
+msgstr ""
+
+#: includes/class-registration-dashboard.php:2634
+msgid "ייצוא רשימת המתנה"
+msgstr ""
+
+#: includes/views/cookie-consent-admin.php:18
+msgid "הסכמת עוגיות (GDPR)"
+msgstr ""
+
+#: includes/views/cookie-consent-admin.php:22
+msgid "עוגיות שזוהו וטרם סווגו:"
+msgstr ""
+
+#: includes/views/cookie-consent-admin.php:30
+msgid "לחיצה על עוגייה תוסיף אותה לרשימה למטה לסיווג. לאחר שמירה היא תיעלם מכאן."
+msgstr ""
+
+#: includes/views/cookie-consent-admin.php:37
+msgid "כללי"
+msgstr ""
+
+#: includes/views/cookie-consent-admin.php:40
+msgid "הפעלת באנר"
+msgstr ""
+
+#: includes/views/cookie-consent-admin.php:44
+msgid "הצג את באנר הסכמת העוגיות באתר"
+msgstr ""
+
+#: includes/views/cookie-consent-admin.php:49
+msgid "מיקום"
+msgstr ""
+
+#: includes/views/cookie-consent-admin.php:52
+msgid "תחתית העמוד"
+msgstr ""
+
+#: includes/views/cookie-consent-admin.php:53
+msgid "ראש העמוד"
+msgstr ""
+
+#: includes/views/cookie-consent-admin.php:58
+msgid "טקסט הבאנר"
+msgstr ""
+
+#: includes/views/cookie-consent-admin.php:64
+msgid "קישור למדיניות פרטיות"
+msgstr ""
+
+#: includes/views/cookie-consent-admin.php:71
+msgid "קטגוריות"
+msgstr ""
+
+#: includes/views/cookie-consent-admin.php:75
+#: includes/views/cookie-consent-admin.php:97
+msgid "קטגוריה"
+msgstr ""
+
+#: includes/views/cookie-consent-admin.php:76
+msgid "שם תצוגה"
+msgstr ""
+
+#: includes/views/cookie-consent-admin.php:77
+msgid "תיאור"
+msgstr ""
+
+#: includes/views/cookie-consent-admin.php:83
+msgid "נעולה"
+msgstr ""
+
+#: includes/views/cookie-consent-admin.php:91
+msgid "רשימת עוגיות"
+msgstr ""
+
+#: includes/views/cookie-consent-admin.php:92
+msgid "הגדר את העוגיות שהאתר משתמש בהן ואת סיווגן. עוגיות שלא ברשימה יסומנו כ\"טרם סווגו\"."
+msgstr ""
+
+#: includes/views/cookie-consent-admin.php:98
+#: includes/views/cookie-consent-banner.php:81
+msgid "ספק"
+msgstr ""
+
+#: includes/views/cookie-consent-admin.php:99
+#: includes/views/cookie-consent-banner.php:82
+msgid "מטרה"
+msgstr ""
+
+#: includes/views/cookie-consent-admin.php:100
+#: includes/views/cookie-consent-banner.php:83
+msgid "תפוגה"
+msgstr ""
+
+#: includes/views/cookie-consent-admin.php:121
+#: includes/views/cookie-consent-admin.php:147
+msgid "הסר"
+msgstr ""
+
+#: includes/views/cookie-consent-admin.php:127
+msgid "הוסף עוגייה"
+msgstr ""
+
+#: includes/views/cookie-consent-admin.php:130
+msgid "שמירת הגדרות"
+msgstr ""
+
+#: includes/views/cookie-consent-banner.php:28
+msgid "הודעת עוגיות"
+msgstr ""
+
+#: includes/views/cookie-consent-banner.php:33
+msgid "מדיניות פרטיות"
+msgstr ""
+
+#: includes/views/cookie-consent-banner.php:37
+msgid "התאמה אישית"
+msgstr ""
+
+#: includes/views/cookie-consent-banner.php:38
+#: includes/views/cookie-consent-banner.php:105
+msgid "דחה הכל"
+msgstr ""
+
+#: includes/views/cookie-consent-banner.php:39
+#: includes/views/cookie-consent-banner.php:107
+msgid "אשר הכל"
+msgstr ""
+
+#: includes/views/cookie-consent-banner.php:49
+#: includes/views/cookie-consent-banner.php:113
+#: includes/views/cookie-consent-banner.php:120
+msgid "הגדרות עוגיות"
+msgstr ""
+
+#: includes/views/cookie-consent-banner.php:50
+msgid "סגירה"
+msgstr ""
+
+#: includes/views/cookie-consent-banner.php:66
+msgid "תמיד פעיל"
+msgstr ""
+
+#: includes/views/cookie-consent-banner.php:75
+#, php-format
+msgid "%d עוגייה"
+msgid_plural "%d עוגיות"
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/views/cookie-consent-banner.php:106
+msgid "שמור העדפות"
+msgstr ""
+
+#: menu-customization-examples.php:26
+msgid "מנהל שיווק"
+msgstr ""
+
+#: menu-customization-examples.php:48
+msgid "סוכן תמיכה"
+msgstr ""
+
+#: menu-customization-examples.php:82
+#: menu-customization-examples.php:208
+msgid "כלי שיווק"
+msgstr ""
+
+#: menu-customization-examples.php:94
+#: menu-customization-examples.php:95
+msgid "קמפיינים"
+msgstr ""
+
+#: menu-customization-examples.php:181
+msgid "כלי שיווק זמינים:"
+msgstr ""
+
+#: menu-customization-examples.php:182
+msgid "יש לך גישה לכלי השיווק והדוחות. השתמש בתפריט \"שיווק\" לניהול קמפיינים."
+msgstr ""
+
+#: menu-customization-examples.php:193
+msgid "הנחיות תמיכה:"
+msgstr ""
+
+#: menu-customization-examples.php:194
+msgid "זכור: אתה יכול לצפות ולהגיב להזמנות בלבד. לשינויי מחירים או החזרים, פנה למנהל."
+msgstr ""
+
+#: menu-customization-examples.php:209
+msgid "כאן תוכל למצוא את כל הכלים הדרושים לניהול השיווק באתר."
+msgstr ""
+
+#: menu-customization-examples.php:213
+msgid "דוחות מכירות"
+msgstr ""
+
+#: menu-customization-examples.php:214
+msgid "צפה בדוחות המכירות והמבצעים."
+msgstr ""
+
+#: menu-customization-examples.php:216
+msgid "צפה בדוחות"
+msgstr ""
+
+#: menu-customization-examples.php:222
+msgid "נהל קופוני הנחה ומבצעים."
+msgstr ""
+
+#: menu-customization-examples.php:224
+msgid "נהל קופונים"
+msgstr ""
+
+#: menu-customization-examples.php:235
+msgid "ניהול קמפיינים"
+msgstr ""
+
+#: menu-customization-examples.php:236
+msgid "כאן תוכל לנהל את כל הקמפיינים השיווקיים שלך."
+msgstr ""
+
+#: menu-customization-examples.php:240
+msgid "תכונה זו תפותח בעתיד. כרגע יש לך גישה לכלי השיווק הבסיסיים."
+msgstr ""

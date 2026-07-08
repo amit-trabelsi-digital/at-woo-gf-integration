@@ -167,24 +167,23 @@ if ( $form_id && class_exists( 'GFAPI' ) ) {
 
 ## עדכונים מרחוק
 
-התוסף כולל מערכת עדכונים מרחוק המתחברת ל:
+התוסף כולל מערכת עדכונים מרחוק (`includes/class-updater.php`) שקוראת את מניפסט הגרסה מה-`Update URI` שבכותרת התוסף:
 ```
-https://updates.alltech.co.il/
+https://raw.githubusercontent.com/amit-trabelsi-digital/at-woo-gf-integration/dev/plugin-info.json
 ```
 
-### מבנה תגובת שרת העדכונים
+### מבנה תגובת שרת העדכונים (`plugin-info.json`)
 
 ```json
 {
-    "version": "1.0.1",
-    "download_url": "https://updates.alltech.co.il/plugins/at-woo-gf-integration.zip",
-    "homepage": "https://alltech.co.il/",
-    "author": "אמיר תומר - AllTech",
-    "tested": "6.4",
-    "requires": "5.8",
-    "requires_php": "7.2",
-    "changelog": "שינויים בגרסה...",
-    "last_updated": "2024-01-18 12:00:00"
+    "version": "2.13.2",
+    "download_url": "https://github.com/amit-trabelsi-digital/at-woo-gf-integration/releases/download/v2.13.2/at-woo-gf-integration-2.13.2.zip",
+    "homepage": "https://amit-trabelsi.co.il/",
+    "author": "Amit Trabelsi",
+    "tested": "6.7",
+    "requires": "6.0",
+    "requires_php": "7.4",
+    "last_updated": "2026-07-08 00:00:00"
 }
 ```
 
@@ -226,7 +225,7 @@ add_filter( 'woo_gf_dashboard_column_data', function( $data, $column, $entry ) {
 
 ## תמיכה
 
-לשאלות ותמיכה: [support@alltech.co.il](mailto:support@alltech.co.il)
+לשאלות ותמיכה: [amit@trabel.si](mailto:amit@trabel.si)
 
 ## רישיון
 
