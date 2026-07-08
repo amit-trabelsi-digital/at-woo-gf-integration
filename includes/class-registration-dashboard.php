@@ -122,19 +122,12 @@ class Woo_GF_Registration_Dashboard {
      * Render dashboard page
      */
     public function render_dashboard_page() {
-        // Debug logging
-        error_log( '=== WooGF Dashboard Render START ===' );
-        error_log( 'Memory at start: ' . round( memory_get_usage() / 1024 / 1024, 2 ) . ' MB' );
-        $start_time = microtime( true );
-        
         // Clear cache if requested
         if ( isset( $_GET['clear_cache'] ) && wp_verify_nonce( $_GET['_wpnonce'], 'clear_cache' ) ) {
             $this->clear_all_caches();
             wp_redirect( remove_query_arg( array( 'clear_cache', '_wpnonce' ) ) );
             exit;
         }
-        
-        error_log( 'WooGF: Starting page render...' );
         ?>
         <div class="wrap woo-gf-dashboard-wrap">
             <div class="woo-gf-dashboard-header">
@@ -154,11 +147,7 @@ class Woo_GF_Registration_Dashboard {
             <!-- סטטיסטיקות כלליות -->
             <div class="woo-gf-stats-section">
                 <div class="woo-gf-stats-grid">
-                    <?php 
-                    error_log( 'WooGF: Before render_dashboard_stats()' );
-                    $this->render_dashboard_stats(); 
-                    error_log( 'WooGF: After render_dashboard_stats()' );
-                    ?>
+                    <?php $this->render_dashboard_stats(); ?>
                 </div>
             </div>
 
@@ -245,20 +234,12 @@ class Woo_GF_Registration_Dashboard {
                     <div class="woo-gf-tabs-content">
                         <!-- טאב אירועים -->
                         <div id="woo-gf-tab-events" class="woo-gf-tab-panel active">
-                            <?php 
-                            error_log( 'WooGF: Before render_events_table()' );
-                            $this->render_events_table(); 
-                            error_log( 'WooGF: After render_events_table()' );
-                            ?>
+                            <?php $this->render_events_table(); ?>
                         </div>
 
                         <!-- טאב הרשמות -->
                         <div id="woo-gf-tab-registrations" class="woo-gf-tab-panel">
-                            <?php
-                            error_log( 'WooGF: Before render_entries_table()' );
-                            $this->render_entries_table();
-                            error_log( 'WooGF: After render_entries_table()' );
-                            ?>
+                            <?php $this->render_entries_table(); ?>
                         </div>
 
                         <!-- טאב רשימות המתנה -->
@@ -286,13 +267,6 @@ class Woo_GF_Registration_Dashboard {
             </div>
         </div>
         <?php
-        // Debug logging at end
-        $end_time = microtime( true );
-        $total_time = round( ( $end_time - $start_time ) * 1000, 2 );
-        $peak_memory = round( memory_get_peak_usage() / 1024 / 1024, 2 );
-        error_log( '=== WooGF Dashboard Render COMPLETE ===' );
-        error_log( 'Total time: ' . $total_time . ' ms' );
-        error_log( 'Peak memory: ' . $peak_memory . ' MB' );
     }
 
     /**
@@ -311,7 +285,9 @@ class Woo_GF_Registration_Dashboard {
             $total_events = $this->get_events_count();
             $active_events = $this->get_active_events_count();
         } catch ( Exception $e ) {
-            error_log( 'WooGF Dashboard Stats Error: ' . $e->getMessage() );
+            if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+                error_log( 'WooGF Dashboard Stats Error: ' . $e->getMessage() );
+            }
             // Return default values on error
             $total_entries = 0;
             $total_forms = 0;
@@ -391,7 +367,9 @@ class Woo_GF_Registration_Dashboard {
         try {
             $events = $this->get_events_data($current_page, $per_page);
         } catch ( Exception $e ) {
-            error_log( 'WooGF Events Table Error: ' . $e->getMessage() );
+            if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+                error_log( 'WooGF Events Table Error: ' . $e->getMessage() );
+            }
             echo '<div class="notice notice-error">';
             echo '<p>שגיאה בטעינת נתוני האירועים. אנא נסה לרענן את הדף.</p>';
             echo '<p><small>פרטים טכניים: ' . esc_html( $e->getMessage() ) . '</small></p>';
@@ -1593,7 +1571,9 @@ class Woo_GF_Registration_Dashboard {
         try {
             $entries = GFAPI::get_entries( $form_ids, $search_criteria, $sorting, $paging, $total_count );
         } catch ( Exception $e ) {
-            error_log( 'WooGF Error getting entries: ' . $e->getMessage() );
+            if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+                error_log( 'WooGF Error getting entries: ' . $e->getMessage() );
+            }
             return array();
         }
         
@@ -1914,6 +1894,11 @@ class Woo_GF_Registration_Dashboard {
      */
     public function ajax_clear_dashboard_cache() {
         check_ajax_referer( 'woo_gf_dashboard_nonce', 'nonce' );
+
+        if ( ! current_user_can( 'manage_woocommerce' ) ) {
+            wp_send_json_error( array( 'message' => __( 'אין הרשאה', 'at-woo-gf-integration' ) ), 403 );
+        }
+
         $this->clear_all_caches();
         wp_send_json_success( array( 'message' => __( 'המטמון נוקה בהצלחה', 'at-woo-gf-integration' ) ) );
     }
@@ -1933,8 +1918,14 @@ class Woo_GF_Registration_Dashboard {
         
         // Clear all registration count caches
         global $wpdb;
-        $wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_woo_gf_reg_count_%'" );
-        $wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_timeout_woo_gf_reg_count_%'" );
+        $wpdb->query( $wpdb->prepare(
+            "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s",
+            $wpdb->esc_like( '_transient_woo_gf_reg_count_' ) . '%'
+        ) );
+        $wpdb->query( $wpdb->prepare(
+            "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s",
+            $wpdb->esc_like( '_transient_timeout_woo_gf_reg_count_' ) . '%'
+        ) );
     }
 
     /**
@@ -1942,7 +1933,11 @@ class Woo_GF_Registration_Dashboard {
      */
     public function ajax_get_event_details() {
         check_ajax_referer( 'woo_gf_dashboard_nonce', 'nonce' );
-        
+
+        if ( ! current_user_can( 'manage_woocommerce' ) ) {
+            wp_send_json_error( array( 'message' => __( 'אין הרשאה', 'at-woo-gf-integration' ) ), 403 );
+        }
+
         $product_id = intval( $_POST['product_id'] );
         
         if ( ! $product_id ) {
@@ -2041,7 +2036,11 @@ class Woo_GF_Registration_Dashboard {
      */
     public function ajax_get_registrations() {
         check_ajax_referer( 'woo_gf_dashboard_nonce', 'nonce' );
-        
+
+        if ( ! current_user_can( 'manage_woocommerce' ) ) {
+            wp_send_json_error( array( 'message' => __( 'אין הרשאה', 'at-woo-gf-integration' ) ), 403 );
+        }
+
         $form_id = intval( $_POST['form_id'] );
         $product_id = intval( $_POST['product_id'] );
         
@@ -2398,6 +2397,28 @@ class Woo_GF_Registration_Dashboard {
     }
     
     /**
+     * Escape a single value for a CSV cell (RFC 4180) and neutralise CSV
+     * formula injection.
+     *
+     * Spreadsheet apps (Excel, Sheets, LibreOffice) execute a cell whose text
+     * begins with = + - @ or a control char (tab/CR) as a formula. Prefixing
+     * such values with a single quote forces them to be treated as text. Inner
+     * double-quotes are doubled per RFC 4180. Caller wraps the result in quotes.
+     *
+     * @param mixed $value Raw cell value.
+     * @return string Escaped cell value (without surrounding quotes).
+     */
+    private function csv_escape_cell( $value ) {
+        $value = (string) $value;
+
+        if ( '' !== $value && in_array( $value[0], array( '=', '+', '-', '@', "\t", "\r" ), true ) ) {
+            $value = "'" . $value;
+        }
+
+        return str_replace( '"', '""', $value );
+    }
+
+    /**
      * AJAX handler for exporting registrations to Excel/CSV
      */
     public function ajax_export_registrations() {
@@ -2491,7 +2512,7 @@ class Woo_GF_Registration_Dashboard {
         // Create CSV string
         $csv_string = '';
         foreach ( $csv_data as $row ) {
-            $csv_string .= '"' . implode( '","', array_map( 'wp_specialchars', $row ) ) . '"' . "\n";
+            $csv_string .= '"' . implode( '","', array_map( array( $this, 'csv_escape_cell' ), $row ) ) . '"' . "\r\n";
         }
         
         // Set headers for download

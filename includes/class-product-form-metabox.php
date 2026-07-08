@@ -104,8 +104,6 @@ class Woo_GF_Product_Form_Metabox {
                         $('.wc-tabs li:first a').click();
                     }
                 }
-                
-                console.log('✅ הוסרה כפילות של טאב Gravity Forms');
             });
         </script>
         <?php

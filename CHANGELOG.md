@@ -5,6 +5,16 @@
 הפורמט מבוסס על [Keep a Changelog](https://keepachangelog.com/he/1.0.0/),
 והפרויקט משתמש ב-[Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.13.2] - 2026-07-08
+
+### אבטחה
+- **בדיקת הרשאות בנקודות AJAX של הדשבורד** - שלוש נקודות (`ajax_get_event_details`, `ajax_get_registrations`, `ajax_clear_dashboard_cache`) אימתו nonce אך לא הרשאה; כעת נדרשת `manage_woocommerce`, כך שמשתמש מחובר חסר-הרשאה אינו יכול לשלוף פרטי נרשמים או לנקות מטמון.
+- **הזרקת נוסחאות ב-CSV** - ייצוא הנרשמים השתמש ב-`wp_specialchars` (בריחה ל-HTML, לא ל-CSV); ערך תא שמתחיל ב-`= + - @` היה מורץ כנוסחה באקסל. נוספה `csv_escape_cell()` שמוסיפה prefix `'` ומכפילה מרכאות לפי RFC 4180.
+- **`$wpdb->prepare` בניקוי מטמון** - שאילתות מחיקת ה-transients עברו ל-`prepare` + `esc_like`.
+
+### שונה
+- הוסרו קריאות `error_log` של מדדי זמן/זיכרון מרינדור הדשבורד; קריאות ה-`error_log` שנותרו (בבלוקי catch) גודרו ב-`WP_DEBUG`. הוסרה שורת `console.log` מה-metabox.
+
 ## [2.13.1] - 2026-07-08
 
 ### תוקן
