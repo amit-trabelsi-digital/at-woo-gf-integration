@@ -210,7 +210,7 @@ class WC_Product_Event extends WC_Product {
 	 * @return string
 	 */
 	public function add_to_cart_text() {
-		return apply_filters( 'woocommerce_product_add_to_cart_text', __( 'הרשמה לאירוע', 'woo-gf-integration' ), $this );
+		return apply_filters( 'woocommerce_product_add_to_cart_text', __( 'הרשמה לאירוע', 'at-woo-gf-integration' ), $this );
 	}
 
 	/**
@@ -219,7 +219,7 @@ class WC_Product_Event extends WC_Product {
 	 * @return string
 	 */
 	public function single_add_to_cart_text() {
-		return apply_filters( 'woocommerce_product_single_add_to_cart_text', __( 'הירשם לאירוע', 'woo-gf-integration' ), $this );
+		return apply_filters( 'woocommerce_product_single_add_to_cart_text', __( 'הירשם לאירוע', 'at-woo-gf-integration' ), $this );
 	}
 
 	/**

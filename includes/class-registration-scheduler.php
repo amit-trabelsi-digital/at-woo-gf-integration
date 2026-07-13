@@ -57,11 +57,11 @@ class Woo_GF_Registration_Scheduler {
     public function add_cron_schedules( $schedules ) {
         $schedules['weekly'] = array(
             'interval' => WEEK_IN_SECONDS,
-            'display'  => esc_html__( 'Once Weekly', 'woo-gf-integration' ),
+            'display'  => esc_html__( 'Once Weekly', 'at-woo-gf-integration' ),
         );
         $schedules['monthly'] = array(
             'interval' => MONTH_IN_SECONDS,
-            'display'  => esc_html__( 'Once Monthly', 'woo-gf-integration' ),
+            'display'  => esc_html__( 'Once Monthly', 'at-woo-gf-integration' ),
         );
         return $schedules;
     }
@@ -175,8 +175,8 @@ class Woo_GF_Registration_Scheduler {
 
         // Send email
         $product_name = $product->get_name();
-        $subject = sprintf( __( 'עדכון הרשמות עבור: %s', 'woo-gf-integration' ), $product_name );
-        $body = sprintf( __( 'מצורף קובץ CSV עם כל ההרשמות עבור המוצר "%s" נכון לתאריך %s.', 'woo-gf-integration' ), $product_name, date_i18n( get_option( 'date_format' ) ) );
+        $subject = sprintf( __( 'עדכון הרשמות עבור: %s', 'at-woo-gf-integration' ), $product_name );
+        $body = sprintf( __( 'מצורף קובץ CSV עם כל ההרשמות עבור המוצר "%s" נכון לתאריך %s.', 'at-woo-gf-integration' ), $product_name, date_i18n( get_option( 'date_format' ) ) );
         $headers = array('Content-Type: text/html; charset=UTF-8');
         
         wp_mail( $to, $subject, $body, $headers, array( $csv_path ) );
@@ -215,7 +215,7 @@ class Woo_GF_Registration_Scheduler {
                 $header[] = $field->label;
             }
         }
-        $header[] = __( 'Date Submitted', 'woo-gf-integration' );
+        $header[] = __( 'Date Submitted', 'at-woo-gf-integration' );
         fputcsv( $file, $header );
         
         // Data rows

@@ -688,12 +688,12 @@ class AT_Woo_GF_Integration {
         
         if ($post->post_status === 'publish-hidden') {
             $complete = ' selected="selected"';
-            $label = '<span id="post-status-display"> מפורסם אך נגיש בלינק ישיר בלבד</span>';
+            $label = '<span id="post-status-display"> ' . esc_html__( 'מפורסם אך נגיש בלינק ישיר בלבד', 'at-woo-gf-integration' ) . '</span>';
         }
         
         echo '<script>
         jQuery(document).ready(function($) {
-            $("select#post_status").append("<option value=\"publish-hidden\"' . $complete . '>מפורסם אך נגיש בלינק ישיר בלבד</option>");
+            $("select#post_status").append("<option value=\"publish-hidden\"' . $complete . '>' . esc_html__( 'מפורסם אך נגיש בלינק ישיר בלבד', 'at-woo-gf-integration' ) . '</option>");
             $(".misc-pub-section label").append("' . $label . '");
         });
         </script>';

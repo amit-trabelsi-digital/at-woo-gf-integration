@@ -55,7 +55,7 @@ class Woo_GF_Ajax_Handler {
 
         // Check permissions
         if ( ! current_user_can( 'edit_products' ) ) {
-            wp_die( __( 'Insufficient permissions', 'woo-gf-integration' ) );
+            wp_die( __( 'Insufficient permissions', 'at-woo-gf-integration' ) );
         }
 
         $form_id = isset( $_POST['form_id'] ) ? intval( $_POST['form_id'] ) : 0;
@@ -64,13 +64,13 @@ class Woo_GF_Ajax_Handler {
         $per_page = 10;
 
         if ( ! $form_id ) {
-            wp_send_json_error( __( 'Invalid form ID', 'woo-gf-integration' ) );
+            wp_send_json_error( __( 'Invalid form ID', 'at-woo-gf-integration' ) );
         }
 
         // Get form
         $form = GFAPI::get_form( $form_id );
         if ( ! $form ) {
-            wp_send_json_error( __( 'Form not found', 'woo-gf-integration' ) );
+            wp_send_json_error( __( 'Form not found', 'at-woo-gf-integration' ) );
         }
 
         // Calculate column count for table
@@ -138,20 +138,20 @@ class Woo_GF_Ajax_Handler {
         <table class="wp-list-table widefat striped">
             <thead>
                 <tr>
-                    <th><?php esc_html_e( 'מזהה', 'woo-gf-integration' ); ?></th>
+                    <th><?php esc_html_e( 'מזהה', 'at-woo-gf-integration' ); ?></th>
                     <?php foreach ( $form['fields'] as $field ) : ?>
                         <?php if ( in_array( $field->type, array( 'name', 'email', 'phone', 'text' ) ) ) : ?>
                             <th><?php echo esc_html( $field->label ); ?></th>
                         <?php endif; ?>
                     <?php endforeach; ?>
-                    <th><?php esc_html_e( 'תאריך', 'woo-gf-integration' ); ?></th>
-                    <th><?php esc_html_e( 'פעולות', 'woo-gf-integration' ); ?></th>
+                    <th><?php esc_html_e( 'תאריך', 'at-woo-gf-integration' ); ?></th>
+                    <th><?php esc_html_e( 'פעולות', 'at-woo-gf-integration' ); ?></th>
                 </tr>
             </thead>
             <tbody>
                 <?php if ( empty( $entries ) ) : ?>
                     <tr>
-                        <td colspan="<?php echo $column_count; ?>"><?php esc_html_e( 'לא נמצאו הרשמות', 'woo-gf-integration' ); ?></td>
+                        <td colspan="<?php echo $column_count; ?>"><?php esc_html_e( 'לא נמצאו הרשמות', 'at-woo-gf-integration' ); ?></td>
                     </tr>
                 <?php else : ?>
                     <?php foreach ( $entries as $entry ) : ?>
@@ -182,11 +182,11 @@ class Woo_GF_Ajax_Handler {
                                 <a href="#" class="woo-gf-view-entry button button-small" 
                                    data-entry-id="<?php echo esc_attr( $entry['id'] ); ?>"
                                    data-form-id="<?php echo esc_attr( $form_id ); ?>">
-                                    <?php esc_html_e( 'צפה', 'woo-gf-integration' ); ?>
+                                    <?php esc_html_e( 'צפה', 'at-woo-gf-integration' ); ?>
                                 </a>
                                 <a href="<?php echo esc_url( admin_url( 'admin.php?page=gf_entries&view=entry&id=' . $form_id . '&lid=' . $entry['id'] ) ); ?>" 
                                    class="button button-small" target="_blank">
-                                    <?php esc_html_e( 'ערוך', 'woo-gf-integration' ); ?>
+                                    <?php esc_html_e( 'ערוך', 'at-woo-gf-integration' ); ?>
                                 </a>
                             </td>
                         </tr>
@@ -199,7 +199,7 @@ class Woo_GF_Ajax_Handler {
             <div class="tablenav bottom">
                 <div class="tablenav-pages">
                     <span class="displaying-num">
-                        <?php printf( _n( '%s פריט', '%s פריטים', $total_count, 'woo-gf-integration' ), number_format_i18n( $total_count ) ); ?>
+                        <?php printf( _n( '%s פריט', '%s פריטים', $total_count, 'at-woo-gf-integration' ), number_format_i18n( $total_count ) ); ?>
                     </span>
                     <span class="pagination-links">
                         <?php
@@ -210,7 +210,7 @@ class Woo_GF_Ajax_Handler {
                         }
                         
                         echo '<span class="paging-input">';
-                        printf( __( 'עמוד %1$s מתוך %2$s', 'woo-gf-integration' ), $page, $total_pages );
+                        printf( __( 'עמוד %1$s מתוך %2$s', 'at-woo-gf-integration' ), $page, $total_pages );
                         echo '</span> ';
                         
                         if ( $page < $total_pages ) {
@@ -243,14 +243,14 @@ class Woo_GF_Ajax_Handler {
 
         // Check permissions
         if ( ! current_user_can( 'edit_products' ) ) {
-            wp_die( __( 'Insufficient permissions', 'woo-gf-integration' ) );
+            wp_die( __( 'Insufficient permissions', 'at-woo-gf-integration' ) );
         }
 
         $entry_id = isset( $_POST['entry_id'] ) ? intval( $_POST['entry_id'] ) : 0;
         $form_id = isset( $_POST['form_id'] ) ? intval( $_POST['form_id'] ) : 0;
 
         if ( ! $entry_id || ! $form_id ) {
-            wp_send_json_error( __( 'Invalid request', 'woo-gf-integration' ) );
+            wp_send_json_error( __( 'Invalid request', 'at-woo-gf-integration' ) );
         }
 
         // Get entry
@@ -262,21 +262,21 @@ class Woo_GF_Ajax_Handler {
         // Get form
         $form = GFAPI::get_form( $form_id );
         if ( ! $form ) {
-            wp_send_json_error( __( 'Form not found', 'woo-gf-integration' ) );
+            wp_send_json_error( __( 'Form not found', 'at-woo-gf-integration' ) );
         }
 
         // Build response HTML
         ob_start();
         ?>
         <div class="woo-gf-entry-details">
-            <h3><?php printf( __( 'הרשמה #%d', 'woo-gf-integration' ), $entry_id ); ?></h3>
-            <p><strong><?php esc_html_e( 'תאריך:', 'woo-gf-integration' ); ?></strong> <?php echo esc_html( date_i18n( 'd/m/Y H:i', strtotime( $entry['date_created'] ) ) ); ?></p>
+            <h3><?php printf( __( 'הרשמה #%d', 'at-woo-gf-integration' ), $entry_id ); ?></h3>
+            <p><strong><?php esc_html_e( 'תאריך:', 'at-woo-gf-integration' ); ?></strong> <?php echo esc_html( date_i18n( 'd/m/Y H:i', strtotime( $entry['date_created'] ) ) ); ?></p>
             
             <table class="wp-list-table widefat fixed striped">
                 <thead>
                     <tr>
-                        <th><?php esc_html_e( 'שדה', 'woo-gf-integration' ); ?></th>
-                        <th><?php esc_html_e( 'ערך', 'woo-gf-integration' ); ?></th>
+                        <th><?php esc_html_e( 'שדה', 'at-woo-gf-integration' ); ?></th>
+                        <th><?php esc_html_e( 'ערך', 'at-woo-gf-integration' ); ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -369,18 +369,18 @@ class Woo_GF_Ajax_Handler {
         check_ajax_referer( 'haruv_event_gf_nonce', 'security' );
 
         if ( ! current_user_can( 'edit_products' ) || ! isset( $_POST['product_id'] ) ) {
-            wp_send_json_error( [ 'message' => __( 'אין לך הרשאה לבצע פעולה זו.', 'woo-gf-integration' ) ] );
+            wp_send_json_error( [ 'message' => __( 'אין לך הרשאה לבצע פעולה זו.', 'at-woo-gf-integration' ) ] );
         }
 
         if ( ! class_exists( 'GFAPI' ) ) {
-            wp_send_json_error( [ 'message' => __( 'Gravity Forms אינו מותקן או פעיל.', 'woo-gf-integration' ) ] );
+            wp_send_json_error( [ 'message' => __( 'Gravity Forms אינו מותקן או פעיל.', 'at-woo-gf-integration' ) ] );
         }
 
         $product_id = intval( $_POST['product_id'] );
         $product = wc_get_product( $product_id );
 
         if ( ! $product ) {
-            wp_send_json_error( [ 'message' => __( 'מוצר לא נמצא.', 'woo-gf-integration' ) ] );
+            wp_send_json_error( [ 'message' => __( 'מוצר לא נמצא.', 'at-woo-gf-integration' ) ] );
         }
 
         $form_title = $product->get_name();
@@ -388,19 +388,19 @@ class Woo_GF_Ajax_Handler {
         // Basic form structure
         $form = [
             'title'        => $form_title,
-            'description'  => sprintf( __( 'טופס הרשמה לאירוע: %s', 'woo-gf-integration' ), $form_title ),
+            'description'  => sprintf( __( 'טופס הרשמה לאירוע: %s', 'at-woo-gf-integration' ), $form_title ),
             'labelPlacement' => 'top_label',
             'button'       => [
                 'type' => 'text',
-                'text' => __( 'שלח הרשמה', 'woo-gf-integration' ),
+                'text' => __( 'שלח הרשמה', 'at-woo-gf-integration' ),
             ],
             'fields'       => [
-                [ 'type' => 'name', 'label' => __( 'שם מלא', 'woo-gf-integration' ), 'isRequired' => true, 'inputs' => [
-                    [ 'id' => '1.3', 'label' => __( 'שם פרטי', 'woo-gf-integration' ) ],
-                    [ 'id' => '1.6', 'label' => __( 'שם משפחה', 'woo-gf-integration' ) ],
+                [ 'type' => 'name', 'label' => __( 'שם מלא', 'at-woo-gf-integration' ), 'isRequired' => true, 'inputs' => [
+                    [ 'id' => '1.3', 'label' => __( 'שם פרטי', 'at-woo-gf-integration' ) ],
+                    [ 'id' => '1.6', 'label' => __( 'שם משפחה', 'at-woo-gf-integration' ) ],
                 ]],
-                [ 'type' => 'email', 'label' => __( 'כתובת אימייל', 'woo-gf-integration' ), 'isRequired' => true ],
-                [ 'type' => 'phone', 'label' => __( 'טלפון', 'woo-gf-integration' ), 'isRequired' => true ],
+                [ 'type' => 'email', 'label' => __( 'כתובת אימייל', 'at-woo-gf-integration' ), 'isRequired' => true ],
+                [ 'type' => 'phone', 'label' => __( 'טלפון', 'at-woo-gf-integration' ), 'isRequired' => true ],
             ],
         ];
 
@@ -410,7 +410,7 @@ class Woo_GF_Ajax_Handler {
             if ( $stock_quantity > 0 ) {
                 $form['limitEntries'] = true;
                 $form['limitEntriesCount'] = $stock_quantity;
-                $form['limitEntriesMessage'] = __( 'מצטערים, ההרשמה לאירוע זה מלאה.', 'woo-gf-integration' );
+                $form['limitEntriesMessage'] = __( 'מצטערים, ההרשמה לאירוע זה מלאה.', 'at-woo-gf-integration' );
             }
         }
 
@@ -427,7 +427,7 @@ class Woo_GF_Ajax_Handler {
 
 
         wp_send_json_success( [
-            'message' => __( 'הטופס נוצר וקושר בהצלחה!', 'woo-gf-integration' ),
+            'message' => __( 'הטופס נוצר וקושר בהצלחה!', 'at-woo-gf-integration' ),
             'form_id' => $form_id,
             'form_title' => $form_title,
             'edit_url' => admin_url( 'admin.php?page=gf_edit_forms&id=' . $form_id ),

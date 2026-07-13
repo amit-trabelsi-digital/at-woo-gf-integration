@@ -62,7 +62,7 @@ class WooGF_Event_Product_Type {
 	 * Add event to product type selector.
 	 */
 	public function add_event_product_type( $types ) {
-		$types['event'] = __( 'אירוע', 'woo-gf-integration' );
+		$types['event'] = __( 'אירוע', 'at-woo-gf-integration' );
 		return $types;
 	}
 
@@ -71,7 +71,7 @@ class WooGF_Event_Product_Type {
 	 */
 	public function add_event_tab( $tabs ) {
 		$tabs['event_options'] = array(
-			'label'    => __( 'פרטי אירוע', 'woo-gf-integration' ),
+			'label'    => __( 'פרטי אירוע', 'at-woo-gf-integration' ),
 			'target'   => 'event_product_data',
 			'class'    => array( 'show_if_event' ),
 			'priority' => 21,
@@ -96,10 +96,10 @@ class WooGF_Event_Product_Type {
 				woocommerce_wp_text_input(
 					array(
 						'id'          => '_event_date',
-						'label'       => '<span class="dashicons dashicons-calendar-alt"></span> ' . __( 'תאריך האירוע', 'woo-gf-integration' ),
+						'label'       => '<span class="dashicons dashicons-calendar-alt"></span> ' . __( 'תאריך האירוע', 'at-woo-gf-integration' ),
 						'placeholder' => 'YYYY-MM-DD HH:MM',
 						'desc_tip'    => true,
-						'description' => __( 'תאריך ושעת התחלת האירוע', 'woo-gf-integration' ),
+						'description' => __( 'תאריך ושעת התחלת האירוע', 'at-woo-gf-integration' ),
 						'type'        => 'datetime-local',
 						'value'       => $product->is_type( 'event' ) ? str_replace( ' ', 'T', get_post_meta( $product->get_id(), '_event_date', true ) ) : '',
 					)
@@ -108,10 +108,10 @@ class WooGF_Event_Product_Type {
 				woocommerce_wp_text_input(
 					array(
 						'id'          => '_event_end_date',
-						'label'       => '<span class="dashicons dashicons-clock"></span> ' . __( 'תאריך סיום האירוע', 'woo-gf-integration' ),
+						'label'       => '<span class="dashicons dashicons-clock"></span> ' . __( 'תאריך סיום האירוע', 'at-woo-gf-integration' ),
 						'placeholder' => 'YYYY-MM-DD HH:MM',
 						'desc_tip'    => true,
-						'description' => __( 'תאריך ושעת סיום האירוע (אופציונלי)', 'woo-gf-integration' ),
+						'description' => __( 'תאריך ושעת סיום האירוע (אופציונלי)', 'at-woo-gf-integration' ),
 						'type'        => 'datetime-local',
 						'value'       => $product->is_type( 'event' ) ? str_replace( ' ', 'T', get_post_meta( $product->get_id(), '_event_end_date', true ) ) : '',
 					)
@@ -120,10 +120,10 @@ class WooGF_Event_Product_Type {
 				woocommerce_wp_textarea_input(
 					array(
 						'id'          => '_event_location',
-						'label'       => '<span class="dashicons dashicons-location"></span> ' . __( 'מיקום האירוע', 'woo-gf-integration' ),
-						'placeholder' => __( 'כתובת או קישור לזום', 'woo-gf-integration' ),
+						'label'       => '<span class="dashicons dashicons-location"></span> ' . __( 'מיקום האירוע', 'at-woo-gf-integration' ),
+						'placeholder' => __( 'כתובת או קישור לזום', 'at-woo-gf-integration' ),
 						'desc_tip'    => true,
-						'description' => __( 'מיקום פיזי או קישור לאירוע מקוון', 'woo-gf-integration' ),
+						'description' => __( 'מיקום פיזי או קישור לאירוע מקוון', 'at-woo-gf-integration' ),
 						'value'       => $product->is_type( 'event' ) ? get_post_meta( $product->get_id(), '_event_location', true ) : '',
 					)
 				);
@@ -131,9 +131,9 @@ class WooGF_Event_Product_Type {
 				woocommerce_wp_text_input(
 					array(
 						'id'                => '_max_attendees',
-						'label'             => '<span class="dashicons dashicons-groups"></span> ' . __( 'מספר משתתפים מקסימלי', 'woo-gf-integration' ),
+						'label'             => '<span class="dashicons dashicons-groups"></span> ' . __( 'מספר משתתפים מקסימלי', 'at-woo-gf-integration' ),
 						'desc_tip'          => true,
-						'description'       => __( 'השאר ריק או 0 לאירוע ללא הגבלה (יסתנכרן עם Gravity Forms)', 'woo-gf-integration' ),
+						'description'       => __( 'השאר ריק או 0 לאירוע ללא הגבלה (יסתנכרן עם Gravity Forms)', 'at-woo-gf-integration' ),
 						'type'              => 'number',
 						'custom_attributes' => array(
 							'step' => '1',
@@ -185,14 +185,14 @@ class WooGF_Event_Product_Type {
 				woocommerce_wp_select(
 					array(
 						'id'          => '_event_type',
-						'label'       => '<span class="dashicons dashicons-admin-site-alt3"></span> ' . __( 'סוג אירוע', 'woo-gf-integration' ),
+						'label'       => '<span class="dashicons dashicons-admin-site-alt3"></span> ' . __( 'סוג אירוע', 'at-woo-gf-integration' ),
 						'options'     => array(
-							'physical' => __( '📍 פיזי', 'woo-gf-integration' ),
-							'virtual'  => __( '💻 מקוון', 'woo-gf-integration' ),
-							'hybrid'   => __( '🔄 משולב', 'woo-gf-integration' ),
+							'physical' => __( '📍 פיזי', 'at-woo-gf-integration' ),
+							'virtual'  => __( '💻 מקוון', 'at-woo-gf-integration' ),
+							'hybrid'   => __( '🔄 משולב', 'at-woo-gf-integration' ),
 						),
 						'desc_tip'    => true,
-						'description' => __( 'בחר את סוג האירוע', 'woo-gf-integration' ),
+						'description' => __( 'בחר את סוג האירוע', 'at-woo-gf-integration' ),
 						'value'       => $product->get_meta( '_event_type', true ) ?: 'physical',
 					)
 				);
@@ -201,7 +201,7 @@ class WooGF_Event_Product_Type {
 
 			<div class="options_group">
 				<p class="form-field">
-					<label><span class="dashicons dashicons-id-alt"></span> <?php esc_html_e( 'משתתפים רשומים', 'woo-gf-integration' ); ?></label>
+					<label><span class="dashicons dashicons-id-alt"></span> <?php esc_html_e( 'משתתפים רשומים', 'at-woo-gf-integration' ); ?></label>
 					<?php
 					$form_id = $product->get_meta( '_woo_gf_form_id', true );
 					if ( $form_id && class_exists( 'GFAPI' ) ) {
@@ -219,21 +219,21 @@ class WooGF_Event_Product_Type {
 						
 						echo '<span class="event-attendees-count">';
 						/* translators: %d: number of attendees */
-						echo sprintf( esc_html__( '🎫 %d משתתפים רשומים', 'woo-gf-integration' ), $entry_count );
+						echo sprintf( esc_html__( '🎫 %d משתתפים רשומים', 'at-woo-gf-integration' ), $entry_count );
 						
 						if ( $max_attendees > 0 ) {
 							/* translators: %d: maximum number of attendees */
-							echo ' ' . sprintf( esc_html__( '(מתוך %d)', 'woo-gf-integration' ), $max_attendees );
+							echo ' ' . sprintf( esc_html__( '(מתוך %d)', 'at-woo-gf-integration' ), $max_attendees );
 							
 							$percentage = ( $entry_count / $max_attendees ) * 100;
 							echo '<br><progress value="' . esc_attr( $entry_count ) . '" max="' . esc_attr( $max_attendees ) . '" style="width: 100%; margin-top: 5px;"></progress>';
-							echo '<br><small>' . esc_html( round( $percentage, 1 ) ) . '% ' . esc_html__( 'תפוסה', 'woo-gf-integration' ) . '</small>';
+							echo '<br><small>' . esc_html( round( $percentage, 1 ) ) . '% ' . esc_html__( 'תפוסה', 'at-woo-gf-integration' ) . '</small>';
 						}
 						echo '</span>';
 					} else {
 						echo '<span class="description">';
 						echo '<span class="dashicons dashicons-warning"></span> ';
-						esc_html_e( 'יש לחבר טופס Gravity Forms כדי לעקוב אחר משתתפים', 'woo-gf-integration' );
+						esc_html_e( 'יש לחבר טופס Gravity Forms כדי לעקוב אחר משתתפים', 'at-woo-gf-integration' );
 						echo '</span>';
 					}
 					?>

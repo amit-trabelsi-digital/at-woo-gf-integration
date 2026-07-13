@@ -89,20 +89,20 @@ class WooGF_Event_Attendees_Limit {
 
 		$max_attendees = $product->get_max_attendees();
 		if ( empty( $max_attendees ) || $max_attendees <= 0 ) {
-			return __( 'מקומות פנויים', 'woo-gf-integration' );
+			return __( 'מקומות פנויים', 'at-woo-gf-integration' );
 		}
 
 		$current_attendees = $this->get_current_attendees_count( $product->get_id() );
 		$available = $max_attendees - $current_attendees;
 
 		if ( $available <= 0 ) {
-			return __( 'האירוע מלא', 'woo-gf-integration' );
+			return __( 'האירוע מלא', 'at-woo-gf-integration' );
 		} elseif ( $available <= 5 ) {
 			/* translators: %d: number of available spots */
-			return sprintf( __( 'נותרו %d מקומות אחרונים!', 'woo-gf-integration' ), $available );
+			return sprintf( __( 'נותרו %d מקומות אחרונים!', 'at-woo-gf-integration' ), $available );
 		} else {
 			/* translators: %d: number of available spots */
-			return sprintf( __( '%d מקומות פנויים', 'woo-gf-integration' ), $available );
+			return sprintf( __( '%d מקומות פנויים', 'at-woo-gf-integration' ), $available );
 		}
 	}
 
@@ -156,7 +156,7 @@ class WooGF_Event_Attendees_Limit {
 				wc_add_notice( 
 					sprintf( 
 						/* translators: 1: product name, 2: available quantity */
-						__( 'מצטערים, ניתן להוסיף רק %2$d כרטיסים נוספים ל"%1$s".', 'woo-gf-integration' ), 
+						__( 'מצטערים, ניתן להוסיף רק %2$d כרטיסים נוספים ל"%1$s".', 'at-woo-gf-integration' ), 
 						$product->get_name(),
 						$available
 					), 
@@ -166,7 +166,7 @@ class WooGF_Event_Attendees_Limit {
 				wc_add_notice( 
 					sprintf( 
 						/* translators: %s: product name */
-						__( 'מצטערים, אין מקומות פנויים ב"%s".', 'woo-gf-integration' ), 
+						__( 'מצטערים, אין מקומות פנויים ב"%s".', 'at-woo-gf-integration' ), 
 						$product->get_name()
 					), 
 					'error' 
@@ -205,7 +205,7 @@ class WooGF_Event_Attendees_Limit {
 			wc_add_notice( 
 				sprintf( 
 					/* translators: 1: product name, 2: available quantity */
-					__( 'מצטערים, ניתן להזמין רק %2$d כרטיסים ל"%1$s".', 'woo-gf-integration' ), 
+					__( 'מצטערים, ניתן להזמין רק %2$d כרטיסים ל"%1$s".', 'at-woo-gf-integration' ), 
 					$product->get_name(),
 					$available
 				), 

@@ -185,7 +185,7 @@ class Woo_GF_Registration_Dashboard {
                                     <input type="date" name="date_from" 
                                            value="<?php echo esc_attr( isset( $_GET['date_from'] ) ? $_GET['date_from'] : '' ); ?>" 
                                            placeholder="<?php esc_attr_e( 'מתאריך', 'at-woo-gf-integration' ); ?>" />
-                                    <span class="woo-gf-date-separator">עד</span>
+                                    <span class="woo-gf-date-separator"><?php esc_html_e( 'עד', 'at-woo-gf-integration' ); ?></span>
                                     <input type="date" name="date_to" 
                                            value="<?php echo esc_attr( isset( $_GET['date_to'] ) ? $_GET['date_to'] : '' ); ?>" 
                                            placeholder="<?php esc_attr_e( 'עד תאריך', 'at-woo-gf-integration' ); ?>" />
@@ -371,8 +371,8 @@ class Woo_GF_Registration_Dashboard {
                 error_log( 'WooGF Events Table Error: ' . $e->getMessage() );
             }
             echo '<div class="notice notice-error">';
-            echo '<p>שגיאה בטעינת נתוני האירועים. אנא נסה לרענן את הדף.</p>';
-            echo '<p><small>פרטים טכניים: ' . esc_html( $e->getMessage() ) . '</small></p>';
+            echo '<p>' . esc_html__( 'שגיאה בטעינת נתוני האירועים. אנא נסה לרענן את הדף.', 'at-woo-gf-integration' ) . '</p>';
+            echo '<p><small>' . esc_html__( 'פרטים טכניים: ', 'at-woo-gf-integration' ) . esc_html( $e->getMessage() ) . '</small></p>';
             echo '</div>';
             return;
         }
@@ -394,30 +394,30 @@ class Woo_GF_Registration_Dashboard {
         
         if (empty($events)) {
             echo '<div class="woo-gf-empty-state">';
-            echo '<h3>אין אירועים להצגה</h3>';
-            echo '<p>לא נמצאו אירועים עם טפסי הרשמה מקושרים. צור אירוע חדש או קשר אירוע קיים לטופס Gravity Forms.</p>';
+            echo '<h3>' . esc_html__( 'אין אירועים להצגה', 'at-woo-gf-integration' ) . '</h3>';
+            echo '<p>' . esc_html__( 'לא נמצאו אירועים עם טפסי הרשמה מקושרים. צור אירוע חדש או קשר אירוע קיים לטופס Gravity Forms.', 'at-woo-gf-integration' ) . '</p>';
             
             // Debug information
             $this->display_debug_info();
             
-            echo '<h4>הוראות:</h4>';
+            echo '<h4>' . esc_html__( 'הוראות:', 'at-woo-gf-integration' ) . '</h4>';
             echo '<ol>';
-            echo '<li>צור מוצר חדש מסוג "אירוע"</li>';
-            echo '<li>בכרטיסיית "Gravity Forms" בחר טופס</li>';
-            echo '<li>בכרטיסיית "פרטי אירוע" הגדר תאריך ומספר משתתפים מקסימלי</li>';
-            echo '<li>שמור את המוצר</li>';
+            echo '<li>' . esc_html__( 'צור מוצר חדש מסוג "אירוע"', 'at-woo-gf-integration' ) . '</li>';
+            echo '<li>' . esc_html__( 'בכרטיסיית "Gravity Forms" בחר טופס', 'at-woo-gf-integration' ) . '</li>';
+            echo '<li>' . esc_html__( 'בכרטיסיית "פרטי אירוע" הגדר תאריך ומספר משתתפים מקסימלי', 'at-woo-gf-integration' ) . '</li>';
+            echo '<li>' . esc_html__( 'שמור את המוצר', 'at-woo-gf-integration' ) . '</li>';
             echo '</ol>';
             
             // Add button to create sample event
             if (current_user_can('manage_options')) {
                 echo '<div class="woo-gf-sample-event-section">';
-                echo '<h4>🎯 יצירת אירוע לדוגמה</h4>';
-                echo '<p>לחץ על הכפתור למטה כדי ליצור אירוע לדוגמה עם כל הנתונים הנדרשים לבדיקת הדשבורד.</p>';
+                echo '<h4>' . esc_html__( '🎯 יצירת אירוע לדוגמה', 'at-woo-gf-integration' ) . '</h4>';
+                echo '<p>' . esc_html__( 'לחץ על הכפתור למטה כדי ליצור אירוע לדוגמה עם כל הנתונים הנדרשים לבדיקת הדשבורד.', 'at-woo-gf-integration' ) . '</p>';
                 echo '<form method="post" style="display: inline;">';
                 wp_nonce_field('woo_gf_create_sample_event', 'woo_gf_nonce');
                 echo '<button type="submit" name="woo_gf_create_sample_event" class="woo-gf-btn woo-gf-btn-success">';
                 echo '<span class="dashicons dashicons-plus-alt"></span>';
-                echo 'צור אירוע לדוגמה';
+                echo esc_html__( 'צור אירוע לדוגמה', 'at-woo-gf-integration' );
                 echo '</button>';
                 echo '</form>';
                 echo '</div>';
@@ -429,14 +429,14 @@ class Woo_GF_Registration_Dashboard {
             echo '<table class="woo-gf-table">';
             echo '<thead>';
             echo '<tr>';
-            echo '<th>פרטי אירוע</th>';
+            echo '<th>' . esc_html__( 'פרטי אירוע', 'at-woo-gf-integration' ) . '</th>';
             
             // Date header with sort link
             echo '<th>';
             $next_order = ($sort_by === 'date' && $sort_order === 'asc') ? 'desc' : 'asc';
             $sort_icon = ($sort_by === 'date') ? ('asc' === $sort_order ? ' ↓' : ' ↑') : '';
             echo '<a href="' . esc_url(add_query_arg(array('sort_by' => 'date', 'sort_order' => $next_order))) . '" class="woo-gf-sort-link">';
-            echo 'תאריך &amp; שעה' . $sort_icon;
+            echo __( 'תאריך &amp; שעה', 'at-woo-gf-integration' ) . $sort_icon;
             echo '</a>';
             echo '</th>';
             
@@ -445,23 +445,23 @@ class Woo_GF_Registration_Dashboard {
             $next_order = ($sort_by === 'price' && $sort_order === 'asc') ? 'desc' : 'asc';
             $sort_icon = ($sort_by === 'price') ? ('asc' === $sort_order ? ' ↓' : ' ↑') : '';
             echo '<a href="' . esc_url(add_query_arg(array('sort_by' => 'price', 'sort_order' => $next_order))) . '" class="woo-gf-sort-link">';
-            echo 'מחיר' . $sort_icon;
+            echo esc_html__( 'מחיר', 'at-woo-gf-integration' ) . $sort_icon;
             echo '</a>';
             echo '</th>';
             
-            echo '<th>פרוייקטור אחראי</th>';
-            echo '<th>משתתפים</th>';
+            echo '<th>' . esc_html__( 'פרוייקטור אחראי', 'at-woo-gf-integration' ) . '</th>';
+            echo '<th>' . esc_html__( 'משתתפים', 'at-woo-gf-integration' ) . '</th>';
             
             // Status header with sort link
             echo '<th>';
             $next_order = ($sort_by === 'status' && $sort_order === 'asc') ? 'desc' : 'asc';
             $sort_icon = ($sort_by === 'status') ? ('asc' === $sort_order ? ' ↓' : ' ↑') : '';
             echo '<a href="' . esc_url(add_query_arg(array('sort_by' => 'status', 'sort_order' => $next_order))) . '" class="woo-gf-sort-link">';
-            echo 'סטטוס טופס' . $sort_icon;
+            echo esc_html__( 'סטטוס טופס', 'at-woo-gf-integration' ) . $sort_icon;
             echo '</a>';
             echo '</th>';
             
-            echo '<th>פעולות</th>';
+            echo '<th>' . esc_html__( 'פעולות', 'at-woo-gf-integration' ) . '</th>';
             echo '</tr>';
             echo '</thead>';
             echo '<tbody>';
@@ -481,7 +481,7 @@ class Woo_GF_Registration_Dashboard {
                 
                 // Default status
                 $form_status_class = 'woo-gf-status-active';
-                $form_status_text = '✅ פתוח';
+                $form_status_text = __( '✅ פתוח', 'at-woo-gf-integration' );
                 $form_status_reason = '';
                 
                 if ($form) {
@@ -490,8 +490,8 @@ class Woo_GF_Registration_Dashboard {
                     
                     if (!$is_form_manually_active) {
                         $form_status_class = 'woo-gf-status-closed';
-                        $form_status_text = '❌ סגור';
-                        $form_status_reason = 'הטופס הושבת ידנית';
+                        $form_status_text = __( '❌ סגור', 'at-woo-gf-integration' );
+                        $form_status_reason = __( 'הטופס הושבת ידנית', 'at-woo-gf-integration' );
                     } else {
                         // Check schedule dates
                         $now = time();
@@ -503,8 +503,8 @@ class Woo_GF_Registration_Dashboard {
                                 $start_timestamp = strtotime($form['scheduleStart']);
                                 if ($start_timestamp && $now < $start_timestamp) {
                                     $form_status_class = 'woo-gf-status-scheduled';
-                                    $form_status_text = '⏰ מתוזמן';
-                                    $form_status_reason = 'טרם נפתח - נפתח ב-' . date_i18n('j.m.Y H:i', $start_timestamp);
+                                    $form_status_text = __( '⏰ מתוזמן', 'at-woo-gf-integration' );
+                                    $form_status_reason = __( 'טרם נפתח - נפתח ב-', 'at-woo-gf-integration' ) . date_i18n('j.m.Y H:i', $start_timestamp);
                                 }
                             }
                             
@@ -513,8 +513,8 @@ class Woo_GF_Registration_Dashboard {
                                 $end_timestamp = strtotime($form['scheduleEnd']);
                                 if ($end_timestamp && $now > $end_timestamp) {
                                     $form_status_class = 'woo-gf-status-expired';
-                                    $form_status_text = '🕒 ההרשמה נסגרה אוטומטית';
-                                    $form_status_reason = 'הטופס נסגר ב-' . date_i18n('j.m.Y H:i', $end_timestamp) . $form['scheduleEnd'];
+                                    $form_status_text = __( '🕒 ההרשמה נסגרה אוטומטית', 'at-woo-gf-integration' );
+                                    $form_status_reason = __( 'הטופס נסגר ב-', 'at-woo-gf-integration' ) . date_i18n('j.m.Y H:i', $end_timestamp) . $form['scheduleEnd'];
                                 }
                             }
                         }
@@ -522,8 +522,8 @@ class Woo_GF_Registration_Dashboard {
                         // Check capacity (only if still open)
                         if ($form_status_class === 'woo-gf-status-active' && $capacity > 0 && $registration_count >= $capacity) {
                             $form_status_class = 'woo-gf-status-full';
-                            $form_status_text = '🎫 מלא';
-                            $form_status_reason = 'הושלמה המכסה (' . number_format_i18n($capacity) . ' מקומות)';
+                            $form_status_text = __( '🎫 מלא', 'at-woo-gf-integration' );
+                            $form_status_reason = sprintf( __( 'הושלמה המכסה (%s מקומות)', 'at-woo-gf-integration' ), number_format_i18n($capacity) );
                         }
                     }
                 }
@@ -537,7 +537,7 @@ class Woo_GF_Registration_Dashboard {
                 
                 // Form name as clickable link
                 echo '<div class="woo-gf-event-meta">';
-                echo 'טופס: ';
+                echo esc_html__( 'טופס: ', 'at-woo-gf-integration' );
                 if (isset($event['form_id']) && $event['form_id']) {
                     echo '<a href="' . esc_url(admin_url('admin.php?page=gf_edit_forms&id=' . $event['form_id'])) . '" target="_blank">' . esc_html($event['form_title']) . '</a>';
                 } else {
@@ -557,7 +557,7 @@ class Woo_GF_Registration_Dashboard {
                         $start_timestamp = strtotime($start_date_str);
                         if ($start_timestamp && $start_timestamp > time()) {
                             echo '<div class="woo-gf-event-meta" style="color: #46b450; font-size: 12px;">';
-                            echo '🔓 פתיחה: ' . date_i18n('j בF Y, H:i', $start_timestamp);
+                            echo esc_html__( '🔓 פתיחה: ', 'at-woo-gf-integration' ) . date_i18n('j בF Y, H:i', $start_timestamp);
                             echo '</div>';
                         }
                     }
@@ -571,7 +571,7 @@ class Woo_GF_Registration_Dashboard {
                             $is_past = $end_timestamp < time();
                             $color = $is_past ? '#dc3232' : '#f39c12';
                             echo '<div class="woo-gf-event-meta" style="color: ' . $color . '; font-size: 12px;">';
-                            echo ($is_past ? '🔒' : '⏱️') . ' סגירה: ' . date_i18n('j בF Y, H:i', $end_timestamp);
+                            echo ($is_past ? '🔒' : '⏱️') . esc_html__( ' סגירה: ', 'at-woo-gf-integration' ) . date_i18n('j בF Y, H:i', $end_timestamp);
                             echo '</div>';
                         }
                     }
@@ -580,9 +580,9 @@ class Woo_GF_Registration_Dashboard {
                 // Capacity/Tickets
                 echo '<div class="woo-gf-event-meta" style="color: #0073aa; font-weight: 500;">';
                 if ($capacity > 0) {
-                    echo '🎫 ' . number_format_i18n($capacity) . ' כרטיסים';
+                    echo sprintf( esc_html__( '🎫 %s כרטיסים', 'at-woo-gf-integration' ), number_format_i18n($capacity) );
                 } else {
-                    echo '🎫 ∞ (ללא הגבלה)';
+                    echo esc_html__( '🎫 ∞ (ללא הגבלה)', 'at-woo-gf-integration' );
                 }
                 echo '</div>';
                 
@@ -596,7 +596,7 @@ class Woo_GF_Registration_Dashboard {
                     echo '<div class="woo-gf-event-meta" style="color: #0073aa;">' . date_i18n('H:i', $event_date) . '</div>';
                     echo '</div>';
                 } else {
-                    echo '<div class="woo-gf-event-meta" style="color: #999;">ללא תאריך</div>';
+                    echo '<div class="woo-gf-event-meta" style="color: #999;">' . esc_html__( 'ללא תאריך', 'at-woo-gf-integration' ) . '</div>';
                 }
                 echo '</td>';
                 
@@ -606,7 +606,7 @@ class Woo_GF_Registration_Dashboard {
                 if ($price > 0) {
                     echo '<div class="woo-gf-event-title">' . wc_price($price) . '</div>';
                 } else {
-                    echo '<div class="woo-gf-event-badge" style="background: #e7f7e8; color: #46b450;">🎉 חינמי</div>';
+                    echo '<div class="woo-gf-event-badge" style="background: #e7f7e8; color: #46b450;">' . esc_html__( '🎉 חינמי', 'at-woo-gf-integration' ) . '</div>';
                 }
                 echo '</td>';
                 
@@ -616,7 +616,7 @@ class Woo_GF_Registration_Dashboard {
                 if (!empty($manager)) {
                     echo '<div class="woo-gf-event-meta">' . esc_html($manager) . '</div>';
                 } else {
-                    echo '<div class="woo-gf-event-meta" style="color: #999;">לא צוין</div>';
+                    echo '<div class="woo-gf-event-meta" style="color: #999;">' . esc_html__( 'לא צוין', 'at-woo-gf-integration' ) . '</div>';
                 }
                 echo '</td>';
                 
@@ -637,9 +637,9 @@ class Woo_GF_Registration_Dashboard {
                     echo '<div class="woo-gf-capacity-bar">';
                     echo '<div class="woo-gf-capacity-fill ' . $capacity_class . '" style="width: ' . min(100, $capacity_percentage) . '%"></div>';
                     echo '</div>';
-                    echo '<div class="woo-gf-event-meta">' . number_format_i18n($available_spots) . ' פנויים</div>';
+                    echo '<div class="woo-gf-event-meta">' . number_format_i18n($available_spots) . esc_html__( ' פנויים', 'at-woo-gf-integration' ) . '</div>';
                 } else {
-                    echo '<div class="woo-gf-event-meta" style="color: #999;">ללא הגבלה</div>';
+                    echo '<div class="woo-gf-event-meta" style="color: #999;">' . esc_html__( 'ללא הגבלה', 'at-woo-gf-integration' ) . '</div>';
                 }
 
                 if ( $waitlist_enabled ) {
@@ -664,7 +664,7 @@ class Woo_GF_Registration_Dashboard {
                 // Actions
                 echo '<td>';
                 echo '<div class="woo-gf-action-buttons">';
-                echo '<a href="' . admin_url('post.php?post=' . $event_id . '&action=edit') . '" class="woo-gf-btn woo-gf-btn-secondary woo-gf-btn-sm" title="ערוך אירוע">';
+                echo '<a href="' . admin_url('post.php?post=' . $event_id . '&action=edit') . '" class="woo-gf-btn woo-gf-btn-secondary woo-gf-btn-sm" title="' . esc_attr__( 'ערוך אירוע', 'at-woo-gf-integration' ) . '">';
                 echo '<span class="dashicons dashicons-edit"></span>';
                 echo '</a>';
                 
@@ -674,7 +674,7 @@ class Woo_GF_Registration_Dashboard {
                 echo 'data-event-id="' . esc_attr($event_id) . '" ';
                 echo 'data-form-id="' . esc_attr($event['form_id']) . '" ';
                 echo 'data-event-title="' . esc_attr($event['title']) . '" ';
-                echo 'title="' . ($has_registrations ? 'צפה בנרשמים' : 'אין נרשמים') . '">';
+                echo 'title="' . ($has_registrations ? esc_attr__( 'צפה בנרשמים', 'at-woo-gf-integration' ) : esc_attr__( 'אין נרשמים', 'at-woo-gf-integration' )) . '">';
                 echo '<span class="dashicons dashicons-groups"></span>';
                 echo '</button>';
                 
@@ -684,7 +684,7 @@ class Woo_GF_Registration_Dashboard {
                 echo 'data-form-id="' . esc_attr($event['form_id']) . '" ';
                 echo 'data-event-title="' . esc_attr($event['title']) . '" ';
                 echo ($has_registrations ? '' : 'disabled="disabled" ');
-                echo 'title="' . ($has_registrations ? 'ייצוא לאקסל' : 'אין הרשמות לייצוא') . '">';
+                echo 'title="' . ($has_registrations ? esc_attr__( 'ייצוא לאקסל', 'at-woo-gf-integration' ) : esc_attr__( 'אין הרשמות לייצוא', 'at-woo-gf-integration' )) . '">';
                 echo '<span class="dashicons dashicons-download"></span>';
                 echo '</button>';
 
@@ -693,7 +693,7 @@ class Woo_GF_Registration_Dashboard {
                     echo '<button type="button" class="woo-gf-btn woo-gf-btn-secondary woo-gf-btn-sm view-waitlist" ';
                     echo 'data-event-id="' . esc_attr( $event_id ) . '" ';
                     echo 'data-event-title="' . esc_attr( $event['title'] ) . '" ';
-                    echo 'title="' . esc_attr( $has_waitlist ? 'צפה ברשימת המתנה' : 'אין נרשמים לרשימת המתנה' ) . '">';
+                    echo 'title="' . ( $has_waitlist ? esc_attr__( 'צפה ברשימת המתנה', 'at-woo-gf-integration' ) : esc_attr__( 'אין נרשמים לרשימת המתנה', 'at-woo-gf-integration' ) ) . '">';
                     echo '<span class="dashicons dashicons-clock"></span>';
                     echo '</button>';
 
@@ -701,7 +701,7 @@ class Woo_GF_Registration_Dashboard {
                     echo 'data-event-id="' . esc_attr( $event_id ) . '" ';
                     echo 'data-event-title="' . esc_attr( $event['title'] ) . '" ';
                     echo ( $has_waitlist ? '' : 'disabled="disabled" ' );
-                    echo 'title="' . esc_attr( $has_waitlist ? 'ייצוא רשימת המתנה' : 'אין רשימת המתנה לייצוא' ) . '">';
+                    echo 'title="' . ( $has_waitlist ? esc_attr__( 'ייצוא רשימת המתנה', 'at-woo-gf-integration' ) : esc_attr__( 'אין רשימת המתנה לייצוא', 'at-woo-gf-integration' ) ) . '">';
                     echo '<span class="dashicons dashicons-media-spreadsheet"></span>';
                     echo '</button>';
                 }
@@ -2231,18 +2231,18 @@ class Woo_GF_Registration_Dashboard {
         $forms = $this->get_cached_forms();
         if ( empty( $forms ) ) {
             echo '<div class="notice notice-error">';
-            echo '<p>אין טפסים זמינים. צור טופס Gravity Forms תחילה.</p>';
+            echo '<p>' . esc_html__( 'אין טפסים זמינים. צור טופס Gravity Forms תחילה.', 'at-woo-gf-integration' ) . '</p>';
             echo '</div>';
             return;
         }
         
         // Create a sample event product
         $product = new WC_Product_Simple();
-        $product->set_name( 'אירוע לדוגמה - ' . date( 'Y-m-d H:i' ) );
+        $product->set_name( sprintf( __( 'אירוע לדוגמה - %s', 'at-woo-gf-integration' ), date( 'Y-m-d H:i' ) ) );
         $product->set_status( 'publish' );
         $product->set_catalog_visibility( 'visible' );
-        $product->set_description( 'אירוע לדוגמה שנוצר אוטומטית לבדיקת הדשבורד' );
-        $product->set_short_description( 'אירוע לדוגמה' );
+        $product->set_description( __( 'אירוע לדוגמה שנוצר אוטומטית לבדיקת הדשבורד', 'at-woo-gf-integration' ) );
+        $product->set_short_description( __( 'אירוע לדוגמה', 'at-woo-gf-integration' ) );
         $product->set_regular_price( '100' );
         $product->set_sale_price( '' );
         $product->set_manage_stock( false );
@@ -2265,7 +2265,7 @@ class Woo_GF_Registration_Dashboard {
         $product->set_meta_data( '_max_attendees', 50 );
         
         // Set event location
-        $product->set_meta_data( '_event_location', 'מיקום לדוגמה' );
+        $product->set_meta_data( '_event_location', __( 'מיקום לדוגמה', 'at-woo-gf-integration' ) );
         
         // Save the product
         $product_id = $product->save();
@@ -2275,11 +2275,11 @@ class Woo_GF_Registration_Dashboard {
             wp_set_object_terms( $product_id, 'event', 'product_type' );
             
             echo '<div class="notice notice-success">';
-            echo '<p>נוצר אירוע לדוגמה בהצלחה! <a href="' . get_edit_post_link( $product_id ) . '">ערוך את האירוע</a></p>';
+            echo '<p>' . esc_html__( 'נוצר אירוע לדוגמה בהצלחה!', 'at-woo-gf-integration' ) . ' <a href="' . get_edit_post_link( $product_id ) . '">' . esc_html__( 'ערוך את האירוע', 'at-woo-gf-integration' ) . '</a></p>';
             echo '</div>';
         } else {
             echo '<div class="notice notice-error">';
-            echo '<p>שגיאה ביצירת אירוע לדוגמה.</p>';
+            echo '<p>' . esc_html__( 'שגיאה ביצירת אירוע לדוגמה.', 'at-woo-gf-integration' ) . '</p>';
             echo '</div>';
         }
     }
@@ -2310,12 +2310,12 @@ class Woo_GF_Registration_Dashboard {
      */
     private function display_debug_info() {
         echo '<div class="woo-gf-debug-section">';
-        echo '<h4>🔍 מידע דיבאג</h4>';
+        echo '<h4>' . esc_html__( '🔍 מידע דיבאג', 'at-woo-gf-integration' ) . '</h4>';
         
         // Check if Gravity Forms is active
         if (!class_exists('GFAPI')) {
             echo '<div class="woo-gf-debug-item">';
-            echo '<strong>❌ Gravity Forms לא פעיל</strong> - הדשבורד דורש Gravity Forms להיות מותקן ופעיל.';
+            echo '<strong>' . esc_html__( '❌ Gravity Forms לא פעיל', 'at-woo-gf-integration' ) . '</strong>' . esc_html__( ' - הדשבורד דורש Gravity Forms להיות מותקן ופעיל.', 'at-woo-gf-integration' );
             echo '</div>';
             return;
         }
@@ -2341,18 +2341,18 @@ class Woo_GF_Registration_Dashboard {
         echo '<div class="woo-gf-debug-stats">';
         echo '<div class="woo-gf-debug-stat">';
         echo '<span class="woo-gf-debug-number">' . $published_products . '</span>';
-        echo '<span class="woo-gf-debug-label">סה"כ מוצרים מפורסמים</span>';
+        echo '<span class="woo-gf-debug-label">' . esc_html__( 'סה"כ מוצרים מפורסמים', 'at-woo-gf-integration' ) . '</span>';
         echo '</div>';
         echo '<div class="woo-gf-debug-stat">';
         echo '<span class="woo-gf-debug-number">' . count($products_with_forms) . '</span>';
-        echo '<span class="woo-gf-debug-label">מוצרים עם טפסים (עשרה ראשונים)</span>';
+        echo '<span class="woo-gf-debug-label">' . esc_html__( 'מוצרים עם טפסים (עשרה ראשונים)', 'at-woo-gf-integration' ) . '</span>';
         echo '</div>';
         echo '</div>';
         
         // Show sample products with forms (only first 3)
         if (!empty($products_with_forms)) {
             echo '<div class="woo-gf-debug-item">';
-            echo '<strong>📋 דוגמאות מוצרים עם טפסים:</strong>';
+            echo '<strong>' . esc_html__( '📋 דוגמאות מוצרים עם טפסים:', 'at-woo-gf-integration' ) . '</strong>';
             echo '<ul>';
             foreach (array_slice($products_with_forms, 0, 3) as $product_id) {
                 $form_id = get_post_meta($product_id, '_woo_gf_form_id', true);
@@ -2362,9 +2362,9 @@ class Woo_GF_Registration_Dashboard {
                 echo '<li>';
                 echo '<strong>' . esc_html($product_title) . '</strong>';
                 echo ' (ID: ' . $product_id . ')';
-                echo ' - טופס: ' . ($form_id ? $form_id : 'לא נמצא');
-                if ($event_date) echo ' - תאריך: ' . esc_html($event_date);
-                echo ' <a href="' . get_edit_post_link($product_id) . '">ערוך</a>';
+                echo esc_html__( ' - טופס: ', 'at-woo-gf-integration' ) . ($form_id ? $form_id : esc_html__( 'לא נמצא', 'at-woo-gf-integration' ));
+                if ($event_date) echo esc_html__( ' - תאריך: ', 'at-woo-gf-integration' ) . esc_html($event_date);
+                echo ' <a href="' . get_edit_post_link($product_id) . '">' . esc_html__( 'ערוך', 'at-woo-gf-integration' ) . '</a>';
                 echo '</li>';
             }
             echo '</ul>';
@@ -2375,21 +2375,21 @@ class Woo_GF_Registration_Dashboard {
         try {
             $forms = $this->get_cached_forms();
             echo '<div class="woo-gf-debug-item">';
-            echo '<strong>📝 טפסים זמינים:</strong> ' . count($forms) . ' טפסים';
+            echo '<strong>' . esc_html__( '📝 טפסים זמינים:', 'at-woo-gf-integration' ) . '</strong> ' . count($forms) . esc_html__( ' טפסים', 'at-woo-gf-integration' );
             if (!empty($forms)) {
                 echo '<ul>';
                 foreach (array_slice($forms, 0, 3) as $form) {
                     echo '<li>' . esc_html($form['title']) . ' (ID: ' . $form['id'] . ')</li>';
                 }
                 if (count($forms) > 3) {
-                    echo '<li>... ועוד ' . (count($forms) - 3) . ' טפסים</li>';
+                    echo '<li>' . esc_html__( '... ועוד ', 'at-woo-gf-integration' ) . (count($forms) - 3) . esc_html__( ' טפסים', 'at-woo-gf-integration' ) . '</li>';
                 }
                 echo '</ul>';
             }
             echo '</div>';
         } catch ( Exception $e ) {
             echo '<div class="woo-gf-debug-item">';
-            echo '<strong>⚠️ שגיאה בטעינת טפסים:</strong> ' . esc_html($e->getMessage());
+            echo '<strong>' . esc_html__( '⚠️ שגיאה בטעינת טפסים:', 'at-woo-gf-integration' ) . '</strong> ' . esc_html($e->getMessage());
             echo '</div>';
         }
         
@@ -2474,7 +2474,7 @@ class Woo_GF_Registration_Dashboard {
         $csv_data = array();
         
         // Add header row with field labels
-        $headers = array( 'תאריך הרשמה', 'שם', 'דוא"ל', 'סטטוס' );
+        $headers = array( __( 'תאריך הרשמה', 'at-woo-gf-integration' ), __( 'שם', 'at-woo-gf-integration' ), __( 'דוא"ל', 'at-woo-gf-integration' ), __( 'סטטוס', 'at-woo-gf-integration' ) );
         
         // Add custom form fields to headers
         foreach ( $form['fields'] as $field ) {

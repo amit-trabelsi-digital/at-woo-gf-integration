@@ -124,7 +124,7 @@ class Woo_GF_Product_Form_Metabox {
                 jQuery(document).ready(function($) {
                     $('h1.wp-heading-inline').each(function() {
                         if ( ! $(this).find('.event-icon').length ) {
-                            $(this).prepend('<span class="dashicons dashicons-calendar-alt event-icon" style="color: #9b59b6; font-size: 30px; vertical-align: middle; margin-right: 10px;" title="<?php esc_attr_e( 'מוצר מסוג אירוע', 'woo-gf-integration' ); ?>"></span>');
+                            $(this).prepend('<span class="dashicons dashicons-calendar-alt event-icon" style="color: #9b59b6; font-size: 30px; vertical-align: middle; margin-right: 10px;" title="<?php esc_attr_e( 'מוצר מסוג אירוע', 'at-woo-gf-integration' ); ?>"></span>');
                         }
                     });
                 });
@@ -139,7 +139,7 @@ class Woo_GF_Product_Form_Metabox {
     public function add_product_form_metabox() {
         add_meta_box(
             'woo_gf_product_form_entries',
-            __( 'הרשמות טופס Gravity Forms', 'woo-gf-integration' ),
+            __( 'הרשמות טופס Gravity Forms', 'at-woo-gf-integration' ),
             array( $this, 'render_entries_metabox' ),
             'product',
             'normal',
@@ -152,7 +152,7 @@ class Woo_GF_Product_Form_Metabox {
      */
     public function add_product_data_tab( $tabs ) {
         $tabs['gravity_forms'] = array(
-            'label'    => __( 'Gravity Forms', 'woo-gf-integration' ),
+            'label'    => __( 'Gravity Forms', 'at-woo-gf-integration' ),
             'target'   => 'gravity_forms_product_data',
             'class'    => array(),
             'priority' => 80,
@@ -182,8 +182,8 @@ class Woo_GF_Product_Form_Metabox {
                 
                 woocommerce_wp_select( array(
                     'id'          => '_woo_gf_form_id',
-                    'label'       => '<span class="dashicons dashicons-forms"></span> ' . __( 'בחר טופס', 'woo-gf-integration' ),
-                    'description' => __( 'בחר טופס Gravity Forms לשייך למוצר זה', 'woo-gf-integration' ),
+                    'label'       => '<span class="dashicons dashicons-forms"></span> ' . __( 'בחר טופס', 'at-woo-gf-integration' ),
+                    'description' => __( 'בחר טופס Gravity Forms לשייך למוצר זה', 'at-woo-gf-integration' ),
                     'desc_tip'    => true,
                     'value'       => $selected_form,
                     'options'     => $this->get_forms_options( $forms ),
@@ -193,15 +193,15 @@ class Woo_GF_Product_Form_Metabox {
                 <p class="form-field">
                     <button type="button" class="button" id="woo_gf_view_entries">
                         <span class="dashicons dashicons-visibility" style="vertical-align: text-bottom;"></span>
-                        <?php esc_html_e( 'צפה בהרשמות', 'woo-gf-integration' ); ?>
+                        <?php esc_html_e( 'צפה בהרשמות', 'at-woo-gf-integration' ); ?>
                     </button>
                     <button type="button" class="button button-primary" id="woo_gf_create_form">
                         <span class="dashicons dashicons-plus-alt" style="vertical-align: text-bottom;"></span>
                         <?php 
                         echo esc_html( 
                             $selected_form ? 
-                            __( 'החלף בטופס חדש', 'woo-gf-integration' ) : 
-                            __( 'צור טופס חדש', 'woo-gf-integration' ) 
+                            __( 'החלף בטופס חדש', 'at-woo-gf-integration' ) : 
+                            __( 'צור טופס חדש', 'at-woo-gf-integration' ) 
                         ); 
                         ?>
                     </button>
@@ -209,7 +209,7 @@ class Woo_GF_Product_Form_Metabox {
                         <a href="<?php echo esc_url( admin_url( 'admin.php?page=gf_edit_forms&id=' . $selected_form ) ); ?>" 
                            class="button" target="_blank">
                             <span class="dashicons dashicons-edit" style="vertical-align: text-bottom;"></span>
-                            <?php esc_html_e( 'ערוך טופס', 'woo-gf-integration' ); ?>
+                            <?php esc_html_e( 'ערוך טופס', 'at-woo-gf-integration' ); ?>
                         </a>
                     <?php endif; ?>
                 </p>
@@ -219,7 +219,7 @@ class Woo_GF_Product_Form_Metabox {
             <div class="options_group" id="woo_gf_form_schedule_settings">
                 <h4 style="margin: 15px 12px 10px; font-size: 13px; color: #23282d;">
                     <span class="dashicons dashicons-clock" style="vertical-align: text-bottom;"></span>
-                    <?php esc_html_e( 'תזמון וסטטוס טופס', 'woo-gf-integration' ); ?>
+                    <?php esc_html_e( 'תזמון וסטטוס טופס', 'at-woo-gf-integration' ); ?>
                 </h4>
                 
                 <?php
@@ -250,8 +250,8 @@ class Woo_GF_Product_Form_Metabox {
                 
                 woocommerce_wp_checkbox( array(
                     'id'          => '_woo_gf_form_is_active',
-                    'label'       => __( 'הטופס פעיל', 'woo-gf-integration' ),
-                    'description' => __( 'סמן כדי שהטופס יהיה זמין להרשמות. בטל סימון כדי לסגור את הטופס ידנית', 'woo-gf-integration' ),
+                    'label'       => __( 'הטופס פעיל', 'at-woo-gf-integration' ),
+                    'description' => __( 'סמן כדי שהטופס יהיה זמין להרשמות. בטל סימון כדי לסגור את הטופס ידנית', 'at-woo-gf-integration' ),
                     'desc_tip'    => true,
                     'value'       => $is_form_active ? 'yes' : 'no',
                     'cbvalue'     => 'yes',
@@ -259,8 +259,8 @@ class Woo_GF_Product_Form_Metabox {
                 
                 woocommerce_wp_checkbox( array(
                     'id'          => '_woo_gf_enable_form_schedule',
-                    'label'       => __( 'הפעל תזמון אוטומטי', 'woo-gf-integration' ),
-                    'description' => __( 'הגדר תאריכי פתיחה וסגירה אוטומטית של הטופס', 'woo-gf-integration' ),
+                    'label'       => __( 'הפעל תזמון אוטומטי', 'at-woo-gf-integration' ),
+                    'description' => __( 'הגדר תאריכי פתיחה וסגירה אוטומטית של הטופס', 'at-woo-gf-integration' ),
                     'desc_tip'    => true,
                     'value'       => $schedule_enabled ? 'yes' : 'no',
                     'cbvalue'     => 'yes',
@@ -268,8 +268,8 @@ class Woo_GF_Product_Form_Metabox {
                 
                 woocommerce_wp_text_input( array(
                     'id'          => '_woo_gf_schedule_start',
-                    'label'       => '<span class="dashicons dashicons-unlock"></span> ' . __( 'תאריך פתיחה', 'woo-gf-integration' ),
-                    'description' => __( 'הטופס ייפתח אוטומטית בתאריך ושעה זו', 'woo-gf-integration' ),
+                    'label'       => '<span class="dashicons dashicons-unlock"></span> ' . __( 'תאריך פתיחה', 'at-woo-gf-integration' ),
+                    'description' => __( 'הטופס ייפתח אוטומטית בתאריך ושעה זו', 'at-woo-gf-integration' ),
                     'desc_tip'    => true,
                     'type'        => 'datetime-local',
                     'value'       => $schedule_start ? date('Y-m-d\TH:i', strtotime($schedule_start)) : '',
@@ -278,8 +278,8 @@ class Woo_GF_Product_Form_Metabox {
                 
                 woocommerce_wp_text_input( array(
                     'id'          => '_woo_gf_schedule_end',
-                    'label'       => '<span class="dashicons dashicons-lock"></span> ' . __( 'תאריך סגירה', 'woo-gf-integration' ),
-                    'description' => __( 'הטופס ייסגר אוטומטית בתאריך ושעה זו', 'woo-gf-integration' ),
+                    'label'       => '<span class="dashicons dashicons-lock"></span> ' . __( 'תאריך סגירה', 'at-woo-gf-integration' ),
+                    'description' => __( 'הטופס ייסגר אוטומטית בתאריך ושעה זו', 'at-woo-gf-integration' ),
                     'desc_tip'    => true,
                     'type'        => 'datetime-local',
                     'value'       => $schedule_end ? date('Y-m-d\TH:i', strtotime($schedule_end)) : '',
@@ -288,8 +288,8 @@ class Woo_GF_Product_Form_Metabox {
                 ?>
                 
                 <p class="form-field" style="margin: 10px 12px; padding: 10px; background: #f0f6fc; border-right: 4px solid #0073aa;">
-                    <strong><span class="dashicons dashicons-info" style="color: #0073aa;"></span> <?php esc_html_e( 'חשוב לדעת:', 'woo-gf-integration' ); ?></strong><br>
-                    <small><?php esc_html_e( 'השינויים האלה ישפיעו ישירות על הטופס ב-Gravity Forms. לאחר שמירה, הטופס יתעדכן אוטומטית עם ההגדרות החדשות.', 'woo-gf-integration' ); ?></small>
+                    <strong><span class="dashicons dashicons-info" style="color: #0073aa;"></span> <?php esc_html_e( 'חשוב לדעת:', 'at-woo-gf-integration' ); ?></strong><br>
+                    <small><?php esc_html_e( 'השינויים האלה ישפיעו ישירות על הטופס ב-Gravity Forms. לאחר שמירה, הטופס יתעדכן אוטומטית עם ההגדרות החדשות.', 'at-woo-gf-integration' ); ?></small>
                 </p>
                 
                 <style>
@@ -335,24 +335,24 @@ class Woo_GF_Product_Form_Metabox {
             </div>
 
             <div class="options_group">
-                <h4 style="margin-bottom: 10px;"><?php esc_html_e( 'מעקב הרשמות', 'woo-gf-integration' ); ?></h4>
+                <h4 style="margin-bottom: 10px;"><?php esc_html_e( 'מעקב הרשמות', 'at-woo-gf-integration' ); ?></h4>
                 <?php
                 woocommerce_wp_checkbox( array(
                     'id'          => '_woo_gf_enable_registration_email',
-                    'label'       => __( 'הפעל שליחת עדכון הרשמות במייל', 'woo-gf-integration' ),
-                    'description' => __( 'שלח מייל תקופתי עם קובץ CSV של הנרשמים', 'woo-gf-integration' ),
+                    'label'       => __( 'הפעל שליחת עדכון הרשמות במייל', 'at-woo-gf-integration' ),
+                    'description' => __( 'שלח מייל תקופתי עם קובץ CSV של הנרשמים', 'at-woo-gf-integration' ),
                     'desc_tip'    => true,
                     'value'       => $product->get_meta( '_woo_gf_enable_registration_email', true ),
                 ) );
 
                 woocommerce_wp_select( array(
                     'id'          => '_woo_gf_email_frequency',
-                    'label'       => __( 'תדירות שליחה', 'woo-gf-integration' ),
+                    'label'       => __( 'תדירות שליחה', 'at-woo-gf-integration' ),
                     'options'     => array(
-                        'hourly'  => __( 'שעתי', 'woo-gf-integration' ),
-                        'daily'   => __( 'יומי', 'woo-gf-integration' ),
-                        'weekly'  => __( 'שבועי', 'woo-gf-integration' ),
-                        'monthly' => __( 'חודשי', 'woo-gf-integration' ),
+                        'hourly'  => __( 'שעתי', 'at-woo-gf-integration' ),
+                        'daily'   => __( 'יומי', 'at-woo-gf-integration' ),
+                        'weekly'  => __( 'שבועי', 'at-woo-gf-integration' ),
+                        'monthly' => __( 'חודשי', 'at-woo-gf-integration' ),
                     ),
                     'value'       => $product->get_meta( '_woo_gf_email_frequency', true ),
                     'wrapper_class' => 'show_if_registration_email_enabled',
@@ -360,7 +360,7 @@ class Woo_GF_Product_Form_Metabox {
 
                 woocommerce_wp_text_input( array(
                     'id'          => '_woo_gf_notification_email',
-                    'label'       => __( 'כתובת מייל לקבלת העדכון', 'woo-gf-integration' ),
+                    'label'       => __( 'כתובת מייל לקבלת העדכון', 'at-woo-gf-integration' ),
                     'placeholder' => 'email@example.com',
                     'type'        => 'email',
                     'value'       => $product->get_meta( '_woo_gf_notification_email', true ),
@@ -393,7 +393,7 @@ class Woo_GF_Product_Form_Metabox {
                     ?>
                     <div class="options_group">
                         <p class="form-field">
-                            <strong><span class="dashicons dashicons-calendar" style="color: #0073aa;"></span> <?php esc_html_e( 'פרטי אירוע:', 'woo-gf-integration' ); ?></strong><br>
+                            <strong><span class="dashicons dashicons-calendar" style="color: #0073aa;"></span> <?php esc_html_e( 'פרטי אירוע:', 'at-woo-gf-integration' ); ?></strong><br>
                             <?php
                             $event_date = $product->get_meta( '_event_date', true );
                             $event_location = $product->get_meta( '_event_location', true );
@@ -432,7 +432,7 @@ class Woo_GF_Product_Form_Metabox {
                                 
                                 echo '<span class="dashicons dashicons-groups" style="color: #646970;"></span> ';
                                 echo sprintf( 
-                                    esc_html__( '%1$d/%2$d משתתפים רשומים (%3$s%% תפוסה)', 'woo-gf-integration' ),
+                                    esc_html__( '%1$d/%2$d משתתפים רשומים (%3$s%% תפוסה)', 'at-woo-gf-integration' ),
                                     $entry_count,
                                     $max_attendees,
                                     round( $percentage, 1 )
@@ -440,11 +440,11 @@ class Woo_GF_Product_Form_Metabox {
                                 
                                 if ( $available <= 5 && $available > 0 ) {
                                     echo '<br><span style="color: #d63638;"><span class="dashicons dashicons-warning"></span> ';
-                                    echo sprintf( esc_html__( 'נותרו %d מקומות בלבד!', 'woo-gf-integration' ), $available );
+                                    echo sprintf( esc_html__( 'נותרו %d מקומות בלבד!', 'at-woo-gf-integration' ), $available );
                                     echo '</span>';
                                 } elseif ( $available <= 0 ) {
                                     echo '<br><span style="color: #d63638;"><span class="dashicons dashicons-no"></span> ';
-                                    echo esc_html__( 'האירוע מלא', 'woo-gf-integration' );
+                                    echo esc_html__( 'האירוע מלא', 'at-woo-gf-integration' );
                                     echo '</span>';
                                 }
                             }
@@ -463,7 +463,7 @@ class Woo_GF_Product_Form_Metabox {
      * Get forms options for select field
      */
     private function get_forms_options( $forms ) {
-        $options = array( '' => __( '-- בחר טופס --', 'woo-gf-integration' ) );
+        $options = array( '' => __( '-- בחר טופס --', 'at-woo-gf-integration' ) );
         
         if ( ! empty( $forms ) ) {
             foreach ( $forms as $form ) {
@@ -483,7 +483,7 @@ class Woo_GF_Product_Form_Metabox {
         $form_id = $product ? $product->get_meta( '_woo_gf_form_id', true ) : '';
         
         if ( empty( $form_id ) ) {
-            echo '<p>' . esc_html__( 'לא נבחר טופס עבור מוצר זה. בחר טופס בכרטיסיית Gravity Forms בתיבת נתוני המוצר.', 'woo-gf-integration' ) . '</p>';
+            echo '<p>' . esc_html__( 'לא נבחר טופס עבור מוצר זה. בחר טופס בכרטיסיית Gravity Forms בתיבת נתוני המוצר.', 'at-woo-gf-integration' ) . '</p>';
             return;
         }
         
@@ -491,15 +491,15 @@ class Woo_GF_Product_Form_Metabox {
         $form = GFAPI::get_form( $form_id );
         
         if ( ! $form ) {
-            echo '<p>' . esc_html__( 'הטופס שנבחר לא נמצא.', 'woo-gf-integration' ) . '</p>';
+            echo '<p>' . esc_html__( 'הטופס שנבחר לא נמצא.', 'at-woo-gf-integration' ) . '</p>';
             return;
         }
         
-        echo '<h4>' . sprintf( esc_html__( 'הרשמות לטופס: %s', 'woo-gf-integration' ), esc_html( $form['title'] ) ) . '</h4>';
+        echo '<h4>' . sprintf( esc_html__( 'הרשמות לטופס: %s', 'at-woo-gf-integration' ), esc_html( $form['title'] ) ) . '</h4>';
         
         // Container for entries table
         echo '<div id="woo_gf_entries_container" data-form-id="' . esc_attr( $form_id ) . '" data-product-id="' . esc_attr( $post->ID ) . '">';
-        echo '<p>' . esc_html__( 'טוען הרשמות...', 'woo-gf-integration' ) . '</p>';
+        echo '<p>' . esc_html__( 'טוען הרשמות...', 'at-woo-gf-integration' ) . '</p>';
         echo '</div>';
     }
 
@@ -581,7 +581,7 @@ class Woo_GF_Product_Form_Metabox {
                             }
                             // Default message if not set
                             if ( empty( $form['scheduleMessage'] ) ) {
-                                $form['scheduleMessage'] = __( 'מצטערים, ההרשמה לאירוע זה נסגרה.', 'woo-gf-integration' );
+                                $form['scheduleMessage'] = __( 'מצטערים, ההרשמה לאירוע זה נסגרה.', 'at-woo-gf-integration' );
                             }
                         }
                         
