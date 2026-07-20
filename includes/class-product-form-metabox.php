@@ -176,7 +176,18 @@ class Woo_GF_Product_Form_Metabox {
                 // Get saved form ID
                 $product = wc_get_product( $post->ID );
                 $selected_form = $product ? $product->get_meta( '_woo_gf_form_id', true ) : '';
-                
+
+                // Default form: when no form has been chosen yet (new product / empty
+                // meta) pre-select the default event form (#20). A user's saved choice is
+                // never overridden — this only fills the empty case. The id is filterable
+                // via `at_woo_gf_default_form_id`. See HRV-E5.
+                if ( '' === $selected_form || null === $selected_form || false === $selected_form ) {
+                    $default_form_id = apply_filters( 'at_woo_gf_default_form_id', 20 );
+                    if ( $default_form_id && GFAPI::get_form( $default_form_id ) ) {
+                        $selected_form = (string) $default_form_id;
+                    }
+                }
+
                 // Get all forms
                 $forms = GFAPI::get_forms();
                 
@@ -223,30 +234,40 @@ class Woo_GF_Product_Form_Metabox {
                 </h4>
                 
                 <?php
-                // Get form scheduling data
+                // Get form scheduling data.
+                // The product post meta is the authoritative source for this admin UI
+                // (it is written on every product save). The linked Gravity Forms form is
+                // only a fallback source. Therefore the saved schedule values must be read
+                // unconditionally and must NOT be gated behind the presence of the GF form
+                // object: if the linked form was deleted, replaced, trashed, or GFAPI is
+                // unavailable, the previously-saved dates would otherwise fail to load into
+                // the edit fields. See HRV-C8.
                 $form = $selected_form ? GFAPI::get_form( $selected_form ) : null;
-                $is_form_active = true;
-                $schedule_enabled = false;
-                $schedule_start = '';
-                $schedule_end = '';
-                
+
+                // Form active status: prefer the live GF form, then saved meta, else active.
+                $meta_is_active = get_post_meta( $post->ID, '_woo_gf_form_is_active', true );
                 if ( $form ) {
-                    $is_form_active = !isset( $form['is_active'] ) || $form['is_active'] !== false;
-                    
-                    // Priority to post meta for the admin interface persistence
-                    $meta_schedule_enabled = get_post_meta( $post->ID, '_woo_gf_enable_form_schedule', true );
-                    if ( '' !== $meta_schedule_enabled ) {
-                        $schedule_enabled = 'yes' === $meta_schedule_enabled;
-                    } else {
-                        $schedule_enabled = isset( $form['scheduleForm'] ) && $form['scheduleForm'];
-                    }
-
-                    $meta_start = get_post_meta( $post->ID, '_woo_gf_schedule_start', true );
-                    $schedule_start = ! empty( $meta_start ) ? $meta_start : ( isset( $form['scheduleStart'] ) ? $form['scheduleStart'] : '' );
-
-                    $meta_end = get_post_meta( $post->ID, '_woo_gf_schedule_end', true );
-                    $schedule_end = ! empty( $meta_end ) ? $meta_end : ( isset( $form['scheduleEnd'] ) ? $form['scheduleEnd'] : '' );
+                    $is_form_active = ! isset( $form['is_active'] ) || $form['is_active'] !== false;
+                } elseif ( '' !== $meta_is_active ) {
+                    $is_form_active = 'yes' === $meta_is_active;
+                } else {
+                    $is_form_active = true;
                 }
+
+                // Schedule enabled: prefer saved meta, fall back to the GF form flag.
+                $meta_schedule_enabled = get_post_meta( $post->ID, '_woo_gf_enable_form_schedule', true );
+                if ( '' !== $meta_schedule_enabled ) {
+                    $schedule_enabled = 'yes' === $meta_schedule_enabled;
+                } else {
+                    $schedule_enabled = $form && ! empty( $form['scheduleForm'] );
+                }
+
+                // Schedule start/end dates: prefer saved meta, fall back to the GF form values.
+                $meta_start = get_post_meta( $post->ID, '_woo_gf_schedule_start', true );
+                $schedule_start = ! empty( $meta_start ) ? $meta_start : ( $form && isset( $form['scheduleStart'] ) ? $form['scheduleStart'] : '' );
+
+                $meta_end = get_post_meta( $post->ID, '_woo_gf_schedule_end', true );
+                $schedule_end = ! empty( $meta_end ) ? $meta_end : ( $form && isset( $form['scheduleEnd'] ) ? $form['scheduleEnd'] : '' );
                 
                 woocommerce_wp_checkbox( array(
                     'id'          => '_woo_gf_form_is_active',
