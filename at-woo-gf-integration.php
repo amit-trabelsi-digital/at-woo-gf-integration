@@ -3,7 +3,7 @@
  * Plugin Name: AT - WooCommerce Gravity Forms Integration
  * Plugin URI: https://amit-trabelsi.co.il/
  * Description: תוסף מתקדם שמחבר בין WooCommerce ל-Gravity Forms עם ניהול אירועים, הרשאות משתמשים ודשבורד הרשמות מלא
- * Version: 2.13.4
+ * Version: 2.13.5
  * Author: Amit Trabelsi
  * Author URI: https://amit-trabelsi-digital.com/
  * Text Domain: at-woo-gf-integration
@@ -147,6 +147,9 @@ class AT_Woo_GF_Integration {
         // Enqueue admin scripts and styles
         add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
 
+        // "שמור שינויים" shortcut in the sticky admin bar of the product editor
+        add_action( 'admin_bar_menu', array( $this, 'add_quick_save_admin_bar_button' ), 100 );
+
         // Add action to change post labels
         add_action( 'admin_menu', array( $this, 'change_post_labels' ) );
         
@@ -167,6 +170,59 @@ class AT_Woo_GF_Integration {
         // אינטגרציה עם Relevanssi - הסתרת תוכן מוסתר מתוצאות חיפוש
         add_filter('relevanssi_post_ok', array($this, 'relevanssi_exclude_hidden_posts'), 10, 2);
         add_filter('relevanssi_modify_wp_query', array($this, 'relevanssi_exclude_hidden_from_query'));
+    }
+
+    /**
+     * Add a "שמור שינויים" shortcut to the admin bar of the product editor.
+     *
+     * The product editor is the classic (non-Gutenberg) screen and its Update
+     * button sits at the very top of a long sidebar, so on a tall product the
+     * user has to scroll back up to save. The admin bar is sticky, so a button
+     * there is always reachable.
+     *
+     * Rendered server-side on purpose: the capability check, the translated
+     * labels and the escaping all belong in PHP, and the markup is present on
+     * first paint instead of being grafted onto WordPress' own admin-bar DOM by
+     * jQuery. assets/js/admin.js only binds the click.
+     *
+     * @param WP_Admin_Bar $wp_admin_bar Admin bar instance.
+     */
+    public function add_quick_save_admin_bar_button( $wp_admin_bar ) {
+        if ( ! is_admin() ) {
+            return;
+        }
+
+        global $pagenow, $post;
+
+        if ( ! in_array( $pagenow, array( 'post.php', 'post-new.php' ), true ) ) {
+            return;
+        }
+
+        if ( ! $post instanceof WP_Post || 'product' !== $post->post_type ) {
+            return;
+        }
+
+        if ( ! current_user_can( 'edit_post', $post->ID ) ) {
+            return;
+        }
+
+        $label  = __( 'שמור שינויים', 'at-woo-gf-integration' );
+        $saving = __( 'שומר…', 'at-woo-gf-integration' );
+
+        $button = sprintf(
+            '<button type="button" class="button button-primary at-woogf-quick-save__button" data-label="%1$s" data-saving-label="%2$s" aria-label="%3$s">%1$s</button>',
+            esc_attr( $label ),
+            esc_attr( $saving ),
+            esc_attr__( 'שמירת השינויים במוצר', 'at-woo-gf-integration' )
+        );
+
+        $wp_admin_bar->add_node(
+            array(
+                'id'    => 'at-woogf-quick-save',
+                'title' => $button,
+                'meta'  => array( 'class' => 'at-woogf-quick-save' ),
+            )
+        );
     }
 
     /**

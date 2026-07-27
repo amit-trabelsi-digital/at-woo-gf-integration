@@ -138,3 +138,32 @@ body.rtl .tablenav-pages {
 body.rtl .woo-gf-modal-close {
     float: left;
 } 
+/* ── Admin-bar quick save ─────────────────────────────────────────────────
+   Node rendered by AT_Woo_GF_Integration::add_quick_save_admin_bar_button().
+   The admin bar is 32px tall, so the button has to sit inside that height
+   without stretching the bar. */
+#wpadminbar #wp-admin-bar-at-woogf-quick-save > .ab-item {
+    display: flex;
+    align-items: center;
+    height: 32px;
+    padding-inline: 10px;
+}
+
+#wpadminbar .at-woogf-quick-save__button {
+    height: auto;
+    min-height: 24px;
+    padding-block: 0;
+    padding-inline: 12px;
+    font-size: 12px;
+    line-height: 22px;
+}
+
+#wpadminbar .at-woogf-quick-save__button:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 1px;
+}
+
+#wpadminbar .at-woogf-quick-save__button[disabled] {
+    opacity: 0.7;
+    cursor: progress;
+}

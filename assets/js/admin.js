@@ -179,10 +179,32 @@ jQuery(document).ready(function($) {
                 return;
             }
         }
-        
+
+        // Ask for the new form's name, pre-filled with the product name.
+        // The new form is a copy of the template form, so it must get its own
+        // name — otherwise the forms list fills up with identical titles.
+        var defaultTitle = ($('#title').val() || '').trim();
+        var formTitle = prompt(
+            'שם הטופס החדש\n\n' +
+            'הטופס ייווצר כשכפול של טופס התבנית ויקושר לאירוע זה.',
+            defaultTitle
+        );
+
+        // Cancelled by the user.
+        if (formTitle === null) {
+            return;
+        }
+
+        formTitle = formTitle.trim();
+
+        if (formTitle === '') {
+            alert('❌ שגיאה: יש להזין שם לטופס.');
+            return;
+        }
+
         // Disable button and show loading
-        button.prop('disabled', true).html('<span class="spinner is-active" style="float: right; margin: 4px;"></span> ' + 'יוצר טופס...');
-        
+        button.prop('disabled', true).html('<span class="spinner is-active" style="float: right; margin: 4px;"></span> ' + 'משכפל טופס...');
+
         // AJAX request to create the form
         $.ajax({
             url: atWooGfIntegration.ajax_url,
@@ -190,6 +212,7 @@ jQuery(document).ready(function($) {
             data: {
                 action: 'haruv_create_gf_form_for_event',
                 product_id: productId,
+                form_title: formTitle,
                 security: $('#haruv_event_gf_nonce_field').val()
             },
             success: function(response) {
@@ -216,10 +239,13 @@ jQuery(document).ready(function($) {
                     button.after(editButton);
                     
                     // Show success message
-                    alert('✅ הטופס נוצר בהצלחה!\n\nהטופס "' + formTitle + '" נוצר וקושר למוצר.');
+                    alert('✅ הטופס נוצר בהצלחה!\n\nהטופס "' + formTitle + '" שוכפל מטופס התבנית וקושר לאירוע.');
 
                 } else {
-                    alert('❌ שגיאה ביצירת הטופס:\n\n' + response.data.message);
+                    var errorMessage = (response.data && response.data.message)
+                        ? response.data.message
+                        : 'אירעה שגיאה לא ידועה.';
+                    alert('❌ שגיאה ביצירת הטופס:\n\n' + errorMessage);
                 }
             },
             error: function() {
@@ -249,71 +275,72 @@ jQuery(document).ready(function($) {
         }
     }
 
-    // 2. Add "Quick Save" button to sticky Admin Bar
-    if ($('body').hasClass('post-type-product') && ($('body').hasClass('post-php') || $('body').hasClass('post-new-php'))) {
-        var adminBar = $('#wp-admin-bar-root-default');
-        
-        if (adminBar.length > 0) {
-            // Create list item for admin bar
-            var li = $('<li id="wp-admin-bar-quick-save-product"></li>');
-            var div = $('<div class="ab-item ab-empty-item" style="padding: 0 10px; display: flex; align-items: center; height: 32px;"></div>');
-            var saveBtn = $('<button type="button" class="button button-primary">שמור שינויים</button>');
-            
-            // Logic for click
-            saveBtn.on('click', function(e) {
+    // 2. "שמור שינויים" shortcut in the sticky admin bar.
+    //
+    // The button itself is rendered server-side (see
+    // AT_Woo_GF_Integration::add_quick_save_admin_bar_button); here we only wire
+    // the click to WordPress' own save path.
+    //
+    // The product editor is a classic screen, so the only correct way to save is
+    // to let WordPress submit form#post through one of its real submit buttons:
+    //   - #publish  — "פרסום" / "עדכן"
+    //   - #save-post — "שמירת טיוטה", for users who cannot publish
+    // Both carry a name/value pair that post.php reads to decide the resulting
+    // post status, so form.submit() is never an option — it skips every submit
+    // handler (TinyMCE flush, WooCommerce field sync, ACF validation) *and* drops
+    // the submitter from the payload. A native click on the real button is the
+    // closest possible equivalent of the user pressing it.
+    var $quickSave = $('#wp-admin-bar-at-woogf-quick-save .at-woogf-quick-save__button');
+
+    if ($quickSave.length) {
+        var wpSubmitButton = document.getElementById('publish') || document.getElementById('save-post');
+        var idleLabel = $quickSave.data('label') || $quickSave.text();
+        var savingLabel = $quickSave.data('saving-label') || idleLabel;
+
+        var setBusy = function (busy) {
+            $quickSave
+                .prop('disabled', busy)
+                .attr('aria-busy', busy ? 'true' : 'false')
+                .text(busy ? savingLabel : idleLabel);
+        };
+
+        if (!wpSubmitButton) {
+            // Nothing to submit through — don't offer a button that cannot work.
+            $('#wp-admin-bar-at-woogf-quick-save').remove();
+        } else {
+            $quickSave.on('click', function (e) {
                 e.preventDefault();
-                
-                // Visual feedback
-                var originalText = $(this).text();
-                $(this).text('שומר...').prop('disabled', true);
-                var self = $(this);
-                
-                // 1. Classic Editor / WooCommerce Products
-                var publishBtn = $('#publish');
-                var saveDraftBtn = $('#save-post');
-                var buttonClicked = false;
-                
-                // Logic:
-                // We prefer clicking the actual buttons as they trigger all validation and WordPress hooks.
-                // In WordPress, both "Publish" and "Update" buttons have id="publish".
-                
-                if (publishBtn.length) {
-                    // Force click the button, even if not visible (might be in a collapsed sidebar)
-                    publishBtn[0].click();
-                    buttonClicked = true;
-                } else if (saveDraftBtn.length) {
-                    saveDraftBtn[0].click();
-                    buttonClicked = true;
-                }
-                
-                if (!buttonClicked) {
-                    // 2. Gutenberg / Block Editor fallback
-                    var gutenbergSave = $('.editor-post-publish-button, .editor-post-publish-panel__toggle');
-                    if (gutenbergSave.length) {
-                        gutenbergSave[0].click();
-                        buttonClicked = true;
-                    }
+
+                if ($quickSave.prop('disabled') || wpSubmitButton.disabled) {
+                    return;
                 }
 
-                if (!buttonClicked) {
-                    // 3. Last resort - submit the form directly
-                    var postForm = $('form#post');
-                    if (postForm.length) {
-                        postForm.submit();
-                    }
+                // Flush editors that hold their value outside the form, so the
+                // content field is up to date no matter which editor is active.
+                if (window.tinyMCE && typeof window.tinyMCE.triggerSave === 'function') {
+                    window.tinyMCE.triggerSave();
                 }
-                
-                // Reset button after delay (if page doesn't reload)
-                setTimeout(function() {
-                    self.text(originalText).prop('disabled', false);
-                }, 5000);
+
+                setBusy(true);
+
+                if (typeof wpSubmitButton.click === 'function') {
+                    wpSubmitButton.click();
+                } else if (typeof document.getElementById('post').requestSubmit === 'function') {
+                    document.getElementById('post').requestSubmit(wpSubmitButton);
+                }
             });
-            
-            div.append(saveBtn);
-            li.append(div);
-            
-            // Add to admin bar (append adds it to the end of the group)
-            adminBar.append(li);
+
+            // Mirror WordPress' own button state instead of guessing with a timer.
+            // A successful save navigates away; when it does not — ACF validation
+            // errors, a failed nonce — WordPress re-enables #publish, and the
+            // shortcut has to come back with it rather than stay stuck on "שומר…".
+            if (window.MutationObserver) {
+                new MutationObserver(function () {
+                    if (!wpSubmitButton.disabled && $quickSave.prop('disabled')) {
+                        setBusy(false);
+                    }
+                }).observe(wpSubmitButton, { attributes: true, attributeFilter: ['disabled', 'class'] });
+            }
         }
     }
 }); 
