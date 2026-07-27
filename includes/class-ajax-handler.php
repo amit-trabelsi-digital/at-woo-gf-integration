@@ -363,74 +363,196 @@ class Woo_GF_Ajax_Handler {
     }
 
     /**
-     * Create a new form and associate it with product
+     * Default Gravity Forms form id used as the duplication template.
+     *
+     * Form #20 on this site is titled "טופס לברירת מחדל" and exists purely to be
+     * copied: it carries the standard event-registration fields, notifications and
+     * confirmations. Override with the `at_woo_gf_template_form_id` filter.
+     *
+     * @var int
+     */
+    const TEMPLATE_FORM_ID = 20;
+
+    /**
+     * Resolve the id of the form that acts as the duplication template.
+     *
+     * @return int
+     */
+    private function get_template_form_id() {
+        return (int) apply_filters( 'at_woo_gf_template_form_id', self::TEMPLATE_FORM_ID );
+    }
+
+    /**
+     * Duplicate the template form, rename it, and link it to the product.
+     *
+     * The template form (see self::TEMPLATE_FORM_ID) is the single source of truth
+     * for what an event registration form looks like. Nothing here builds a form
+     * from scratch: if the template is missing, trashed or unreadable we fail loudly
+     * with a Hebrew message rather than quietly producing an empty form that the
+     * site manager would then have to rebuild by hand.
      */
     public function create_form() {
         check_ajax_referer( 'haruv_event_gf_nonce', 'security' );
 
-        if ( ! current_user_can( 'edit_products' ) || ! isset( $_POST['product_id'] ) ) {
-            wp_send_json_error( [ 'message' => __( 'אין לך הרשאה לבצע פעולה זו.', 'at-woo-gf-integration' ) ] );
+        if ( ! isset( $_POST['product_id'] ) ) {
+            wp_send_json_error( [ 'message' => __( 'לא צוין מוצר.', 'at-woo-gf-integration' ) ] );
         }
 
-        if ( ! class_exists( 'GFAPI' ) ) {
+        $product_id = absint( $_POST['product_id'] );
+
+        // Creating a Gravity Forms form is a privileged action: require the GF
+        // create-form capability (or a full administrator), *and* the ability to
+        // edit this specific product, since we write the link into its meta.
+        $can_create_form = class_exists( 'GFCommon' )
+            ? GFCommon::current_user_can_any( 'gravityforms_create_form' )
+            : current_user_can( 'manage_options' );
+
+        if ( ! $can_create_form && ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( [ 'message' => __( 'אין לך הרשאה ליצור טפסים ב-Gravity Forms.', 'at-woo-gf-integration' ) ] );
+        }
+
+        if ( ! $product_id || ! current_user_can( 'edit_post', $product_id ) ) {
+            wp_send_json_error( [ 'message' => __( 'אין לך הרשאה לערוך מוצר זה.', 'at-woo-gf-integration' ) ] );
+        }
+
+        if ( ! class_exists( 'GFAPI' ) || ! class_exists( 'GFFormsModel' ) ) {
             wp_send_json_error( [ 'message' => __( 'Gravity Forms אינו מותקן או פעיל.', 'at-woo-gf-integration' ) ] );
         }
 
-        $product_id = intval( $_POST['product_id'] );
         $product = wc_get_product( $product_id );
 
         if ( ! $product ) {
             wp_send_json_error( [ 'message' => __( 'מוצר לא נמצא.', 'at-woo-gf-integration' ) ] );
         }
 
-        $form_title = $product->get_name();
-        
-        // Basic form structure
-        $form = [
-            'title'        => $form_title,
-            'description'  => sprintf( __( 'טופס הרשמה לאירוע: %s', 'at-woo-gf-integration' ), $form_title ),
-            'labelPlacement' => 'top_label',
-            'button'       => [
-                'type' => 'text',
-                'text' => __( 'שלח הרשמה', 'at-woo-gf-integration' ),
-            ],
-            'fields'       => [
-                [ 'type' => 'name', 'label' => __( 'שם מלא', 'at-woo-gf-integration' ), 'isRequired' => true, 'inputs' => [
-                    [ 'id' => '1.3', 'label' => __( 'שם פרטי', 'at-woo-gf-integration' ) ],
-                    [ 'id' => '1.6', 'label' => __( 'שם משפחה', 'at-woo-gf-integration' ) ],
-                ]],
-                [ 'type' => 'email', 'label' => __( 'כתובת אימייל', 'at-woo-gf-integration' ), 'isRequired' => true ],
-                [ 'type' => 'phone', 'label' => __( 'טלפון', 'at-woo-gf-integration' ), 'isRequired' => true ],
-            ],
-        ];
+        $template_form_id = $this->get_template_form_id();
 
-        // If product has stock management, set form limit
+        if ( ! $template_form_id ) {
+            wp_send_json_error( [ 'message' => __( 'לא הוגדר טופס תבנית לשכפול. פנה למנהל המערכת.', 'at-woo-gf-integration' ) ] );
+        }
+
+        // Hard gate on the template. GFFormsModel::get_form() returns false for a
+        // missing form *and* for a trashed one, which is exactly the check we want:
+        // duplicating from the trash would produce a form the admin cannot find.
+        $template_props = GFFormsModel::get_form( $template_form_id );
+
+        if ( ! $template_props ) {
+            wp_send_json_error( [
+                'message' => sprintf(
+                    /* translators: %d: Gravity Forms form id. */
+                    __( 'טופס התבנית (מספר %d) לא נמצא או שהועבר לאשפה, ולכן לא ניתן לשכפל אותו. שחזר את טופס התבנית ב-Gravity Forms, או בחר טופס קיים מהרשימה.', 'at-woo-gf-integration' ),
+                    $template_form_id
+                ),
+            ] );
+        }
+
+        // Requested title: the admin can override it from the UI; otherwise derive
+        // it from the product name. Never fall back to the template's own title.
+        $requested_title = isset( $_POST['form_title'] )
+            ? sanitize_text_field( wp_unslash( $_POST['form_title'] ) )
+            : '';
+
+        if ( '' === $requested_title ) {
+            $requested_title = $product->get_name();
+        }
+
+        if ( '' === trim( $requested_title ) ) {
+            wp_send_json_error( [ 'message' => __( 'יש להזין שם לטופס (או לתת שם למוצר) לפני יצירת הטופס.', 'at-woo-gf-integration' ) ] );
+        }
+
+        // Duplicate. GF's own routine copies fields, settings, notifications and
+        // confirmations — reimplementing that here would drift from the template.
+        $new_form_id = GFFormsModel::duplicate_form( $template_form_id );
+
+        if ( is_wp_error( $new_form_id ) ) {
+            wp_send_json_error( [
+                'message' => sprintf(
+                    /* translators: %s: error message from Gravity Forms. */
+                    __( 'שכפול טופס התבנית נכשל: %s', 'at-woo-gf-integration' ),
+                    $new_form_id->get_error_message()
+                ),
+            ] );
+        }
+
+        if ( ! $new_form_id ) {
+            wp_send_json_error( [ 'message' => __( 'שכפול טופס התבנית נכשל מסיבה לא ידועה. נסה שוב או צור את הטופס ידנית ב-Gravity Forms.', 'at-woo-gf-integration' ) ] );
+        }
+
+        // Rename the copy. duplicate_form() names it "<template> (1)"; GFAPI::update_form()
+        // runs the title through GF's uniqueness check, so a clashing name becomes
+        // "<name> (1)" rather than failing.
+        $new_form = GFAPI::get_form( $new_form_id );
+
+        if ( ! $new_form ) {
+            wp_send_json_error( [ 'message' => __( 'הטופס שוכפל אך לא ניתן היה לטעון אותו לצורך שינוי השם. בדוק את רשימת הטפסים ב-Gravity Forms.', 'at-woo-gf-integration' ) ] );
+        }
+
+        $new_form['title'] = $requested_title;
+        $new_form['description'] = sprintf(
+            /* translators: %s: product (event) name. */
+            __( 'טופס הרשמה לאירוע: %s', 'at-woo-gf-integration' ),
+            $product->get_name()
+        );
+
+        // Point the copy at this product, and make sure it did not inherit the
+        // template's own product link.
+        $new_form['woo_gf_linked_product_id'] = $product_id;
+
+        // Cap entries by the event capacity when stock is managed.
         if ( $product->get_manage_stock() ) {
             $stock_quantity = $product->get_stock_quantity();
             if ( $stock_quantity > 0 ) {
-                $form['limitEntries'] = true;
-                $form['limitEntriesCount'] = $stock_quantity;
-                $form['limitEntriesMessage'] = __( 'מצטערים, ההרשמה לאירוע זה מלאה.', 'at-woo-gf-integration' );
+                $new_form['limitEntries']        = true;
+                $new_form['limitEntriesCount']   = $stock_quantity;
+                $new_form['limitEntriesMessage'] = __( 'מצטערים, ההרשמה לאירוע זה מלאה.', 'at-woo-gf-integration' );
             }
         }
 
-        $form_id = GFAPI::add_form( $form );
+        /**
+         * Filter the duplicated form before it is saved.
+         *
+         * @param array $new_form   The duplicated Gravity Forms form array.
+         * @param int   $product_id The product the form is being linked to.
+         */
+        $new_form = apply_filters( 'woo_gf_integration_new_form', $new_form, $product_id );
 
-        if ( is_wp_error( $form_id ) ) {
-            wp_send_json_error( [ 'message' => $form_id->get_error_message() ] );
+        $updated = GFAPI::update_form( $new_form );
+
+        if ( is_wp_error( $updated ) ) {
+            wp_send_json_error( [
+                'message' => sprintf(
+                    /* translators: %s: error message from Gravity Forms. */
+                    __( 'הטופס שוכפל אך עדכון פרטיו נכשל: %s', 'at-woo-gf-integration' ),
+                    $updated->get_error_message()
+                ),
+            ] );
         }
 
-        // Link the new form to the product using the correct meta key
-        update_post_meta( $product_id, '_woo_gf_form_id', $form_id );
-        $product->update_meta_data( '_woo_gf_form_id', $form_id );
+        // Read the title back — GF may have made it unique.
+        $saved_form  = GFAPI::get_form( $new_form_id );
+        $final_title = $saved_form && ! empty( $saved_form['title'] ) ? $saved_form['title'] : $requested_title;
+
+        // Link the new form to the product (HPOS-safe CRUD).
+        $product->update_meta_data( '_woo_gf_form_id', (string) $new_form_id );
         $product->save();
 
+        /**
+         * Fires after a registration form has been created for a product.
+         *
+         * @param int $new_form_id The new form id.
+         * @param int $product_id  The linked product id.
+         */
+        do_action( 'woo_gf_integration_form_created', $new_form_id, $product_id );
 
         wp_send_json_success( [
-            'message' => __( 'הטופס נוצר וקושר בהצלחה!', 'at-woo-gf-integration' ),
-            'form_id' => $form_id,
-            'form_title' => $form_title,
-            'edit_url' => admin_url( 'admin.php?page=gf_edit_forms&id=' . $form_id ),
+            'message'    => sprintf(
+                /* translators: %d: template form id. */
+                __( 'הטופס שוכפל מטופס התבנית (מספר %d) וקושר למוצר בהצלחה!', 'at-woo-gf-integration' ),
+                $template_form_id
+            ),
+            'form_id'    => $new_form_id,
+            'form_title' => $final_title,
+            'edit_url'   => admin_url( 'admin.php?page=gf_edit_forms&id=' . $new_form_id ),
         ] );
     }
 } 

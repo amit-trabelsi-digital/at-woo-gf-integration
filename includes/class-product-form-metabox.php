@@ -177,16 +177,16 @@ class Woo_GF_Product_Form_Metabox {
                 $product = wc_get_product( $post->ID );
                 $selected_form = $product ? $product->get_meta( '_woo_gf_form_id', true ) : '';
 
-                // Default form: when no form has been chosen yet (new product / empty
-                // meta) pre-select the default event form (#20). A user's saved choice is
-                // never overridden — this only fills the empty case. The id is filterable
-                // via `at_woo_gf_default_form_id`. See HRV-E5.
-                if ( '' === $selected_form || null === $selected_form || false === $selected_form ) {
-                    $default_form_id = apply_filters( 'at_woo_gf_default_form_id', 20 );
-                    if ( $default_form_id && GFAPI::get_form( $default_form_id ) ) {
-                        $selected_form = (string) $default_form_id;
-                    }
-                }
+                // No form is auto-selected. A new event product starts with an empty
+                // select and the site manager must explicitly pick an existing form or
+                // press "צור טופס חדש", which duplicates the template form. Form #20
+                // ("טופס לברירת מחדל") is that duplication template — it is deliberately
+                // NOT pre-selected here, because pre-selecting it silently linked every
+                // new event to the same shared form. See HRV-E5 and
+                // Woo_GF_Ajax_Handler::get_template_form_id().
+                //
+                // Products that already have `_woo_gf_form_id` saved keep their value —
+                // it is read straight from meta above and never overridden.
 
                 // Get all forms
                 $forms = GFAPI::get_forms();

@@ -79,9 +79,20 @@ $forms = apply_filters( 'woo_gf_available_forms', $forms );
 // שינוי מספר רשומות לעמוד
 $per_page = apply_filters( 'woo_gf_entries_per_page', 20 );
 
-// התאמת טופס חדש לפני יצירה
+// התאמת הטופס המשוכפל לפני שמירתו
 $form = apply_filters( 'woo_gf_integration_new_form', $form, $product_id );
+
+// מזהה טופס התבנית שממנו משכפלים טופס הרשמה חדש
+$template_id = apply_filters( 'at_woo_gf_template_form_id', 20 );
 ```
+
+### טופס התבנית
+
+מוצר אירוע חדש **אינו** מקבל טופס נבחר אוטומטית — מנהל האתר חייב לבחור טופס קיים או ללחוץ "צור טופס חדש".
+
+הכפתור "צור טופס חדש" אינו בונה טופס מאפס: הוא משכפל את **טופס התבנית** (ברירת מחדל: טופס 20, "טופס לברירת מחדל") באמצעות `GFFormsModel::duplicate_form()`, כך שהשדות, ההגדרות, ההתראות והאישורים מגיעים מהתבנית. לאחר השכפול הטופס מקבל שם חדש (ברירת מחדל: שם המוצר, ניתן לעריכה בממשק) ומקושר למוצר דרך `_woo_gf_form_id`.
+
+אם טופס התבנית נמחק, הועבר לאשפה או ש-Gravity Forms כבוי — הפעולה נכשלת עם הודעת שגיאה מפורשת ואינה יוצרת טופס חלקי.
 
 ## שימוש ב-API
 
@@ -140,10 +151,11 @@ if ( $form_id && class_exists( 'GFAPI' ) ) {
 - פרמטרים: entry_id, form_id, nonce
 - תגובה: HTML של פרטי הרשומה
 
-### woo_gf_create_form
-יוצר טופס חדש אוטומטית
-- פרמטרים: product_id, nonce
-- תגובה: form_id, message, redirect
+### haruv_create_gf_form_for_event
+משכפל את טופס התבנית, נותן לו שם ומקשר אותו למוצר
+- פרמטרים: `product_id`, `form_title` (אופציונלי — ברירת מחדל שם המוצר), `security` (nonce מסוג `haruv_event_gf_nonce`)
+- הרשאות: `gravityforms_create_form` **וגם** `edit_post` על המוצר
+- תגובה: `form_id`, `form_title`, `edit_url`, `message`
 
 ## אבטחה
 
