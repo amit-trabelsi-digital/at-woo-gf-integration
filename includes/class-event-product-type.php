@@ -89,6 +89,27 @@ class WooGF_Event_Product_Type {
 		if ( ! $product ) {
 			return;
 		}
+
+		/*
+		 * Read the saved values through the typed CRUD getters, never through
+		 * $product->get_meta( '_event_*' ).
+		 *
+		 * Every key in WC_Product_Event::$extra_data becomes a CRUD prop, and
+		 * WC_Data_Store_WP::filter_raw_meta_data() strips the matching `_{key}` meta
+		 * out of $product->meta_data. WC_Data::get_meta() only re-routes such a key to
+		 * its getter when the key is already listed in the data store's
+		 * internal_meta_keys — and that list is only populated the first time meta is
+		 * read for the object. The result is order dependent: the first `_event_*`
+		 * key asked for in a request comes back EMPTY, later ones work. That is why
+		 * "מספר משתתפים מקסימלי" rendered blank even though the meta held a value —
+		 * and a blank field is submitted as blank, wiping _max_attendees and _stock on
+		 * the next save. See HRV-DOUBLE-SAVE / HRV-C8.
+		 */
+		$is_event              = $product->is_type( 'event' );
+		$event_max_attendees   = $is_event ? $product->get_max_attendees( 'edit' ) : '';
+		$event_duration        = $is_event ? $product->get_event_duration( 'edit' ) : '';
+		$event_inquiries_email = $is_event ? $product->get_event_inquiries_email( 'edit' ) : '';
+		$event_type            = $is_event ? $product->get_event_type( 'edit' ) : '';
 		?>
 		<div id="event_product_data" class="panel woocommerce_options_panel hidden">
 			<div class="options_group">
@@ -139,7 +160,7 @@ class WooGF_Event_Product_Type {
 							'step' => '1',
 							'min'  => '0',
 						),
-						'value'             => $product->get_meta( '_max_attendees', true ) ? $product->get_meta( '_max_attendees', true ) : '',
+						'value'             => $event_max_attendees ? $event_max_attendees : '',
 					)
 				);
 
@@ -154,7 +175,7 @@ class WooGF_Event_Product_Type {
 							'step' => '0.5',
 							'min'  => '0',
 						),
-						'value'       => $product->get_meta( '_event_duration', true ),
+						'value'       => $event_duration,
 					)
 				);
 
@@ -166,7 +187,7 @@ class WooGF_Event_Product_Type {
 						'desc_tip'    => true,
 						'description' => __( 'כתובת המייל אליה יגיעו פניות בנוגע לאירוע', 'at-woo-gf-integration' ),
 						'type'        => 'email',
-						'value'       => $product->get_meta( '_event_inquiries_email', true ),
+						'value'       => $event_inquiries_email,
 					)
 				);
 
@@ -193,7 +214,7 @@ class WooGF_Event_Product_Type {
 						),
 						'desc_tip'    => true,
 						'description' => __( 'בחר את סוג האירוע', 'at-woo-gf-integration' ),
-						'value'       => $product->get_meta( '_event_type', true ) ?: 'physical',
+						'value'       => $event_type ? $event_type : 'physical',
 					)
 				);
 				?>
@@ -215,7 +236,7 @@ class WooGF_Event_Product_Type {
 							),
 						);
 						$entry_count = GFAPI::count_entries( $form_id, $search_criteria );
-						$max_attendees = $product->get_meta( '_max_attendees', true );
+						$max_attendees = $event_max_attendees;
 						
 						echo '<span class="event-attendees-count">';
 						/* translators: %d: number of attendees */

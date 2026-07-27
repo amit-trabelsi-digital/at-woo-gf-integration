@@ -5,6 +5,14 @@
 הפורמט מבוסס על [Keep a Changelog](https://keepachangelog.com/he/1.0.0/),
 והפרויקט משתמש ב-[Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.13.4] - 2026-07-27
+
+### תוקן
+- **צריך ללחוץ "עדכן" פעמיים כדי לשמור אירוע** - שני באגים נפרדים באותו אזור, שניהם תוקנו:
+  - **שכתוב חוזר של מטא האירוע ב-`WC_Product_Event::save()`** - הדריסה כתבה את *כל* מפתחות מטא האירוע מתוך ה-props בכל קריאה ל-`$product->save()`, ללא תנאי. המפתח `inquiries_email` ב-`$extra_data` מופה בליבת WooCommerce למטא `_inquiries_email`, בעוד שממשק הניהול שומר ל-`_event_inquiries_email` — ולכן ה-prop תמיד היה ריק והדריסה מחקה את השדה. מכיוון ש-WooCommerce קוראת ל-`$product->save()` שוב מתוך `WC_Meta_Box_Product_Images::save()` (עדיפות 20, כלומר *אחרי* `woocommerce_process_product_meta_event`), לערכים הישנים תמיד הייתה המילה האחרונה. `read_product_data()` שאמור היה למלא את ה-props היה קוד מת מלכתחילה (זו מתודה של ה-data store, לא של `WC_Product`). שתי הדריסות הוסרו — ליבת WooCommerce כבר קוראת וכותבת כל `extra_data` אל `_{key}` לבדה — והמפתח שונה ל-`event_inquiries_email` כך שהוא תואם למטא בפועל (`get_inquiries_email()` / `set_inquiries_email()` נשמרו כ-aliases).
+  - **"מספר משתתפים מקסימלי" נטען ריק בעריכה** - הפאנל קרא `$product->get_meta( '_max_attendees' )`. כל מפתח ב-`$extra_data` הופך ל-prop, ו-`WC_Data_Store_WP::filter_raw_meta_data()` מסננת את המטא `_{key}` המקביל מתוך `$product->meta_data`; `WC_Data::get_meta()` מנתבת מפתח כזה ל-getter רק אם הוא כבר רשום ב-`internal_meta_keys` של ה-data store — רשימה שמתמלאת רק בקריאת המטא הראשונה. התוצאה תלוית-סדר: מפתח ה-`_event_*` הראשון שנשאל בבקשה חוזר **ריק**. שדה ריק נשלח כריק, ולכן השמירה הבאה מאפסת את `_max_attendees` ואת `_stock`. כל אתרי הקריאה (פאנל האירוע, מטא-בוקס ה-GF, דשבורד ההרשמות) הועברו ל-getters המוקלדים (`get_max_attendees()`, `get_event_duration()`, `get_event_type()`, `get_event_date()`, `get_event_location()`, `get_event_inquiries_email()`).
+- **הגדרות תזמון הטופס לא נשמרו כשהטופס המקושר נמחק** - צד השמירה של `save_product_form_data()` היה עטוף כולו ב-`if ( $form )`, כך ש-`_woo_gf_form_is_active`, `_woo_gf_enable_form_schedule` ו-`_woo_gf_schedule_start/end` לא נשמרו כלל אם הטופס ב-Gravity Forms נמחק/הועבר לאשפה או ש-GFAPI לא זמין. מטא המוצר נכתב כעת ללא תנאי, והסנכרון לאובייקט הטופס בלבד נותר מגודר. משלים את תיקון צד הקריאה מ-HRV-C8.
+
 ## [2.13.3] - 2026-07-08
 
 ### שונה
@@ -395,7 +403,7 @@
 - הוספת בדיקות nonce לכל הפעולות AJAX
 - סניטציה של כל הקלטים
 
-## [Unreleased]
+## [2.13.4] - 2026-07-27
 ### תכנון עתידי
 - אינטגרציה עם LearnDash
 - שליחת אימיילים אוטומטיים למשתתפים

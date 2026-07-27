@@ -32,16 +32,25 @@ class WC_Product_Event extends WC_Product {
 	/**
 	 * Stores product data.
 	 *
+	 * IMPORTANT: every key here becomes a WooCommerce CRUD prop, and the CPT data
+	 * store reads/writes it from/to the post meta key `_{key}` automatically
+	 * (see WC_Product_Data_Store_CPT::read_extra_data() / ::update_post_meta()).
+	 * The key MUST therefore match the meta key the admin UI saves, otherwise the
+	 * prop is always read as empty and every $product->save() writes that empty value
+	 * back over the real meta. That is exactly what happened with the old
+	 * `inquiries_email` key (meta is `_event_inquiries_email`, not
+	 * `_inquiries_email`) — see HRV-DOUBLE-SAVE.
+	 *
 	 * @var array
 	 */
 	protected $extra_data = array(
-		'event_date'     => '',
-		'event_end_date' => '',
-		'event_location' => '',
-		'max_attendees'  => 0,
-		'event_type'     => 'physical', // physical, virtual, hybrid
-        'event_duration' => '',
-        'inquiries_email' => '',
+		'event_date'             => '',
+		'event_end_date'         => '',
+		'event_location'         => '',
+		'max_attendees'          => 0,
+		'event_type'             => 'physical', // physical, virtual, hybrid.
+		'event_duration'         => '',
+		'event_inquiries_email'  => '',
 	);
 
     /**
@@ -123,13 +132,23 @@ class WC_Product_Event extends WC_Product {
 	}
 
 	/**
-	 * Get inquiries email.
+	 * Get inquiries email (stored in `_event_inquiries_email`).
+	 *
+	 * @param  string $context What the value is for. Valid values are view and edit.
+	 * @return string
+	 */
+	public function get_event_inquiries_email( $context = 'view' ) {
+		return $this->get_prop( 'event_inquiries_email', $context );
+	}
+
+	/**
+	 * Backwards-compatible alias for get_event_inquiries_email().
 	 *
 	 * @param  string $context What the value is for. Valid values are view and edit.
 	 * @return string
 	 */
 	public function get_inquiries_email( $context = 'view' ) {
-		return $this->get_prop( 'inquiries_email', $context );
+		return $this->get_event_inquiries_email( $context );
 	}
 
 	/**
@@ -174,7 +193,9 @@ class WC_Product_Event extends WC_Product {
 	 * @param string $type Event type.
 	 */
 	public function set_event_type( $type ) {
-		$this->set_prop( 'event_type', $type );
+		// The data store feeds this straight from post meta, which may be empty on
+		// products that were never saved through the event panel — keep the default.
+		$this->set_prop( 'event_type', $type ? $type : 'physical' );
 	}
 
 	/**
@@ -187,12 +208,21 @@ class WC_Product_Event extends WC_Product {
 	}
 
 	/**
-	 * Set inquiries email.
+	 * Set inquiries email (stored in `_event_inquiries_email`).
+	 *
+	 * @param string $email Inquiries email.
+	 */
+	public function set_event_inquiries_email( $email ) {
+		$this->set_prop( 'event_inquiries_email', $email );
+	}
+
+	/**
+	 * Backwards-compatible alias for set_event_inquiries_email().
 	 *
 	 * @param string $email Inquiries email.
 	 */
 	public function set_inquiries_email( $email ) {
-		$this->set_prop( 'inquiries_email', $email );
+		$this->set_event_inquiries_email( $email );
 	}
 
 	/**
@@ -232,49 +262,28 @@ class WC_Product_Event extends WC_Product {
 		return true;
 	}
 
-	/**
-	 * Save data (override parent to save event data).
+	/*
+	 * NOTE — no save() / read_product_data() overrides here on purpose.
 	 *
-	 * @since 3.0.0
-	 * @return int
-	 */
-	public function save() {
-		// Save the parent data first
-		$id = parent::save();
-		
-		if ( $id && ! is_wp_error( $id ) ) {
-			// Save event-specific meta using standard WordPress functions to avoid "internal meta key" notices
-			// These are already in $this->extra_data but WooCommerce CPT data store doesn't save them automatically
-			update_post_meta( $id, '_event_date', $this->get_event_date( 'edit' ) );
-			update_post_meta( $id, '_event_end_date', $this->get_event_end_date( 'edit' ) );
-			update_post_meta( $id, '_event_location', $this->get_event_location( 'edit' ) );
-			update_post_meta( $id, '_max_attendees', $this->get_max_attendees( 'edit' ) );
-			update_post_meta( $id, '_event_type', $this->get_event_type( 'edit' ) );
-			update_post_meta( $id, '_event_duration', $this->get_event_duration( 'edit' ) );
-			update_post_meta( $id, '_event_inquiries_email', $this->get_inquiries_email( 'edit' ) );
-		}
-		
-		return $id;
-	}
-	
-	/**
-	 * Read product data.
+	 * They used to exist and were the root cause of the "you have to press Update
+	 * twice" bug:
 	 *
-	 * @since 3.0.0
+	 * - read_product_data() is a *data store* method (WC_Product_Data_Store_CPT),
+	 *   not a WC_Product method. The override was dead code and was never called,
+	 *   so the props were always populated by WooCommerce core instead, which maps
+	 *   each extra_data key to the `_{key}` post meta.
+	 *
+	 * - save() then wrote every event meta key back from those props on *every*
+	 *   $product->save(), unconditionally. Because `inquiries_email` mapped to
+	 *   `_inquiries_email` while the admin saves `_event_inquiries_email`, the prop
+	 *   was always empty and the override wiped the field. Worse, WooCommerce calls
+	 *   $product->save() again from WC_Meta_Box_Product_Images::save() (priority 20)
+	 *   — i.e. AFTER woocommerce_process_product_meta_event — so the stale values
+	 *   always had the last word.
+	 *
+	 * WooCommerce core already persists every extra_data prop to `_{key}` meta in
+	 * WC_Product_Data_Store_CPT::update_post_meta(), and the authoritative admin
+	 * write path is WooGF_Event_Product_Type::save_event_data(). Do not reintroduce
+	 * these overrides.
 	 */
-	protected function read_product_data() {
-		parent::read_product_data();
-		
-		// Read event-specific data using get_post_meta to avoid internal meta key notices
-		$id = $this->get_id();
-		$this->set_props( array(
-			'event_date'     => get_post_meta( $id, '_event_date', true ),
-			'event_end_date' => get_post_meta( $id, '_event_end_date', true ),
-			'event_location' => get_post_meta( $id, '_event_location', true ),
-			'max_attendees'  => (int) get_post_meta( $id, '_max_attendees', true ),
-			'event_type'     => get_post_meta( $id, '_event_type', true ) ?: 'physical',
-			'event_duration' => get_post_meta( $id, '_event_duration', true ),
-			'inquiries_email' => get_post_meta( $id, '_event_inquiries_email', true ) ?: get_post_meta( $id, '_inquiries_email', true ), // Fallback to old key
-		) );
-	}
 } 

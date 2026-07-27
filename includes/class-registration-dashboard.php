@@ -777,12 +777,15 @@ class Woo_GF_Registration_Dashboard {
             );
             $registrations = GFAPI::count_entries( $form_id, $search_criteria );
             
-            // Get event data
-            $event_date = $wc_product->get_meta( '_event_date', true );
-            $event_end_date = $wc_product->get_meta( '_event_end_date', true );
-            $event_location = $wc_product->get_meta( '_event_location', true );
-            $max_attendees = $wc_product->get_meta( '_max_attendees', true );
-            $event_type = $wc_product->get_meta( '_event_type', true );
+            // Get event data. These are WC_Product_Event props, so they must be read
+            // through the typed getters — get_meta( '_event_*' ) returns '' for the
+            // first such key requested in a request. See HRV-DOUBLE-SAVE.
+            $is_event       = $wc_product->is_type( 'event' );
+            $event_date     = $is_event ? $wc_product->get_event_date( 'edit' ) : '';
+            $event_end_date = $is_event ? $wc_product->get_event_end_date( 'edit' ) : '';
+            $event_location = $is_event ? $wc_product->get_event_location( 'edit' ) : '';
+            $max_attendees  = $is_event ? $wc_product->get_max_attendees( 'edit' ) : 0;
+            $event_type     = $is_event ? $wc_product->get_event_type( 'edit' ) : '';
             
             $events[] = array(
                 'id' => $product->ID,

@@ -416,9 +416,12 @@ class Woo_GF_Product_Form_Metabox {
                         <p class="form-field">
                             <strong><span class="dashicons dashicons-calendar" style="color: #0073aa;"></span> <?php esc_html_e( 'פרטי אירוע:', 'at-woo-gf-integration' ); ?></strong><br>
                             <?php
-                            $event_date = $product->get_meta( '_event_date', true );
-                            $event_location = $product->get_meta( '_event_location', true );
-                            $max_attendees = $product->get_meta( '_max_attendees', true );
+                            // Typed CRUD getters — $product->get_meta( '_event_*' ) is not
+                            // reliable for these keys, they are WC_Product_Event props and are
+                            // stripped from meta_data by the data store. See HRV-DOUBLE-SAVE.
+                            $event_date = $product->get_event_date( 'edit' );
+                            $event_location = $product->get_event_location( 'edit' );
+                            $max_attendees = $product->get_max_attendees( 'edit' );
                             
                             if ( $event_date ) {
                                 echo '<span class="dashicons dashicons-calendar-alt" style="color: #646970;"></span> ';
@@ -575,37 +578,58 @@ class Woo_GF_Product_Form_Metabox {
                     }
                 }
 
-                // Save form schedule settings
+                // Save form schedule settings.
+                //
+                // The product post meta is the authoritative source for this admin UI, so
+                // it is written unconditionally. Only the mirroring into the Gravity Forms
+                // form object is gated behind the form actually existing — otherwise a
+                // deleted/trashed form (or GFAPI being unavailable) silently drops the
+                // admin's schedule settings on every save. Counterpart of the read-side
+                // fix in add_product_data_panel(). See HRV-C8.
                 if ( ! empty( $new_form_id ) ) {
                     $form = GFAPI::get_form( $new_form_id );
+
+                    // Form status (active/inactive).
+                    $is_active = isset( $_POST['_woo_gf_form_is_active'] );
+                    update_post_meta( $post_id, '_woo_gf_form_is_active', $is_active ? 'yes' : 'no' );
+
+                    // Schedule settings.
+                    $schedule_enabled = isset( $_POST['_woo_gf_enable_form_schedule'] );
+                    update_post_meta( $post_id, '_woo_gf_enable_form_schedule', $schedule_enabled ? 'yes' : 'no' );
+
+                    $start_val = isset( $_POST['_woo_gf_schedule_start'] )
+                        ? str_replace( 'T', ' ', sanitize_text_field( wp_unslash( $_POST['_woo_gf_schedule_start'] ) ) )
+                        : null;
+                    $end_val = isset( $_POST['_woo_gf_schedule_end'] )
+                        ? str_replace( 'T', ' ', sanitize_text_field( wp_unslash( $_POST['_woo_gf_schedule_end'] ) ) )
+                        : null;
+
+                    if ( $schedule_enabled ) {
+                        if ( null !== $start_val ) {
+                            update_post_meta( $post_id, '_woo_gf_schedule_start', $start_val );
+                        }
+                        if ( null !== $end_val ) {
+                            update_post_meta( $post_id, '_woo_gf_schedule_end', $end_val );
+                        }
+                    }
+
                     if ( $form ) {
-                        // Form status (active/inactive)
-                        $is_active = isset( $_POST['_woo_gf_form_is_active'] ) ? true : false;
-                        $form['is_active'] = $is_active;
-                        update_post_meta( $post_id, '_woo_gf_form_is_active', $is_active ? 'yes' : 'no' );
-                        
-                        // Schedule settings
-                        $schedule_enabled = isset( $_POST['_woo_gf_enable_form_schedule'] );
+                        $form['is_active']    = $is_active;
                         $form['scheduleForm'] = $schedule_enabled;
-                        update_post_meta( $post_id, '_woo_gf_enable_form_schedule', $schedule_enabled ? 'yes' : 'no' );
-                        
+
                         if ( $schedule_enabled ) {
-                            if ( isset( $_POST['_woo_gf_schedule_start'] ) ) {
-                                $start_val = str_replace( 'T', ' ', $_POST['_woo_gf_schedule_start'] );
+                            if ( null !== $start_val ) {
                                 $form['scheduleStart'] = $start_val;
-                                update_post_meta( $post_id, '_woo_gf_schedule_start', $start_val );
                             }
-                            if ( isset( $_POST['_woo_gf_schedule_end'] ) ) {
-                                $end_val = str_replace( 'T', ' ', $_POST['_woo_gf_schedule_end'] );
+                            if ( null !== $end_val ) {
                                 $form['scheduleEnd'] = $end_val;
-                                update_post_meta( $post_id, '_woo_gf_schedule_end', $end_val );
                             }
                             // Default message if not set
                             if ( empty( $form['scheduleMessage'] ) ) {
                                 $form['scheduleMessage'] = __( 'מצטערים, ההרשמה לאירוע זה נסגרה.', 'at-woo-gf-integration' );
                             }
                         }
-                        
+
                         GFAPI::update_form( $form );
                     }
                 }
