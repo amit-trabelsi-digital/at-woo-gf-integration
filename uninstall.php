@@ -37,6 +37,14 @@ function at_woo_gf_integration_uninstall() {
 	delete_option( 'at_woo_gf_cookie_settings' );
 	delete_option( 'at_woo_gf_cookie_detected' );
 
+	// NOTE: the newsletter consent audit trail
+	// ("{$wpdb->prefix}at_newsletter_consent_log") and its schema-version option
+	// ("at_newsletter_consent_db_version") are INTENTIONALLY retained on uninstall.
+	// A consent audit trail is a compliance record and should outlive the plugin;
+	// a reinstall re-uses the existing table (dbDelta is idempotent). Drop it
+	// manually if you truly need a clean slate. Order meta "_haruv_newsletter_optin"
+	// is likewise preserved as part of the order record.
+
 	// Delete transients (update checker + all registration-count caches).
 	delete_transient( 'at_woo_gf_integration_update_info' );
 	$wpdb->query( $wpdb->prepare(

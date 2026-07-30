@@ -235,6 +235,51 @@ add_filter( 'woo_gf_dashboard_column_data', function( $data, $column, $entry ) {
 }, 10, 3 );
 ```
 
+## אינטגרציית ניוזלטר + תיעוד הסכמה (ActiveTrail / MyMarketing)
+
+`includes/class-newsletter-consent.php` (מחלקה `AT_Newsletter_Consent`) הוא **מקור אמת אחד** לתיעוד הצטרפות/הסרה מהניוזלטר ולסנכרון מול ActiveTrail. נטען site-wide מה-constructor (כמו מודול העוגיות), כך שההלפר והטבלה קיימים גם ללא WooCommerce/GF.
+
+### 🔴 הגדרה נדרשת בכל סביבה — המפתח לא בגיט
+
+המפתח (Authorization token) של ActiveTrail **אינו** בקוד. הגדר ב-`wp-config.php` (קובץ שאינו מנוהל בגיט של התמה/התוסף):
+
+```php
+define( 'HARUV_ACTIVETRAIL_TOKEN', '<הערך של כותרת ה-Authorization מ-MyMarketing>' );
+// אופציונלי — קבוצת/רשימת ברירת המחדל (ברירת מחדל 106435):
+// define( 'HARUV_ACTIVETRAIL_GROUP', 106435 );
+```
+
+סדר עדיפויות לקריאת המפתח: קונסטנטה `HARUV_ACTIVETRAIL_TOKEN` → option `at_activetrail_token` → פילטר `haruv_activetrail_token`. אם לא הוגדר מפתח — נרשמת אזהרה (ב-`WP_DEBUG`) ולא מתבצעת קריאת רשת. שים לב: המחרוזת `Haruv2023&` שהופיעה בקוד הישן הייתה משתנה **לא בשימוש** — ערך ה-Authorization האמיתי הוא מחרוזת ה-hex הארוכה.
+
+### מבנה ה-payload (תואם לאתר הישן)
+
+`POST https://webapi.mymarketing.co.il/api/contacts/Import`, header `Authorization: <token>`, גוף:
+
+```json
+{ "group": 106435, "contacts": [ {
+  "email": "", "first_name": "", "last_name": "", "phone1": "",
+  "ext1": "<עיסוק>", "ext2": "<אזור>", "ext3": "<מקום עבודה>",
+  "is_do_not_mail": false, "is_deleted": false } ] }
+```
+
+opt-out נשלח לאותו endpoint עם `is_do_not_mail: true` (ל-MyMarketing אין endpoint ציבורי מתועד ל-unsubscribe באינטגרציה זו — הנחה, לא להמציא list-ids/endpoints).
+
+### טבלת audit trail
+
+`{$wpdb->prefix}at_newsletter_consent_log` — נוצרת דרך `dbDelta` (version-checked ב-`init`). עמודות: `user_id`, `email`, `action` (`opt_in`/`opt_out`/`declined`), `source` (`newsletter_form`/`checkout`/`user_area`), `consent_text`, `consent_version`, `ip`, `created_at`. נשמרת גם בהסרת התוסף (רשומת compliance). מצב-נוכחי ממושכ ל-user meta `newsletter_subscription`.
+
+### נקודות הרחבה
+
+| Hook | תפקיד |
+|------|-------|
+| `haruv_log_newsletter_consent( $identity, $action, $source, $args )` | פונקציה גלובלית לתיעוד אירוע הסכמה (guarded). |
+| `haruv_newsletter_activetrail_sync( $contact, $action )` | פונקציה גלובלית לסנכרון ל-ActiveTrail. |
+| `haruv_newsletter_form_id` (filter) | מזהה טופס GF לניוזלטר (ברירת מחדל 21). |
+| `haruv_activetrail_token` (filter) | override למפתח. |
+| `haruv_activetrail_group` (filter) | override לקבוצה; מקבל גם slug שפה (Polylang) ל-routing עתידי. |
+| `haruv_activetrail_payload` (filter) | שינוי ה-payload היוצא. |
+| `haruv_newsletter_privacy_url` (filter) | לינק מדיניות פרטיות ב-checkout (ברירת מחדל `get_privacy_policy_url()`). |
+
 ## תמיכה
 
 לשאלות ותמיכה: [amit@trabel.si](mailto:amit@trabel.si)

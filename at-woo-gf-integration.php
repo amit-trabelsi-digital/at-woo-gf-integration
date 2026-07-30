@@ -3,7 +3,7 @@
  * Plugin Name: AT - WooCommerce Gravity Forms Integration
  * Plugin URI: https://amit-trabelsi.co.il/
  * Description: תוסף מתקדם שמחבר בין WooCommerce ל-Gravity Forms עם ניהול אירועים, הרשאות משתמשים ודשבורד הרשמות מלא
- * Version: 2.13.5
+ * Version: 2.13.6
  * Author: Amit Trabelsi
  * Author URI: https://amit-trabelsi-digital.com/
  * Text Domain: at-woo-gf-integration
@@ -72,6 +72,14 @@ class AT_Woo_GF_Integration {
         // GDPR cookie consent — site-wide, must load even without WooCommerce/GF.
         require_once AT_WOO_GF_INTEGRATION_PATH . 'includes/class-cookie-consent.php';
         AT_Woo_GF_Cookie_Consent::get_instance();
+
+        // Newsletter consent audit trail + ActiveTrail sync — single source of
+        // truth for the newsletter form, checkout opt-in, and the personal area.
+        // Loaded site-wide: the audit-trail helper and table must exist even when
+        // WooCommerce/Gravity Forms are not both active. The GF hook only fires
+        // when GF is present; the checkout hook only when WooCommerce is present.
+        require_once AT_WOO_GF_INTEGRATION_PATH . 'includes/class-newsletter-consent.php';
+        AT_Newsletter_Consent::get_instance();
     }
     
     /**
