@@ -179,11 +179,11 @@ class Woo_GF_Product_Form_Metabox {
 
                 // No form is auto-selected. A new event product starts with an empty
                 // select and the site manager must explicitly pick an existing form or
-                // press "צור טופס חדש", which duplicates the template form. Form #20
-                // ("טופס לברירת מחדל") is that duplication template — it is deliberately
-                // NOT pre-selected here, because pre-selecting it silently linked every
-                // new event to the same shared form. See HRV-E5 and
-                // Woo_GF_Ajax_Handler::get_template_form_id().
+                // press "צור טופס חדש", which duplicates the *default* form chosen in
+                // "דשבורד הרשמות → הגדרות טפסים". That default form is deliberately NOT
+                // pre-selected here, because pre-selecting it silently linked every new
+                // event to the same shared form. See HRV-E5, HRV-F137 and
+                // AT_Woo_GF_Event_Form_Template::get_template_form_id().
                 //
                 // Products that already have `_woo_gf_form_id` saved keep their value —
                 // it is read straight from meta above and never overridden.

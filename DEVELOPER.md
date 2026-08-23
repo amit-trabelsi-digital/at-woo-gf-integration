@@ -19,6 +19,7 @@ at-woo-gf-integration/
 ├── includes/
 │   ├── class-ajax-handler.php
 │   ├── class-event-attendees-limit.php
+│   ├── class-event-form-template.php
 │   ├── class-event-product-type.php
 │   ├── class-product-event.php
 │   ├── class-product-form-metabox.php
@@ -82,17 +83,36 @@ $per_page = apply_filters( 'woo_gf_entries_per_page', 20 );
 // התאמת הטופס המשוכפל לפני שמירתו
 $form = apply_filters( 'woo_gf_integration_new_form', $form, $product_id );
 
-// מזהה טופס התבנית שממנו משכפלים טופס הרשמה חדש
-$template_id = apply_filters( 'at_woo_gf_template_form_id', 20 );
+// מזהה טופס ברירת המחדל שממנו משכפלים טופס הרשמה חדש
+// (ברירת המחדל מגיעה מהאופציה at_woo_gf_template_form_id)
+$template_id = apply_filters( 'at_woo_gf_template_form_id', $form_id_from_option );
+
+// שם ברירת המחדל של טופס אירוע חדש ("הרשמה: <שם האירוע>")
+$title = apply_filters( 'at_woo_gf_new_form_title', $title, $product_id );
 ```
 
-### טופס התבנית
+### טופס ברירת המחדל (טופס התבנית)
 
-מוצר אירוע חדש **אינו** מקבל טופס נבחר אוטומטית — מנהל האתר חייב לבחור טופס קיים או ללחוץ "צור טופס חדש".
+מוצר אירוע חדש **אינו** מקבל טופס נבחר אוטומטית — מנהל האתר חייב לבחור טופס קיים או ליצור טופס חדש.
 
-הכפתור "צור טופס חדש" אינו בונה טופס מאפס: הוא משכפל את **טופס התבנית** (ברירת מחדל: טופס 20, "טופס לברירת מחדל") באמצעות `GFFormsModel::duplicate_form()`, כך שהשדות, ההגדרות, ההתראות והאישורים מגיעים מהתבנית. לאחר השכפול הטופס מקבל שם חדש (ברירת מחדל: שם המוצר, ניתן לעריכה בממשק) ומקושר למוצר דרך `_woo_gf_form_id`.
+יצירת טופס חדש אינה בונה טופס מאפס: היא משכפלת את **טופס ברירת המחדל** באמצעות `GFFormsModel::duplicate_form()`, כך שהשדות, ההגדרות, ההתראות והאישורים מגיעים ממנו. לאחר השכפול הטופס מקבל שם חדש (`הרשמה: <שם האירוע>`, ניתן לעריכה בממשק המוצר), תיאור, קישור למוצר דרך `_woo_gf_form_id` ו-`woo_gf_linked_product_id` על הטופס, ומגבלת הרשמות לפי מלאי המוצר.
 
-אם טופס התבנית נמחק, הועבר לאשפה או ש-Gravity Forms כבוי — הפעולה נכשלת עם הודעת שגיאה מפורשת ואינה יוצרת טופס חלקי.
+**מי בוחר את טופס ברירת המחדל:** מנהל האתר, במסך **דשבורד הרשמות → הגדרות טפסים** (`admin.php?page=at-woo-gf-event-forms`, הרשאה `manage_options`). הבחירה נשמרת באופציה `at_woo_gf_template_form_id`. סדר הפתרון: אופציה → `AT_Woo_GF_Event_Form_Template::LEGACY_DEFAULT_FORM_ID` (טופס 20, רק כשהאופציה מעולם לא נשמרה) → הפילטר `at_woo_gf_template_form_id`. ערך 0 שנשמר במפורש ("— לא נבחר —") מכובד ואינו נופל חזרה ל-20.
+
+הלוגיקה כולה יושבת ב-`includes/class-event-form-template.php` (`AT_Woo_GF_Event_Form_Template`), ושני משטחי היצירה — נקודת ה-AJAX של עמוד המוצר ופעולת הדשבורד — קוראים לאותה מתודה `create_form_for_product( $product_id, [ 'title' => '', 'force' => false ] )` שמחזירה מערך או `WP_Error`.
+
+**שני משטחי יצירה:**
+
+| מקום | פעולה | הגנת כפילות |
+|------|-------|--------------|
+| עמוד עריכת מוצר → כרטיסיית Gravity Forms | "צור טופס חדש" / "החלף בטופס חדש" (AJAX) | `force = true` — המשתמש כבר אישר החלפה ב-`confirm()` |
+| דשבורד הרשמות → טאב "אירועים ללא טופס" | "צור טופס לאירוע" (`admin-post.php`) | `force = false` — אירוע שכבר יש לו טופס מוחזר כשגיאה `already_linked` |
+
+אם טופס ברירת המחדל לא הוגדר, נמחק, הועבר לאשפה או ש-Gravity Forms כבוי — הפעולה נכשלת עם הודעת שגיאה מפורשת בעברית (עם קישור למסך ההגדרות) ואינה יוצרת טופס חלקי.
+
+### טאב "אירועים ללא טופס"
+
+הטאב מציג מוצרים מסוג `event` שאין להם `_woo_gf_form_id`, שהערך שלהם ריק, **או** שהוא מצביע על טופס שנמחק/הועבר לאשפה ב-Gravity Forms (המקרה האחרון שובר הרשמה בשקט ולכן נכלל). לכל שורה כפתור "צור טופס לאירוע" ששולח ל-`admin-post.php` עם nonce ייעודי לכל מוצר.
 
 ## שימוש ב-API
 
@@ -152,10 +172,19 @@ if ( $form_id && class_exists( 'GFAPI' ) ) {
 - תגובה: HTML של פרטי הרשומה
 
 ### haruv_create_gf_form_for_event
-משכפל את טופס התבנית, נותן לו שם ומקשר אותו למוצר
-- פרמטרים: `product_id`, `form_title` (אופציונלי — ברירת מחדל שם המוצר), `security` (nonce מסוג `haruv_event_gf_nonce`)
+משכפל את טופס ברירת המחדל, נותן לו שם ומקשר אותו למוצר
+- פרמטרים: `product_id`, `form_title` (אופציונלי — ברירת מחדל `הרשמה: <שם האירוע>`), `security` (nonce מסוג `haruv_event_gf_nonce`)
 - הרשאות: `gravityforms_create_form` **וגם** `edit_post` על המוצר
 - תגובה: `form_id`, `form_title`, `edit_url`, `message`
+- המימוש הוא עטיפה דקה בלבד סביב `AT_Woo_GF_Event_Form_Template::create_form_for_product()`
+
+## פעולות admin-post
+
+### at_woo_gf_create_event_form
+כפתור "צור טופס לאירוע" בטאב "אירועים ללא טופס" בדשבורד ההרשמות
+- פרמטרים: `product_id`, `at_woo_gf_create_form_nonce` (nonce מסוג `at_woo_gf_create_event_form_{product_id}`)
+- הרשאות: `gravityforms_create_form` (או `manage_options`) **וגם** `edit_post` על המוצר
+- תוצאה: redirect חזרה לדשבורד + הודעת הצלחה/שגיאה שנשמרת ב-transient חד-פעמי לכל משתמש
 
 ## אבטחה
 

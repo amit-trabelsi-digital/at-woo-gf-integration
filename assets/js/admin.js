@@ -186,7 +186,7 @@ jQuery(document).ready(function($) {
         var defaultTitle = ($('#title').val() || '').trim();
         var formTitle = prompt(
             'שם הטופס החדש\n\n' +
-            'הטופס ייווצר כשכפול של טופס התבנית ויקושר לאירוע זה.',
+            'הטופס ייווצר כשכפול של טופס ברירת המחדל (נקבע ב"דשבורד הרשמות ← הגדרות טפסים") ויקושר לאירוע זה.',
             defaultTitle
         );
 
@@ -239,7 +239,7 @@ jQuery(document).ready(function($) {
                     button.after(editButton);
                     
                     // Show success message
-                    alert('✅ הטופס נוצר בהצלחה!\n\nהטופס "' + formTitle + '" שוכפל מטופס התבנית וקושר לאירוע.');
+                    alert('✅ הטופס נוצר בהצלחה!\n\nהטופס "' + formTitle + '" שוכפל מטופס ברירת המחדל וקושר לאירוע.');
 
                 } else {
                     var errorMessage = (response.data && response.data.message)

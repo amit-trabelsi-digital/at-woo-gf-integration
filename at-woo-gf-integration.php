@@ -3,7 +3,7 @@
  * Plugin Name: AT - WooCommerce Gravity Forms Integration
  * Plugin URI: https://amit-trabelsi.co.il/
  * Description: תוסף מתקדם שמחבר בין WooCommerce ל-Gravity Forms עם ניהול אירועים, הרשאות משתמשים ודשבורד הרשמות מלא
- * Version: 2.13.6
+ * Version: 2.14.0
  * Author: Amit Trabelsi
  * Author URI: https://amit-trabelsi-digital.com/
  * Text Domain: at-woo-gf-integration
@@ -18,7 +18,7 @@
  * Requires PHP: 7.4
  * 
  * @package ATWooGFIntegration
- * @version 2.13.3
+ * @version 2.14.0
  * @author Amit Trabelsi
  * @since 1.0.0
  */
@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define plugin constants
-define( 'AT_WOO_GF_INTEGRATION_VERSION', '2.13.4' );
+define( 'AT_WOO_GF_INTEGRATION_VERSION', '2.14.0' );
 define( 'AT_WOO_GF_INTEGRATION_FILE', __FILE__ );
 define( 'AT_WOO_GF_INTEGRATION_PATH', plugin_dir_path( __FILE__ ) );
 define( 'AT_WOO_GF_INTEGRATION_URL', plugin_dir_url( __FILE__ ) );
@@ -120,6 +120,9 @@ class AT_Woo_GF_Integration {
     private function includes() {
         require_once AT_WOO_GF_INTEGRATION_PATH . 'includes/class-product-form-metabox.php';
         require_once AT_WOO_GF_INTEGRATION_PATH . 'includes/class-registration-dashboard.php';
+        // Must load before the AJAX handler: the handler delegates the form
+        // duplication to this class and aliases its fallback template id.
+        require_once AT_WOO_GF_INTEGRATION_PATH . 'includes/class-event-form-template.php';
         require_once AT_WOO_GF_INTEGRATION_PATH . 'includes/class-ajax-handler.php';
         require_once AT_WOO_GF_INTEGRATION_PATH . 'includes/class-product-event.php';
         require_once AT_WOO_GF_INTEGRATION_PATH . 'includes/class-event-product-type.php';
@@ -137,6 +140,7 @@ class AT_Woo_GF_Integration {
         // Initialize classes
         Woo_GF_Product_Form_Metabox::get_instance();
         Woo_GF_Registration_Dashboard::get_instance();
+        AT_Woo_GF_Event_Form_Template::get_instance();
         Woo_GF_Ajax_Handler::get_instance();
         Woo_GF_Registration_Scheduler::get_instance();
         Woo_GF_Product_Link_Setting::get_instance();

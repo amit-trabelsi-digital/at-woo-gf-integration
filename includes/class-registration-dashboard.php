@@ -136,11 +136,17 @@ class Woo_GF_Registration_Dashboard {
                     <?php esc_html_e( 'דשבורד הרשמות', 'at-woo-gf-integration' ); ?>
                 </h1>
                 <div class="woo-gf-dashboard-actions">
-                    <a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'clear_cache', '1' ), 'clear_cache' ) ); ?>" 
+                    <a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'clear_cache', '1' ), 'clear_cache' ) ); ?>"
                        class="button button-primary" id="refresh-dashboard">
                         <span class="dashicons dashicons-update"></span>
                         <?php esc_html_e( 'רענן', 'at-woo-gf-integration' ); ?>
                     </a>
+                    <?php if ( class_exists( 'AT_Woo_GF_Event_Form_Template' ) && current_user_can( 'manage_options' ) ) : ?>
+                        <a href="<?php echo esc_url( AT_Woo_GF_Event_Form_Template::get_settings_url() ); ?>" class="button">
+                            <span class="dashicons dashicons-admin-generic"></span>
+                            <?php esc_html_e( 'הגדרות טפסים', 'at-woo-gf-integration' ); ?>
+                        </a>
+                    <?php endif; ?>
                 </div>
             </div>
             
@@ -228,6 +234,13 @@ class Woo_GF_Registration_Dashboard {
                             <span class="woo-gf-tab-label"><?php esc_html_e( 'רשימות המתנה', 'at-woo-gf-integration' ); ?></span>
                             <span class="woo-gf-tab-count"><?php echo (int) $this->get_waitlist_events_count(); ?></span>
                         </button>
+                        <?php if ( class_exists( 'AT_Woo_GF_Event_Form_Template' ) ) : ?>
+                            <button class="woo-gf-tab-btn" data-tab="no-form">
+                                <span class="dashicons dashicons-warning"></span>
+                                <span class="woo-gf-tab-label"><?php esc_html_e( 'אירועים ללא טופס', 'at-woo-gf-integration' ); ?></span>
+                                <span class="woo-gf-tab-count"><?php echo (int) AT_Woo_GF_Event_Form_Template::get_events_without_form_count(); ?></span>
+                            </button>
+                        <?php endif; ?>
                     </div>
 
                     <!-- Tabs Content -->
@@ -246,6 +259,13 @@ class Woo_GF_Registration_Dashboard {
                         <div id="woo-gf-tab-waitlist" class="woo-gf-tab-panel">
                             <?php $this->render_waitlist_table(); ?>
                         </div>
+
+                        <?php if ( class_exists( 'AT_Woo_GF_Event_Form_Template' ) ) : ?>
+                            <!-- טאב אירועים ללא טופס: שכפול טופס ברירת המחדל לאירוע -->
+                            <div id="woo-gf-tab-no-form" class="woo-gf-tab-panel">
+                                <?php AT_Woo_GF_Event_Form_Template::get_instance()->render_events_without_form_table(); ?>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>

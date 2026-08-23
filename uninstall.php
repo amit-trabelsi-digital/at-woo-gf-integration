@@ -33,9 +33,10 @@ function at_woo_gf_integration_uninstall() {
 		}
 	}
 
-	// Remove plugin options (cookie-consent module).
+	// Remove plugin options (cookie-consent module + event form template).
 	delete_option( 'at_woo_gf_cookie_settings' );
 	delete_option( 'at_woo_gf_cookie_detected' );
+	delete_option( 'at_woo_gf_template_form_id' );
 
 	// NOTE: the newsletter consent audit trail
 	// ("{$wpdb->prefix}at_newsletter_consent_log") and its schema-version option
