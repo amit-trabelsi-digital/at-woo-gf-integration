@@ -3,7 +3,7 @@
  * Plugin Name: AT - WooCommerce Gravity Forms Integration
  * Plugin URI: https://amit-trabelsi.co.il/
  * Description: תוסף מתקדם שמחבר בין WooCommerce ל-Gravity Forms עם ניהול אירועים, הרשאות משתמשים ודשבורד הרשמות מלא
- * Version: 2.15.0
+ * Version: 2.16.0
  * Author: Amit Trabelsi
  * Author URI: https://amit-trabelsi-digital.com/
  * Text Domain: at-woo-gf-integration
@@ -18,7 +18,7 @@
  * Requires PHP: 7.4
  * 
  * @package ATWooGFIntegration
- * @version 2.14.0
+ * @version 2.16.0
  * @author Amit Trabelsi
  * @since 1.0.0
  */
@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define plugin constants
-define( 'AT_WOO_GF_INTEGRATION_VERSION', '2.15.0' );
+define( 'AT_WOO_GF_INTEGRATION_VERSION', '2.16.0' );
 define( 'AT_WOO_GF_INTEGRATION_FILE', __FILE__ );
 define( 'AT_WOO_GF_INTEGRATION_PATH', plugin_dir_path( __FILE__ ) );
 define( 'AT_WOO_GF_INTEGRATION_URL', plugin_dir_url( __FILE__ ) );
@@ -130,6 +130,9 @@ class AT_Woo_GF_Integration {
         require_once AT_WOO_GF_INTEGRATION_PATH . 'includes/class-event-waitlist.php';
         require_once AT_WOO_GF_INTEGRATION_PATH . 'includes/class-updater.php';
         require_once AT_WOO_GF_INTEGRATION_PATH . 'includes/class-gf-product-link-setting.php';
+        // Polylang string translations for the shared event registration forms.
+        // Order-independent: reads the template form id from the option directly.
+        require_once AT_WOO_GF_INTEGRATION_PATH . 'includes/class-form-i18n.php';
         // Note: class-user-roles-manager.php has been removed - using standard WordPress roles
     }
 
@@ -144,6 +147,7 @@ class AT_Woo_GF_Integration {
         Woo_GF_Ajax_Handler::get_instance();
         Woo_GF_Registration_Scheduler::get_instance();
         Woo_GF_Product_Link_Setting::get_instance();
+        AT_Woo_GF_Form_I18n::get_instance();
         
         // User roles manager has been removed - using standard WordPress roles
         
