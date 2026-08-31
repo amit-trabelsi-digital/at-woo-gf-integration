@@ -264,6 +264,42 @@ add_filter( 'woo_gf_dashboard_column_data', function( $data, $column, $entry ) {
 }, 10, 3 );
 ```
 
+## שורטקוד `[haruv_cookie_list]` — טבלת העוגיות
+
+מרנדר את רשימת העוגיות של האתר כטבלה בכל עמוד/פוסט/וידג'ט. שימוש טיפוסי: עמוד "מדיניות עוגיות" או סעיף בעמוד הפרטיות.
+
+```
+[haruv_cookie_list]
+```
+
+**מקור האמת הוא הרג'יסטרי של מודול ההסכמה** — `AT_Woo_GF_Cookie_Consent::get_settings()['cookies']`, כלומר האופציה `at_woo_gf_cookie_settings` (ובהיעדר רשימה שמורה, `default_cookies()`). זהו בדיוק המערך שמזין את הבאנר ואת מודאל ההעדפות, ולכן הטבלה הציבורית והמודאל לעולם אינם מתפצלים. עריכה במסך **הסכמת עוגיות** משתקפת בשניהם.
+
+עמודות: שם העוגייה, קטגוריה (כתג), ספק (מוצגת רק אם קיים נתון), מטרה, תוקף. השורות מקובצות ל-`<tbody>` לפי קטגוריה, בסדר שבו הקטגוריות מוגדרות; עוגייה עם קטגוריה שהוסרה מההגדרות מוצגת בסוף עם המפתח הגולמי ולא נשמטת.
+
+| רכיב | מיקום |
+|------|--------|
+| רישום + לוגיקה | `AT_Woo_GF_Cookie_Consent::render_cookie_list()` / `get_cookie_list_items()` |
+| תבנית | `includes/views/cookie-list.php` |
+| עיצוב | `assets/css/cookie-list.css` (handle `at-cookie-list`) |
+
+### פילטר
+
+```php
+// שינוי הרשימה בלי לערוך את התוסף. כל פריט: name, category, provider, purpose, expiry.
+// $atts הן תכונות השורטקוד כמות שהן — התוסף אינו צורך אותן, כך שהרחבה
+// יכולה להגדיר תכונות משלה (למשל category="analytics").
+add_filter( 'haruv_cookie_list_items', function ( $cookies, $atts ) {
+    $cookies[] = array(
+        'name'     => '_hjSessionUser',
+        'category' => 'analytics',
+        'provider' => 'Hotjar',
+        'purpose'  => 'מזהה משתמש ייחודי למדידת שימוש.',
+        'expiry'   => 'שנה',
+    );
+    return $cookies;
+}, 10, 2 );
+```
+
 ## אינטגרציית ניוזלטר + תיעוד הסכמה (ActiveTrail / MyMarketing)
 
 `includes/class-newsletter-consent.php` (מחלקה `AT_Newsletter_Consent`) הוא **מקור אמת אחד** לתיעוד הצטרפות/הסרה מהניוזלטר ולסנכרון מול ActiveTrail. נטען site-wide מה-constructor (כמו מודול העוגיות), כך שההלפר והטבלה קיימים גם ללא WooCommerce/GF.

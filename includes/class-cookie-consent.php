@@ -8,6 +8,8 @@
  * - Preferences modal (granular per-category toggles) — re-openable to withdraw.
  * - Automatic scanner: reports cookies not in the registry so the admin can
  *   classify them.
+ * - `[haruv_cookie_list]` shortcode: renders the same registry as a public
+ *   table (for the privacy / cookie-policy page).
  *
  * No non-necessary scripts are fired by this module; other scripts should gate
  * themselves on the `at-cookie-consent` DOM event / window.atCookieConsent.choice.
@@ -28,6 +30,7 @@ class AT_Woo_GF_Cookie_Consent {
 	const DETECTED    = 'at_woo_gf_cookie_detected';
 	const COOKIE_NAME = 'at_cookie_consent';
 	const NONCE       = 'at_woo_gf_integration_nonce';
+	const SHORTCODE   = 'haruv_cookie_list';
 
 	public static function get_instance() {
 		if ( null === self::$instance ) {
@@ -45,6 +48,12 @@ class AT_Woo_GF_Cookie_Consent {
 		// Frontend.
 		add_action( 'wp_enqueue_scripts', array( $this, 'frontend_assets' ) );
 		add_action( 'wp_footer', array( $this, 'render_banner' ) );
+
+		// Public cookie-list table. Registered unconditionally so the shortcode
+		// still resolves when the banner itself is switched off — a cookie
+		// policy page must keep working either way.
+		add_action( 'wp_enqueue_scripts', array( $this, 'register_list_assets' ) );
+		add_shortcode( self::SHORTCODE, array( $this, 'render_cookie_list' ) );
 
 		// AJAX (visitors are logged-out → need nopriv too).
 		add_action( 'wp_ajax_at_cookie_consent_save', array( $this, 'ajax_save' ) );
@@ -355,6 +364,142 @@ class AT_Woo_GF_Cookie_Consent {
 			return;
 		}
 		include AT_WOO_GF_INTEGRATION_PATH . 'includes/views/cookie-consent-banner.php';
+	}
+
+	/* ── [haruv_cookie_list] shortcode ─────────────────────────────────── */
+
+	/**
+	 * Register the list stylesheet, and enqueue it up-front when the shortcode
+	 * is present in the queried post's content.
+	 *
+	 * The callback enqueues it too (covering widgets, blocks and template
+	 * calls), but a stylesheet enqueued mid-`the_content` only prints in the
+	 * footer — catching the common case here avoids that flash.
+	 */
+	public function register_list_assets() {
+		if ( is_admin() ) {
+			return;
+		}
+
+		wp_register_style(
+			'at-cookie-list',
+			AT_WOO_GF_INTEGRATION_URL . 'assets/css/cookie-list.css',
+			array(),
+			AT_WOO_GF_INTEGRATION_VERSION
+		);
+
+		$post = get_post();
+		if ( $post instanceof WP_Post && has_shortcode( $post->post_content, self::SHORTCODE ) ) {
+			wp_enqueue_style( 'at-cookie-list' );
+		}
+	}
+
+	/**
+	 * The cookie definitions rendered by the shortcode.
+	 *
+	 * Reads the *same* source of truth as the banner and preferences modal —
+	 * the saved `at_woo_gf_cookie_settings` registry, falling back to
+	 * `default_cookies()` — so the published list can never drift away from
+	 * what the consent manager actually governs.
+	 *
+	 * @param array $atts Raw shortcode attributes, forwarded to the filter.
+	 * @return array<int,array<string,string>> Cookie definitions.
+	 */
+	public function get_cookie_list_items( $atts = array() ) {
+		$cookies = array_values( $this->get_settings()['cookies'] );
+
+		/**
+		 * Filter the cookie definitions rendered by [haruv_cookie_list].
+		 *
+		 * Lets a theme or site-fixes plugin append, remove or relabel entries
+		 * without editing this plugin. Each item is an array with the keys
+		 * `name`, `category`, `provider`, `purpose` and `expiry`; `category`
+		 * should match a key from `default_categories()` (`necessary`,
+		 * `functional`, `analytics`, `marketing`).
+		 *
+		 * @param array $cookies Cookie definitions from the registry.
+		 * @param array $atts    Raw shortcode attributes.
+		 */
+		$cookies = apply_filters( 'haruv_cookie_list_items', $cookies, $atts );
+
+		return is_array( $cookies ) ? $cookies : array();
+	}
+
+	/**
+	 * Normalize a cookie definition to the five keys the table renders.
+	 *
+	 * @param mixed $cookie Raw registry entry.
+	 * @return array|null Normalized entry, or null when unusable.
+	 */
+	private function normalize_cookie( $cookie ) {
+		if ( ! is_array( $cookie ) || empty( $cookie['name'] ) ) {
+			return null;
+		}
+		return array(
+			'name'     => (string) $cookie['name'],
+			'category' => isset( $cookie['category'] ) ? (string) $cookie['category'] : 'necessary',
+			'provider' => isset( $cookie['provider'] ) ? (string) $cookie['provider'] : '',
+			'purpose'  => isset( $cookie['purpose'] ) ? (string) $cookie['purpose'] : '',
+			'expiry'   => isset( $cookie['expiry'] ) ? (string) $cookie['expiry'] : '',
+		);
+	}
+
+	/**
+	 * Render `[haruv_cookie_list]` — the public cookie table.
+	 *
+	 * Attributes are intentionally left free-form: they are not consumed here,
+	 * only forwarded to the `haruv_cookie_list_items` filter so an extension
+	 * can define its own (e.g. `category="analytics"`).
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 * @return string Table markup.
+	 */
+	public function render_cookie_list( $atts = array() ) {
+		$atts = is_array( $atts ) ? $atts : array();
+
+		wp_enqueue_style( 'at-cookie-list' );
+
+		$settings   = $this->get_settings();
+		$categories = is_array( $settings['categories'] ) ? $settings['categories'] : array();
+
+		// Bucket by category so the table reads in a stable, meaningful order
+		// (necessary first) rather than registry insertion order.
+		$by_cat = array();
+		foreach ( $this->get_cookie_list_items( $atts ) as $cookie ) {
+			$cookie = $this->normalize_cookie( $cookie );
+			if ( null === $cookie ) {
+				continue;
+			}
+			$by_cat[ $cookie['category'] ][] = $cookie;
+		}
+
+		// Known categories in their declared order, then any stragglers whose
+		// category was removed from the settings (they must still be disclosed).
+		$ordered = array();
+		foreach ( array_keys( $categories ) as $key ) {
+			if ( ! empty( $by_cat[ $key ] ) ) {
+				$ordered[ $key ] = $by_cat[ $key ];
+				unset( $by_cat[ $key ] );
+			}
+		}
+		foreach ( $by_cat as $key => $list ) {
+			$ordered[ $key ] = $list;
+		}
+
+		// Only show the provider column when the data actually exists.
+		$has_provider = false;
+		foreach ( $ordered as $list ) {
+			foreach ( $list as $cookie ) {
+				if ( '' !== $cookie['provider'] ) {
+					$has_provider = true;
+					break 2;
+				}
+			}
+		}
+
+		ob_start();
+		include AT_WOO_GF_INTEGRATION_PATH . 'includes/views/cookie-list.php';
+		return ob_get_clean();
 	}
 
 	/* ── AJAX ──────────────────────────────────────────────────────────── */
