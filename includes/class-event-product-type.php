@@ -226,12 +226,18 @@ class WooGF_Event_Product_Type {
 					<?php
 					$form_id = $product->get_meta( '_woo_gf_form_id', true );
 					if ( $form_id && class_exists( 'GFAPI' ) ) {
+						// Entries are stored against the canonical translation, so
+						// every language's edit screen reports the shared count.
+						$count_product_id = function_exists( 'woo_gf_get_canonical_product_id' )
+							? woo_gf_get_canonical_product_id( $post->ID )
+							: $post->ID;
+
 						$search_criteria = array(
 							'status' => 'active',
 							'field_filters' => array(
 								array(
 									'key'   => 'woo_gf_product_id',
-									'value' => $post->ID,
+									'value' => $count_product_id,
 								),
 							),
 						);

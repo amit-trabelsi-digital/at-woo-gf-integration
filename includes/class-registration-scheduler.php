@@ -158,8 +158,20 @@ class Woo_GF_Registration_Scheduler {
             return;
         }
 
+        // Entries are stored against the canonical translation. Only that
+        // product sends the digest, otherwise a he/en/ar event would mail the
+        // same CSV three times (Polylang syncs `_woo_gf_notification_email`).
+        $product_id = $product->get_id();
+        if ( function_exists( 'woo_gf_get_canonical_product_id' ) ) {
+            $canonical_id = woo_gf_get_canonical_product_id( $product_id );
+            if ( $canonical_id !== $product_id ) {
+                return;
+            }
+            $product_id = $canonical_id;
+        }
+
         // Get entries
-        $search_criteria = array( 'status' => 'active', 'field_filters' => array( array( 'key' => 'woo_gf_product_id', 'value' => $product->get_id() ) ) );
+        $search_criteria = array( 'status' => 'active', 'field_filters' => array( array( 'key' => 'woo_gf_product_id', 'value' => $product_id ) ) );
         $entries = GFAPI::get_entries( $form_id, $search_criteria, null, array( 'page_size' => 1000 ) );
         
         if ( empty( $entries ) ) {

@@ -1,7 +1,7 @@
 {
   "name": "AT - WooCommerce Gravity Forms Integration",
   "slug": "at-woo-gf-integration",
-  "version": "2.13.3",
+  "version": "2.15.0",
   "author": "Amit Trabelsi",
   "author_profile": "https://amit-trabelsi-digital.com/",
   "requires": "6.0",

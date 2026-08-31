@@ -434,12 +434,14 @@ class Woo_GF_Product_Form_Metabox {
                             }
                             
                             if ( $max_attendees > 0 && $selected_form ) {
-                                // Count ALL entries (not just active) for this product
+                                // Count ALL entries (not just active) for this product.
+                                // Entries live on the canonical translation, so every
+                                // language's edit screen shows the shared total.
                                 $search_criteria_with_meta = array(
                                     'field_filters' => array(
                                         array(
                                             'key'   => 'woo_gf_product_id',
-                                            'value' => $post->ID,
+                                            'value' => $this->canonical_product_id( $post->ID ),
                                         ),
                                     ),
                                 );
@@ -654,35 +656,84 @@ class Woo_GF_Product_Form_Metabox {
 
     /**
      * Save product ID to entry meta when form is submitted
+     *
+     * The stored ID is normalised to the translation group's canonical product
+     * ( woo_gf_get_canonical_product_id() ), so a registration made on the
+     * Arabic or English page counts against the same capacity pool as the
+     * Hebrew one. The Polylang language the form was actually submitted in is
+     * stamped separately on `woo_gf_entry_lang` so notifications can still be
+     * sent in the registrant's own language.
      */
     public function save_product_id_to_entry( $entry, $form ) {
         // Check if we're on a product page
         if ( is_product() ) {
             global $post;
-            
+
             if ( $post && 'product' === $post->post_type ) {
                 // Check if this form is associated with the current product
                 $product = wc_get_product( $post->ID );
                 $form_id = $product ? $product->get_meta( '_woo_gf_form_id', true ) : '';
-                
+
                 if ( $form_id == $form['id'] ) {
                     // Save product ID to entry meta
-                    gform_update_meta( $entry['id'], 'woo_gf_product_id', $post->ID );
+                    gform_update_meta( $entry['id'], 'woo_gf_product_id', $this->canonical_product_id( $post->ID ) );
+                    $this->save_entry_language( $entry );
                 }
             }
         }
-        
+
         // Also check if form was submitted via AJAX with product ID parameter
         if ( isset( $_POST['woo_gf_product_id'] ) ) {
             $product_id = intval( $_POST['woo_gf_product_id'] );
-            
+
             // Verify this product has this form associated
             $product = wc_get_product( $product_id );
             $form_id = $product ? $product->get_meta( '_woo_gf_form_id', true ) : '';
-            
+
             if ( $form_id == $form['id'] ) {
-                gform_update_meta( $entry['id'], 'woo_gf_product_id', $product_id );
+                gform_update_meta( $entry['id'], 'woo_gf_product_id', $this->canonical_product_id( $product_id ) );
+                $this->save_entry_language( $entry );
             }
         }
+    }
+
+    /**
+     * Normalise a product ID to its translation group's canonical product.
+     *
+     * Falls back to the raw ID when the waitlist include (which owns the
+     * helper) is unavailable, so the metabox never fatals on its own.
+     *
+     * @param int $product_id Product ID.
+     * @return int
+     */
+    private function canonical_product_id( $product_id ) {
+        if ( function_exists( 'woo_gf_get_canonical_product_id' ) ) {
+            return woo_gf_get_canonical_product_id( $product_id );
+        }
+
+        return absint( $product_id );
+    }
+
+    /**
+     * Stamp the Polylang language the entry was submitted in.
+     *
+     * Consumed by the notification layer to reply in the registrant's language.
+     * Stores the language slug ( he / en / ar ). No-op without Polylang.
+     *
+     * @param array $entry Gravity Forms entry.
+     * @return void
+     */
+    private function save_entry_language( $entry ) {
+        if ( empty( $entry['id'] ) || ! function_exists( 'pll_current_language' ) ) {
+            return;
+        }
+
+        $lang = pll_current_language();
+
+        if ( ! $lang ) {
+            return;
+        }
+
+        gform_update_meta( $entry['id'], 'woo_gf_entry_lang', sanitize_key( $lang ) );
     }
 } 

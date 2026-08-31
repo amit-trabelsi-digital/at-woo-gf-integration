@@ -221,9 +221,15 @@ class WooGF_Event_Attendees_Limit {
 	 * Get current attendees count.
 	 */
 	private function get_current_attendees_count( $product_id ) {
+		// Normalise to the canonical translation so all language pages of the
+		// same event share one capacity pool. See HRV-F166.
+		if ( function_exists( 'woo_gf_get_canonical_product_id' ) ) {
+			$product_id = woo_gf_get_canonical_product_id( $product_id );
+		}
+
 		$product = wc_get_product( $product_id );
 		$form_id = $product ? get_post_meta( $product_id, '_woo_gf_form_id', true ) : '';
-		
+
 		if ( ! $form_id || ! class_exists( 'GFAPI' ) ) {
 			return 0;
 		}

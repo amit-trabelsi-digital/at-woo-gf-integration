@@ -15,12 +15,74 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'WOO_GF_EVENT_WAITLIST_META_KEY', '_event_waitlist_entries' );
 
 /**
+ * Resolve the canonical product ID for an event's translation group.
+ *
+ * Polylang stores every translation of an event as a separate product post with
+ * its own ID. Registrations are recorded against the product ID of the page the
+ * form was submitted from, so without normalisation a 50-seat event published in
+ * he + en + ar would accept 50 registrations per language and never flip to
+ * "full". Every read and write of the registration / waitlist pool funnels the
+ * product ID through this function so all languages share ONE pool.
+ *
+ * Rule: the translation in Polylang's default language wins. If the group has no
+ * entry for the default language, the LOWEST ID in the group is used so the
+ * result is deterministic. Without Polylang (or for an untranslated product) the
+ * ID is returned unchanged, so behaviour on a non-Polylang site is identical to
+ * before.
+ *
+ * Memoised per request — this runs on every event card render in archives.
+ *
+ * @param int $product_id Product ID.
+ * @return int Canonical product ID.
+ */
+function woo_gf_get_canonical_product_id( $product_id ) {
+	$product_id = absint( $product_id );
+
+	if ( ! $product_id || ! function_exists( 'pll_get_post_translations' ) ) {
+		return $product_id;
+	}
+
+	static $cache = array();
+
+	if ( isset( $cache[ $product_id ] ) ) {
+		return $cache[ $product_id ];
+	}
+
+	$translations = pll_get_post_translations( $product_id );
+
+	if ( ! is_array( $translations ) || empty( $translations ) ) {
+		$cache[ $product_id ] = $product_id;
+		return $product_id;
+	}
+
+	$canonical    = 0;
+	$default_lang = function_exists( 'pll_default_language' ) ? pll_default_language() : '';
+
+	if ( $default_lang && ! empty( $translations[ $default_lang ] ) ) {
+		$canonical = absint( $translations[ $default_lang ] );
+	}
+
+	if ( ! $canonical ) {
+		$ids = array_filter( array_map( 'absint', array_values( $translations ) ) );
+		if ( ! empty( $ids ) ) {
+			$canonical = min( $ids );
+		}
+	}
+
+	$cache[ $product_id ] = $canonical ? $canonical : $product_id;
+
+	return $cache[ $product_id ];
+}
+
+/**
  * Whether waitlist is enabled for a product.
  *
  * @param int $product_id Product ID.
  * @return bool
  */
 function woo_gf_is_waitlist_enabled( $product_id ) {
+	$product_id = woo_gf_get_canonical_product_id( $product_id );
+
 	$enabled = function_exists( 'get_field' )
 		? get_field( 'enable_waitlist', $product_id )
 		: get_post_meta( $product_id, 'enable_waitlist', true );
@@ -35,7 +97,7 @@ function woo_gf_is_waitlist_enabled( $product_id ) {
  * @return array<int,array<string,mixed>>
  */
 function woo_gf_get_waitlist_entries( $product_id ) {
-	$entries = get_post_meta( absint( $product_id ), WOO_GF_EVENT_WAITLIST_META_KEY, true );
+	$entries = get_post_meta( woo_gf_get_canonical_product_id( $product_id ), WOO_GF_EVENT_WAITLIST_META_KEY, true );
 	return is_array( $entries ) ? $entries : array();
 }
 
@@ -52,11 +114,16 @@ function woo_gf_get_waitlist_count( $product_id ) {
 /**
  * Get registration count for an event product.
  *
+ * The product ID is normalised to the translation group's canonical product, so
+ * registrations submitted from any language page count against one shared pool.
+ * The transient key is built from the canonical ID for the same reason — three
+ * per-language caches would flip the event to "full" at three different times.
+ *
  * @param int $product_id Product ID.
  * @return int
  */
 function woo_gf_get_registration_count( $product_id ) {
-	$product_id = absint( $product_id );
+	$product_id = woo_gf_get_canonical_product_id( $product_id );
 	$form_id    = get_post_meta( $product_id, '_woo_gf_form_id', true );
 
 	if ( ! $form_id || ! class_exists( 'GFAPI' ) ) {
@@ -94,11 +161,15 @@ function woo_gf_get_registration_count( $product_id ) {
  * button until the transient expires. Call this whenever a registration is
  * created or removed for the event's form.
  *
+ * The ID is normalised to the canonical product first, so it deletes the same
+ * key woo_gf_get_registration_count() writes no matter which language page the
+ * registration came from.
+ *
  * @param int $product_id Product ID.
  * @return void
  */
 function woo_gf_flush_registration_count( $product_id ) {
-	$product_id = absint( $product_id );
+	$product_id = woo_gf_get_canonical_product_id( $product_id );
 	if ( ! $product_id ) {
 		return;
 	}
@@ -114,7 +185,10 @@ function woo_gf_flush_registration_count( $product_id ) {
  * Flush the registration-count cache when a Gravity Forms entry is submitted.
  *
  * Fires late (priority 20) so the entry's woo_gf_product_id meta (set at
- * priority 10 by the product-form metabox) is already stored.
+ * priority 10 by the product-form metabox) is already stored. Whichever of the
+ * three sources below resolves the ID, woo_gf_flush_registration_count()
+ * normalises it to the canonical product, so a submission from any language
+ * page clears the one shared transient.
  *
  * @param array $entry Gravity Forms entry.
  * @param array $form  Gravity Forms form.
@@ -147,12 +221,15 @@ add_action( 'gform_after_submission', 'woo_gf_flush_registration_count_on_submis
 /**
  * Add waitlist entry.
  *
+ * Stored against the canonical product so the three language pages share one
+ * waitlist (and one duplicate-email check) rather than one list each.
+ *
  * @param int   $product_id Product ID.
  * @param array $data       Entry data.
  * @return true|WP_Error
  */
 function woo_gf_add_waitlist_entry( $product_id, $data ) {
-	$product_id = absint( $product_id );
+	$product_id = woo_gf_get_canonical_product_id( $product_id );
 	$name       = isset( $data['name'] ) ? sanitize_text_field( $data['name'] ) : '';
 	$email      = isset( $data['email'] ) ? sanitize_email( $data['email'] ) : '';
 	$phone      = isset( $data['phone'] ) ? sanitize_text_field( $data['phone'] ) : '';

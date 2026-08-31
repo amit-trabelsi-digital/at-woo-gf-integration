@@ -785,13 +785,14 @@ class Woo_GF_Registration_Dashboard {
             $form_id = $wc_product->get_meta( '_woo_gf_form_id', true );
             if ( ! $form_id ) continue;
             
-            // Get registrations count
+            // Get registrations count. Entries are stored against the canonical
+            // translation, so every language of the event reports one pool.
             $search_criteria = array(
                 'status' => 'active',
                 'field_filters' => array(
                     array(
                         'key' => 'woo_gf_product_id',
-                        'value' => $product->ID,
+                        'value' => $this->canonical_product_id( $product->ID ),
                     ),
                 ),
             );
@@ -1135,12 +1136,12 @@ class Woo_GF_Registration_Dashboard {
         }
         
         // Get ALL entries from this form, not just active ones
-        // First try with product_id meta filter
+        // First try with product_id meta filter (canonical translation)
         $search_criteria = array(
             'field_filters' => array(
                 array(
                     'key' => 'woo_gf_product_id',
-                    'value' => $event_id,
+                    'value' => $this->canonical_product_id( $event_id ),
                 ),
             ),
         );
@@ -1522,11 +1523,12 @@ class Woo_GF_Registration_Dashboard {
             }
         }
         
-        // Product ID filter (if selected in dropdown)
+        // Product ID filter (if selected in dropdown). Normalised so picking a
+        // translated event still matches the entries stored on the canonical one.
         if ( ! empty( $_GET['product_id'] ) ) {
             $search_criteria['field_filters'][] = array(
                 'key'   => 'woo_gf_product_id',
-                'value' => intval( $_GET['product_id'] ),
+                'value' => $this->canonical_product_id( intval( $_GET['product_id'] ) ),
             );
         }
         
@@ -1692,6 +1694,25 @@ class Woo_GF_Registration_Dashboard {
     }
 
     /**
+     * Normalise a product ID to its translation group's canonical product.
+     *
+     * Registrations for a multilingual event are all stored against the
+     * canonical (default-language) product, so every dashboard read has to look
+     * them up by that ID. Falls back to the raw ID when the waitlist include
+     * (which owns the helper) is unavailable.
+     *
+     * @param int $product_id Product ID.
+     * @return int
+     */
+    private function canonical_product_id( $product_id ) {
+        if ( function_exists( 'woo_gf_get_canonical_product_id' ) ) {
+            return woo_gf_get_canonical_product_id( $product_id );
+        }
+
+        return absint( $product_id );
+    }
+
+    /**
      * Get product by entry
      */
     private function get_product_by_entry( $entry ) {
@@ -1727,6 +1748,11 @@ class Woo_GF_Registration_Dashboard {
      * Get registrations count for a specific form and product (with caching)
      */
     private function get_registration_count( $form_id, $product_id ) {
+        // Normalise to the canonical translation: entries are stored against it,
+        // and woo_gf_flush_registration_count() clears the canonical key. Using
+        // the raw ID here would leave a per-language cache nothing invalidates.
+        $product_id = $this->canonical_product_id( $product_id );
+
         // Use transient cache for 2 minutes
         $cache_key = 'woo_gf_reg_count_' . $form_id . '_' . $product_id;
         $count = get_transient( $cache_key );
@@ -2082,12 +2108,12 @@ class Woo_GF_Registration_Dashboard {
         }
         
         // Get ALL entries from this form (not just active)
-        // First try with product_id meta filter
+        // First try with product_id meta filter (canonical translation)
         $search_criteria = array(
             'field_filters' => array(
                 array(
                     'key' => 'woo_gf_product_id',
-                    'value' => $product_id,
+                    'value' => $this->canonical_product_id( $product_id ),
                 ),
             ),
         );
@@ -2469,12 +2495,12 @@ class Woo_GF_Registration_Dashboard {
         }
         
         // Get all entries for this form/product combination
-        // First try with product_id meta filter
+        // First try with product_id meta filter (canonical translation)
         $search_criteria = array(
             'field_filters' => array(
                 array(
                     'key' => 'woo_gf_product_id',
-                    'value' => $product_id,
+                    'value' => $this->canonical_product_id( $product_id ),
                 ),
             ),
         );

@@ -88,12 +88,17 @@ class Woo_GF_Ajax_Handler {
         // Try to filter by product if provided, but if no entries found, show all
         $entries_found_with_product_filter = false;
         if ( $product_id ) {
-            // First try with product filter
+            // First try with product filter. Entries for a multilingual event are
+            // stored against the canonical translation, so normalise before filtering.
+            $filter_product_id = function_exists( 'woo_gf_get_canonical_product_id' )
+                ? woo_gf_get_canonical_product_id( $product_id )
+                : $product_id;
+
             $test_criteria = array(
                 'field_filters' => array(
                     array(
                         'key' => 'woo_gf_product_id',
-                        'value' => $product_id,
+                        'value' => $filter_product_id,
                         'operator' => '=',
                     ),
                 ),
